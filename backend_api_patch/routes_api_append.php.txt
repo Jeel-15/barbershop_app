@@ -1,0 +1,256 @@
+
+/*
+|--------------------------------------------------------------------------
+| Mobile app API (v1) - admin & staff
+|--------------------------------------------------------------------------
+| Additive only: nothing above or in routes/web.php is touched.
+| Own middleware (not the `auth:` / `throttle:` aliases) so every response,
+| including 401/403/422/429, uses the same JSON envelope.
+*/
+Route::prefix('v1')
+    // Laravel's default 'throttle:api' (60/min) answers outside our JSON envelope; we use ApiRateLimit instead.
+    ->withoutMiddleware('throttle:api')
+    ->middleware([
+        \App\Http\Middleware\Api\ForceJson::class,
+        \App\Http\Middleware\Api\ApiRequestLog::class,
+        \App\Http\Middleware\Api\ApiEnvelope::class,
+    ])
+    ->group(function () {
+        $rl = \App\Http\Middleware\Api\ApiRateLimit::class;
+        $can = \App\Http\Middleware\Api\RequirePermission::class;
+
+        // ---- Public
+        Route::get('health', [\App\Http\Controllers\Api\V1\HealthController::class, 'index']);
+
+        Route::post('auth/login', [\App\Http\Controllers\Api\V1\AuthController::class, 'login'])
+            ->middleware($rl . ':login,10,60,email');
+
+        // Forgot password (same limits as the web: 5/min per email, 10/min OTP check, 3 resends per 10 min)
+        Route::post('auth/forgot-password', [\App\Http\Controllers\Api\V1\PasswordResetController::class, 'forgot'])
+            ->middleware($rl . ':forgot,5,60,email');
+        Route::post('auth/verify-otp', [\App\Http\Controllers\Api\V1\PasswordResetController::class, 'verify'])
+            ->middleware($rl . ':verify,10,60');
+        Route::post('auth/resend-otp', [\App\Http\Controllers\Api\V1\PasswordResetController::class, 'resend'])
+            ->middleware($rl . ':resend,3,600,email');
+        Route::post('auth/reset-password', [\App\Http\Controllers\Api\V1\PasswordResetController::class, 'reset'])
+            ->middleware($rl . ':reset,5,60,email');
+
+        // ---- Signed in
+        // 240 requests per minute per user (the app fires several calls per screen)
+        Route::middleware([\App\Http\Middleware\Api\ApiAuthenticate::class, $rl . ':api,240,60'])->group(function () use ($can) {
+            Route::get('auth/me', [\App\Http\Controllers\Api\V1\AuthController::class, 'me']);
+            Route::post('auth/logout', [\App\Http\Controllers\Api\V1\AuthController::class, 'logout']);
+            Route::post('auth/logout-all', [\App\Http\Controllers\Api\V1\AuthController::class, 'logoutAll']);
+
+            Route::get('bootstrap', [\App\Http\Controllers\Api\V1\BootstrapController::class, 'index']);
+
+            // ME - own profile (web: any signed-in user)
+            Route::get('me/profile', [\App\Http\Controllers\Api\V1\ProfileController::class, 'show']);
+            Route::post('me/profile', [\App\Http\Controllers\Api\V1\ProfileController::class, 'update']);
+
+            // DASH (web: each block is gated by its own permission)
+            Route::get('dashboard/summary', [\App\Http\Controllers\Api\V1\DashboardController::class, 'summary'])
+                ->middleware($can . ':Dashboard-Today_Appointments,Dashboard-Upcoming_Appointments,Dashboard-Top_Services,Dashboard-Top_Staff');
+            Route::get('dashboard/today', [\App\Http\Controllers\Api\V1\DashboardController::class, 'today'])
+                ->middleware($can . ':Dashboard-Today_Appointments');
+            Route::get('dashboard/upcoming', [\App\Http\Controllers\Api\V1\DashboardController::class, 'upcoming'])
+                ->middleware($can . ':Dashboard-Upcoming_Appointments');
+
+            // APPT (web: Appointment-View)
+            Route::middleware($can . ':Appointment-View')->group(function () {
+                Route::get('appointments', [\App\Http\Controllers\Api\V1\AppointmentController::class, 'index']);
+                Route::get('appointments/counts', [\App\Http\Controllers\Api\V1\AppointmentController::class, 'counts']);
+                Route::get('appointments/{id}', [\App\Http\Controllers\Api\V1\AppointmentController::class, 'show'])->whereNumber('id');
+                Route::post('appointments/{id}/confirm', [\App\Http\Controllers\Api\V1\AppointmentController::class, 'confirm'])->whereNumber('id');
+                Route::post('appointments/{id}/cancel', [\App\Http\Controllers\Api\V1\AppointmentController::class, 'cancel'])->whereNumber('id');
+                Route::post('appointments/{id}/reschedule', [\App\Http\Controllers\Api\V1\AppointmentController::class, 'reschedule'])->whereNumber('id');
+            });
+
+            // Slot finder and "who can do these services": used by the reschedule dialog (Appointment-View)
+            // and by the calendar booking form (Calender-View), and the web gates them with login only.
+            Route::middleware($can . ':Appointment-View,Calender-View')->group(function () {
+                Route::get('appointments/slots', [\App\Http\Controllers\Api\V1\AppointmentController::class, 'slots']);
+                Route::get('appointments/staff-by-service', [\App\Http\Controllers\Api\V1\AppointmentController::class, 'staffByService']);
+            });
+
+            // CAL + booking from the calendar (web: Calender-View)
+            Route::middleware($can . ':Calender-View')->group(function () {
+                Route::get('calendar/events', [\App\Http\Controllers\Api\V1\CalendarController::class, 'events']);
+                Route::get('calendar/availability', [\App\Http\Controllers\Api\V1\CalendarController::class, 'availability']);
+                Route::get('calendar/booking-options', [\App\Http\Controllers\Api\V1\CalendarController::class, 'bookingOptions']);
+                Route::post('calendar/breaks', [\App\Http\Controllers\Api\V1\CalendarController::class, 'addBreak']);
+                Route::post('appointments', [\App\Http\Controllers\Api\V1\AppointmentController::class, 'store']);
+                Route::put('appointments/{id}', [\App\Http\Controllers\Api\V1\AppointmentController::class, 'update'])->whereNumber('id');
+            });
+
+            // ME - own working hours (web: staff only + Calender-View)
+            Route::middleware([\App\Http\Middleware\Api\RequireStaff::class, $can . ':Calender-View'])->group(function () {
+                Route::get('me/working-hours', [\App\Http\Controllers\Api\V1\WorkingHoursController::class, 'index']);
+                Route::post('me/working-hours', [\App\Http\Controllers\Api\V1\WorkingHoursController::class, 'store']);
+                Route::put('me/working-hours/days/{slotId}/day-off', [\App\Http\Controllers\Api\V1\WorkingHoursController::class, 'dayOff'])->whereNumber('slotId');
+                Route::put('me/working-hours/{id}', [\App\Http\Controllers\Api\V1\WorkingHoursController::class, 'update'])->whereNumber('id');
+                Route::delete('me/working-hours/{id}', [\App\Http\Controllers\Api\V1\WorkingHoursController::class, 'destroy'])->whereNumber('id');
+            });
+
+            // DASH 4-6 (web: login only; the page shows each block with its own permission)
+            Route::get('dashboard/top-services', [\App\Http\Controllers\Api\V1\DashboardController::class, 'topServices'])
+                ->middleware($can . ':Dashboard-Top_Services');
+            Route::get('dashboard/staff-performance', [\App\Http\Controllers\Api\V1\DashboardController::class, 'staffPerformance'])
+                ->middleware($can . ':Dashboard-Top_Services,Dashboard-Top_Staff');
+            Route::get('dashboard/top-products', [\App\Http\Controllers\Api\V1\DashboardController::class, 'topProducts'])
+                ->middleware($can . ':Dashboard-Top_Selling_Product');
+
+            // CUST (web: Customer-Add|Edit|Delete; writes need their own permission)
+            Route::middleware($can . ':Customer-Add,Customer-Edit,Customer-Delete')->group(function () use ($can) {
+                Route::get('customers', [\App\Http\Controllers\Api\V1\CustomerController::class, 'index']);
+                Route::get('customers/{id}', [\App\Http\Controllers\Api\V1\CustomerController::class, 'show'])->whereNumber('id');
+                Route::get('customers/{id}/appointments', [\App\Http\Controllers\Api\V1\CustomerController::class, 'appointments'])->whereNumber('id');
+                Route::post('customers', [\App\Http\Controllers\Api\V1\CustomerController::class, 'store'])->middleware($can . ':Customer-Add');
+                Route::put('customers/{id}', [\App\Http\Controllers\Api\V1\CustomerController::class, 'update'])->whereNumber('id')->middleware($can . ':Customer-Edit');
+                Route::delete('customers/{id}', [\App\Http\Controllers\Api\V1\CustomerController::class, 'destroy'])->whereNumber('id')->middleware($can . ':Customer-Delete');
+            });
+
+            // ME - own earnings report (web: staff only + Report-View)
+            Route::middleware([\App\Http\Middleware\Api\RequireStaff::class, $can . ':Report-View'])->group(function () {
+                Route::get('me/report/summary', [\App\Http\Controllers\Api\V1\StaffReportController::class, 'summary']);
+                Route::get('me/report/earnings', [\App\Http\Controllers\Api\V1\StaffReportController::class, 'earnings']);
+                Route::get('me/report/services', [\App\Http\Controllers\Api\V1\StaffReportController::class, 'services']);
+                Route::get('me/report/appointments', [\App\Http\Controllers\Api\V1\StaffReportController::class, 'appointments']);
+            });
+
+            // POS / invoices (web: Pos_invoice-Add|Edit|Show_All; staff without Show_All see only their own invoices)
+            Route::middleware($can . ':Pos_invoice-Add,Pos_invoice-Edit')->group(function () {
+                Route::get('pos/catalog', [\App\Http\Controllers\Api\V1\PosController::class, 'catalog']);
+                Route::get('pos/customer-lookup', [\App\Http\Controllers\Api\V1\PosController::class, 'customerLookup']);
+                Route::post('invoices/preview', [\App\Http\Controllers\Api\V1\PosController::class, 'preview']);
+                Route::post('invoices/{id}/email', [\App\Http\Controllers\Api\V1\InvoiceController::class, 'email'])->whereNumber('id');
+            });
+            Route::middleware($can . ':Pos_invoice-Add,Pos_invoice-Edit,Pos_invoice-Show_All')->group(function () {
+                Route::get('invoices', [\App\Http\Controllers\Api\V1\InvoiceController::class, 'index']);
+                Route::get('invoices/{id}', [\App\Http\Controllers\Api\V1\InvoiceController::class, 'show'])->whereNumber('id');
+            });
+            Route::post('invoices', [\App\Http\Controllers\Api\V1\InvoiceController::class, 'store'])->middleware($can . ':Pos_invoice-Add');
+            Route::post('appointments/{id}/complete', [\App\Http\Controllers\Api\V1\InvoiceController::class, 'complete'])->whereNumber('id')->middleware($can . ':Pos_invoice-Add');   // APPT-11, feature flag
+            Route::put('invoices/{id}', [\App\Http\Controllers\Api\V1\InvoiceController::class, 'update'])->whereNumber('id')->middleware($can . ':Pos_invoice-Edit');
+
+            // CAT-2 categories (the list also feeds the service and product forms)
+            Route::get('service-categories', [\App\Http\Controllers\Api\V1\CatalogController::class, 'categories'])
+                ->middleware($can . ':Service_Category-Add,Service_Category-Edit,Service_Category-Delete,Service-Add,Service-Edit,Service-Delete,Product-Add,Product-Edit,Product-Delete');
+            Route::middleware($can . ':Service_Category-Add,Service_Category-Edit,Service_Category-Delete')->group(function () use ($can) {
+                Route::get('service-categories/{id}', [\App\Http\Controllers\Api\V1\CatalogController::class, 'category'])->whereNumber('id');
+                Route::post('service-categories', [\App\Http\Controllers\Api\V1\CatalogController::class, 'createCategory'])->middleware($can . ':Service_Category-Add');
+                Route::match(['put', 'post'], 'service-categories/{id}', [\App\Http\Controllers\Api\V1\CatalogController::class, 'updateCategory'])->whereNumber('id')->middleware($can . ':Service_Category-Edit');
+                Route::delete('service-categories/{id}', [\App\Http\Controllers\Api\V1\CatalogController::class, 'deleteCategory'])->whereNumber('id')->middleware($can . ':Service_Category-Delete');
+            });
+
+            // CAT-1 services
+            Route::middleware($can . ':Service-Add,Service-Edit,Service-Delete')->group(function () use ($can) {
+                Route::get('services', [\App\Http\Controllers\Api\V1\CatalogController::class, 'services']);
+                Route::get('services/{id}', [\App\Http\Controllers\Api\V1\CatalogController::class, 'service'])->whereNumber('id');
+                Route::post('services', [\App\Http\Controllers\Api\V1\CatalogController::class, 'createService'])->middleware($can . ':Service-Add');
+                Route::match(['put', 'post'], 'services/{id}', [\App\Http\Controllers\Api\V1\CatalogController::class, 'updateService'])->whereNumber('id')->middleware($can . ':Service-Edit');
+                Route::patch('services/{id}/home-section', [\App\Http\Controllers\Api\V1\CatalogController::class, 'homeSection'])->whereNumber('id')->middleware($can . ':Service-Edit');
+                Route::delete('services/{id}', [\App\Http\Controllers\Api\V1\CatalogController::class, 'deleteService'])->whereNumber('id')->middleware($can . ':Service-Delete');
+            });
+
+            // CAT-3 products
+            Route::middleware($can . ':Product-Add,Product-Edit,Product-Delete')->group(function () use ($can) {
+                Route::get('products', [\App\Http\Controllers\Api\V1\CatalogController::class, 'products']);
+                Route::get('products/{id}', [\App\Http\Controllers\Api\V1\CatalogController::class, 'product'])->whereNumber('id');
+                Route::post('products', [\App\Http\Controllers\Api\V1\CatalogController::class, 'createProduct'])->middleware($can . ':Product-Add');
+                Route::match(['put', 'post'], 'products/{id}', [\App\Http\Controllers\Api\V1\CatalogController::class, 'updateProduct'])->whereNumber('id')->middleware($can . ':Product-Edit');
+                Route::delete('products/{id}', [\App\Http\Controllers\Api\V1\CatalogController::class, 'deleteProduct'])->whereNumber('id')->middleware($can . ':Product-Delete');
+            });
+
+            // CAT-4 GST
+            Route::middleware($can . ':Gst-Add,Gst-Edit,Gst-Delete')->group(function () use ($can) {
+                Route::get('gst', [\App\Http\Controllers\Api\V1\ShopController::class, 'gstIndex']);
+                Route::post('gst', [\App\Http\Controllers\Api\V1\ShopController::class, 'gstCreate'])->middleware($can . ':Gst-Add');
+                Route::put('gst/{id}', [\App\Http\Controllers\Api\V1\ShopController::class, 'gstUpdate'])->whereNumber('id')->middleware($can . ':Gst-Edit');
+                Route::post('gst/{id}/default', [\App\Http\Controllers\Api\V1\ShopController::class, 'gstDefault'])->whereNumber('id')->middleware($can . ':Gst-Edit');
+                Route::delete('gst/{id}', [\App\Http\Controllers\Api\V1\ShopController::class, 'gstDelete'])->whereNumber('id')->middleware($can . ':Gst-Delete');
+            });
+
+            // CAT-5 payment methods + SHOP-1 settings (web: Setting-Payment_Method)
+            Route::middleware($can . ':Setting-Payment_Method')->group(function () {
+                Route::get('payment-methods', [\App\Http\Controllers\Api\V1\ShopController::class, 'paymentIndex']);
+                Route::post('payment-methods', [\App\Http\Controllers\Api\V1\ShopController::class, 'paymentCreate']);
+                Route::put('payment-methods/{id}', [\App\Http\Controllers\Api\V1\ShopController::class, 'paymentUpdate'])->whereNumber('id');
+                Route::delete('payment-methods/{id}', [\App\Http\Controllers\Api\V1\ShopController::class, 'paymentDelete'])->whereNumber('id');
+                Route::get('settings', [\App\Http\Controllers\Api\V1\ShopController::class, 'settings']);
+                Route::put('settings/general', [\App\Http\Controllers\Api\V1\ShopController::class, 'settingsGeneral']);
+                Route::put('settings/contact', [\App\Http\Controllers\Api\V1\ShopController::class, 'settingsContact']);
+            });
+
+            // SHOP-2 opening hours (web: Slot-Update)
+            Route::middleware($can . ':Slot-Update')->group(function () {
+                Route::get('shop-hours', [\App\Http\Controllers\Api\V1\ShopController::class, 'hours']);
+                Route::put('shop-hours', [\App\Http\Controllers\Api\V1\ShopController::class, 'saveHours']);
+            });
+
+            // SHOP-3 closures
+            Route::middleware($can . ':Shop_Closures-Add,Shop_Closures-Edit,Shop_Closures-Delete')->group(function () use ($can) {
+                Route::get('shop-closures', [\App\Http\Controllers\Api\V1\ShopController::class, 'closures']);
+                Route::get('shop-closures/{id}', [\App\Http\Controllers\Api\V1\ShopController::class, 'closure'])->whereNumber('id');
+                Route::post('shop-closures', [\App\Http\Controllers\Api\V1\ShopController::class, 'closureCreate'])->middleware($can . ':Shop_Closures-Add');
+                Route::put('shop-closures/{id}', [\App\Http\Controllers\Api\V1\ShopController::class, 'closureUpdate'])->whereNumber('id')->middleware($can . ':Shop_Closures-Edit');
+                Route::delete('shop-closures/{id}', [\App\Http\Controllers\Api\V1\ShopController::class, 'closureDelete'])->whereNumber('id')->middleware($can . ':Shop_Closures-Delete');
+            });
+
+            // STAFF (web: Staff-Add|Edit|Delete; each write needs its own permission)
+            Route::middleware($can . ':Staff-Add,Staff-Edit,Staff-Delete')->group(function () use ($can) {
+                Route::get('staff', [\App\Http\Controllers\Api\V1\StaffController::class, 'index']);
+                Route::get('staff/form-options', [\App\Http\Controllers\Api\V1\StaffController::class, 'formOptions']);
+                Route::post('staff', [\App\Http\Controllers\Api\V1\StaffController::class, 'store'])->middleware($can . ':Staff-Add');
+                Route::match(['put', 'post'], 'staff/{id}', [\App\Http\Controllers\Api\V1\StaffController::class, 'update'])->whereNumber('id')->middleware($can . ':Staff-Edit');
+                Route::delete('staff/{id}', [\App\Http\Controllers\Api\V1\StaffController::class, 'destroy'])->whereNumber('id')->middleware($can . ':Staff-Delete');
+                Route::put('staff/{id}/password', [\App\Http\Controllers\Api\V1\StaffController::class, 'password'])->whereNumber('id')->middleware($can . ':Staff-Edit');
+                Route::get('staff/{id}/assigned-services', [\App\Http\Controllers\Api\V1\StaffController::class, 'assigned'])->whereNumber('id');
+                Route::put('staff/{id}/assigned-services', [\App\Http\Controllers\Api\V1\StaffController::class, 'assign'])->whereNumber('id')->middleware($can . ':Staff-Edit');
+            });
+            // STAFF profile numbers (web: the staff member themself, or Staff-Add|Edit - checked in the controller)
+            Route::get('staff/{id}', [\App\Http\Controllers\Api\V1\StaffController::class, 'show'])->whereNumber('id');
+            Route::get('staff/{id}/earnings', [\App\Http\Controllers\Api\V1\StaffController::class, 'earnings'])->whereNumber('id');
+            Route::get('staff/{id}/services', [\App\Http\Controllers\Api\V1\StaffController::class, 'services'])->whereNumber('id');
+            Route::get('staff/{id}/appointments', [\App\Http\Controllers\Api\V1\StaffController::class, 'appointments'])->whereNumber('id');
+
+            // RPT admin reports (web: Report-View and not a Staff-role user)
+            Route::middleware([\App\Http\Middleware\Api\RequireNotStaff::class, $can . ':Report-View'])->group(function () {
+                Route::get('reports/appointments', [\App\Http\Controllers\Api\V1\ReportController::class, 'appointments']);
+                Route::get('reports/payments', [\App\Http\Controllers\Api\V1\ReportController::class, 'payments']);
+                Route::get('reports/staff-earnings', [\App\Http\Controllers\Api\V1\ReportController::class, 'staffEarnings']);
+                Route::get('reports/customer-invoices', [\App\Http\Controllers\Api\V1\ReportController::class, 'customerInvoices']);
+                Route::get('reports/product-sales', [\App\Http\Controllers\Api\V1\ReportController::class, 'productSales']);
+                Route::get('reports/top-products', [\App\Http\Controllers\Api\V1\ReportController::class, 'topProducts']);
+            });
+
+            // CONT-1 testimonials
+            Route::middleware($can . ':Testimonial-Add,Testimonial-Edit,Testimonial-Delete')->group(function () use ($can) {
+                Route::get('testimonials', [\App\Http\Controllers\Api\V1\ContentController::class, 'testimonials']);
+                Route::get('testimonials/{id}', [\App\Http\Controllers\Api\V1\ContentController::class, 'testimonial'])->whereNumber('id');
+                Route::post('testimonials', [\App\Http\Controllers\Api\V1\ContentController::class, 'createTestimonial'])->middleware($can . ':Testimonial-Add');
+                Route::match(['put', 'post'], 'testimonials/{id}', [\App\Http\Controllers\Api\V1\ContentController::class, 'updateTestimonial'])->whereNumber('id')->middleware($can . ':Testimonial-Edit');
+                Route::delete('testimonials/{id}', [\App\Http\Controllers\Api\V1\ContentController::class, 'deleteTestimonial'])->whereNumber('id')->middleware($can . ':Testimonial-Delete');
+            });
+
+            // CONT-2 gallery
+            Route::middleware($can . ':Gallery-Add,Gallery-Edit,Gallery-Delete')->group(function () use ($can) {
+                Route::get('gallery', [\App\Http\Controllers\Api\V1\ContentController::class, 'gallery']);
+                Route::post('gallery', [\App\Http\Controllers\Api\V1\ContentController::class, 'addPicture'])->middleware($can . ':Gallery-Add');
+                Route::match(['put', 'post'], 'gallery/{id}', [\App\Http\Controllers\Api\V1\ContentController::class, 'replacePicture'])->whereNumber('id')->middleware($can . ':Gallery-Add,Gallery-Edit');
+                Route::delete('gallery/{id}', [\App\Http\Controllers\Api\V1\ContentController::class, 'deletePicture'])->whereNumber('id')->middleware($can . ':Gallery-Delete');
+            });
+
+            // ROLE roles and permissions (permissions themselves are not editable here)
+            Route::middleware($can . ':Role-Add,Role-Edit,Role-Delete')->group(function () use ($can) {
+                Route::get('roles', [\App\Http\Controllers\Api\V1\RoleController::class, 'index']);
+                Route::get('roles/{id}', [\App\Http\Controllers\Api\V1\RoleController::class, 'show'])->whereNumber('id');
+                Route::post('roles', [\App\Http\Controllers\Api\V1\RoleController::class, 'store'])->middleware($can . ':Role-Add');
+                Route::put('roles/{id}', [\App\Http\Controllers\Api\V1\RoleController::class, 'update'])->whereNumber('id')->middleware($can . ':Role-Edit');
+                Route::delete('roles/{id}', [\App\Http\Controllers\Api\V1\RoleController::class, 'destroy'])->whereNumber('id')->middleware($can . ':Role-Delete');
+            });
+        });
+
+        // Keep LAST: any other /api/v1/* URL gets the JSON envelope 404.
+        Route::any('{any}', \App\Http\Controllers\Api\V1\FallbackController::class)->where('any', '.*');
+    });

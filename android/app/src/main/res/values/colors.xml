@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The brand ink: the first thing drawn (launch window) and the stage of the splash. -->
+    <color name="app_ink">#0B0806</color>
+</resources>

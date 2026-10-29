@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The window while the app starts: the same ink the Flutter splash opens on, so
+     there is no white or black flash, and the status bar sits on the same colour. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/app_ink" />
+</layer-list>
