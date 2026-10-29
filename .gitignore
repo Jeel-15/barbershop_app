@@ -43,3 +43,28 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Release signing and secrets: never commit
+key.properties
+**/key.properties
+*.jks
+*.keystore
+.env
+.env.*
+google-services.json
+GoogleService-Info.plist
+
+# Debug symbols from --split-debug-info (keep private, versioned elsewhere)
+symbols/
+
+# Local database dumps and demo data backups (can hold customer data)
+*.sql
+*.sql.gz
+
+# Android local
+android/local.properties
+android/.gradle/
+android/app/.cxx/
+**/hs_err_pid*.log
+**/replay_pid*.log
+.claude/scheduled_tasks.lock
