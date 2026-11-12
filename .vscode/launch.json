@@ -1,0 +1,24 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Barbershop (phone on USB, local server)",
+      "request": "launch",
+      "type": "dart",
+      "args": [
+        "--dart-define=API_BASE_URL=http://localhost:8081/rosen_barber/public/api/v1",
+        "--dart-define=FLAVOR=dev"
+      ]
+    },
+    {
+      "name": "Barbershop (release, phone on USB, local server)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "args": [
+        "--dart-define=API_BASE_URL=http://localhost:8081/rosen_barber/public/api/v1",
+        "--dart-define=FLAVOR=dev"
+      ]
+    }
+  ]
+}

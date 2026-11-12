@@ -22,6 +22,15 @@ import '../../helpers/home_fixtures.dart';
 import '../../helpers/load_fonts.dart';
 import '../../helpers/pos_fixtures.dart';
 
+/// The save button now says "Review ...": it opens the check sheet, and Done in
+/// the sheet is what saves.
+Future<void> _reviewAndSubmit(WidgetTester tester, String button) async {
+  await tester.tap(find.widgetWithText(AppButton, button));
+  await _settle(tester);
+  await tester.tap(find.widgetWithText(AppButton, 'Done'));
+  await _settle(tester);
+}
+
 Future<void> _settle(WidgetTester tester) async {
   for (var i = 0; i < 10; i++) {
     await tester.pump(const Duration(milliseconds: 100));
@@ -94,8 +103,7 @@ void main() {
       tester,
     ) async {
       final pos = await _open(tester, appointmentId: 4);
-      await tester.tap(find.widgetWithText(AppButton, 'Complete'));
-      await _settle(tester);
+      await _reviewAndSubmit(tester, 'Review & complete');
       expect(pos.calls, ['complete:4']);
       final d = pos.drafts.single;
       expect(d.lines.map((l) => (l.id, l.staffId, l.qty)), [
@@ -127,14 +135,36 @@ void main() {
       expect(find.text(r'$54.00'), findsWidgets);
     });
 
+    testWidgets('Review shows what will be saved; Edit changes nothing, Done '
+        'saves', (tester) async {
+      final pos = await _open(tester, appointmentId: 4);
+      await tester.tap(find.widgetWithText(AppButton, 'Review & complete'));
+      await _settle(tester);
+      expect(find.text('Check the invoice'), findsOneWidget);
+      expect(find.text('CUSTOMER'), findsOneWidget);
+      expect(find.text('SERVICES'), findsOneWidget);
+      expect(find.text('PAYMENT'), findsOneWidget);
+      expect(find.text('Total Amount'), findsWidgets);
+      expect(find.text('with Mutaz'), findsWidgets);
+      // Nothing is saved while the sheet is open.
+      expect(pos.calls, isEmpty);
+
+      await tester.tap(find.widgetWithText(AppButton, 'Edit'));
+      await _settle(tester);
+      expect(find.text('Check the invoice'), findsNothing);
+      expect(pos.calls, isEmpty);
+
+      await _reviewAndSubmit(tester, 'Review & complete');
+      expect(pos.calls, ['complete:4']);
+    });
+
     testWidgets('payment method is chosen from the shop\'s methods', (
       tester,
     ) async {
       final pos = await _open(tester, appointmentId: 4);
       await tester.tap(find.text('Debit'));
       await tester.pump();
-      await tester.tap(find.widgetWithText(AppButton, 'Complete'));
-      await _settle(tester);
+      await _reviewAndSubmit(tester, 'Review & complete');
       expect(pos.drafts.single.paymentMethod, 'Debit');
     });
   });
@@ -150,7 +180,7 @@ void main() {
         find.textContaining('Click on a service to select it'),
         findsOneWidget,
       );
-      await tester.tap(find.widgetWithText(AppButton, 'Create Invoice'));
+      await tester.tap(find.widgetWithText(AppButton, 'Review invoice'));
       await _settle(tester);
       expect(find.textContaining('at least one service'), findsOneWidget);
       expect(pos.calls, isEmpty);
@@ -200,7 +230,7 @@ void main() {
 
       // No barber yet: the web's wording, and no total.
       expect(find.text('Select Staff Members'), findsWidgets);
-      await tester.tap(find.widgetWithText(AppButton, 'Create Invoice'));
+      await tester.tap(find.widgetWithText(AppButton, 'Review invoice'));
       await _settle(tester);
       expect(pos.calls, isEmpty);
       // Let the error toast go away so it does not cover the button.
@@ -209,8 +239,7 @@ void main() {
       await tester.tap(find.text('mike'));
       await _settle(tester);
       expect(find.text(r'$60.00'), findsWidgets); // 2 x 30.00
-      await tester.tap(find.widgetWithText(AppButton, 'Create Invoice'));
-      await _settle(tester);
+      await _reviewAndSubmit(tester, 'Review invoice');
       expect(pos.calls, ['create']);
       final l = pos.drafts.single.lines.single;
       expect((l.id, l.qty, l.staffId), (25, 2, 42));

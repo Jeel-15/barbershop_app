@@ -76,7 +76,7 @@ flutter build apk --release --target-platform android-arm64 `
 
 # Install on the phone and open it
 flutter install -d PHONE
-& $adb -s PHONE shell monkey -p com.example.barbershop_app -c android.intent.category.LAUNCHER 1
+& $adb -s PHONE shell monkey -p ca.rosenthalbarbershop.app -c android.intent.category.LAUNCHER 1
 ```
 
 The APK file is also here, if you want to copy it to the phone by hand:

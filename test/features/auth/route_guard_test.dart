@@ -1,6 +1,8 @@
 import 'package:barbershop_app/core/router/app_router.dart';
 import 'package:barbershop_app/core/utils/app_version.dart';
 import 'package:barbershop_app/features/auth/application/session_controller.dart';
+import 'package:barbershop_app/features/auth/domain/bootstrap.dart';
+import 'package:barbershop_app/features/auth/domain/perm.dart';
 import 'package:barbershop_app/features/shell/nav_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -61,14 +63,14 @@ void main() {
         AppTab.more,
       ]);
       expect(u.moreLabel, 'More');
-      expect(u.canSell, isTrue);
+      expect(u.canCreateInvoice, isTrue);
     });
 
     test('staff without calendar/sale sees home, bookings, me', () {
       final u = staffBootstrap().user;
       expect(u.visibleTabs, [AppTab.home, AppTab.appointments, AppTab.more]);
       expect(u.moreLabel, 'Me');
-      expect(u.canSell, isFalse);
+      expect(u.canCreateInvoice, isFalse);
     });
   });
 
@@ -78,6 +80,83 @@ void main() {
       expect(AppVersion.parse('1.0.0+5') == const AppVersion(1, 0, 0), isTrue);
       expect(AppVersion.parse('0.9.9') < AppVersion.parse('1.0.0'), isTrue);
       expect(AppVersion.parse('garbage'), const AppVersion(0, 0, 0));
+    });
+  });
+
+  group('a fingerprint-locked session', () {
+    test('only the unlock screen is reachable, nothing else loads', () {
+      const locked = SessionLocked(name: 'API Admin');
+      expect(guardRedirect(locked, '/lock'), isNull);
+      for (final p in [
+        '/',
+        '/welcome',
+        '/sign-in',
+        '/app/home',
+        '/app/invoices',
+      ]) {
+        expect(guardRedirect(locked, p), '/lock', reason: p);
+      }
+    });
+
+    test('signed out or in, the lock screen is never kept', () {
+      expect(guardRedirect(const SignedOut(), '/lock'), '/sign-in');
+      expect(guardRedirect(admin, '/lock'), '/app/home');
+    });
+  });
+
+  group('forms and actions need their own permission', () {
+    // The module flag is true for any of Add / Edit / Delete; a form needs its own.
+    SignedIn with_(List<String> perms) =>
+        SignedIn(Bootstrap.fromJson(bootstrapJson(permissions: perms)));
+
+    test('invoice: new and complete need Add, edit needs Edit', () {
+      final addOnly = with_(const [Perm.posInvoiceAdd]);
+      final editOnly = with_(const [Perm.posInvoiceEdit]);
+      expect(guardRedirect(addOnly, '/app/invoice/new'), isNull);
+      expect(guardRedirect(addOnly, '/app/invoice/complete/9'), isNull);
+      expect(guardRedirect(addOnly, '/app/invoice/edit/9'), '/app/home');
+
+      expect(guardRedirect(editOnly, '/app/invoice/new'), '/app/home');
+      expect(guardRedirect(editOnly, '/app/invoice/complete/9'), '/app/home');
+      expect(guardRedirect(editOnly, '/app/invoice/edit/9'), isNull);
+    });
+
+    test(
+      'a user who can only edit cannot open the New form (and the reverse)',
+      () {
+        final editOnly = with_(const [Perm.serviceEdit, Perm.productAdd]);
+        expect(guardRedirect(editOnly, '/app/services/edit/3'), isNull);
+        expect(guardRedirect(editOnly, '/app/services/new'), '/app/home');
+        expect(guardRedirect(editOnly, '/app/products/new'), isNull);
+        expect(guardRedirect(editOnly, '/app/products/edit/3'), '/app/home');
+      },
+    );
+
+    test('every form route is covered', () {
+      final none = with_(const []);
+      for (final p in [
+        'services',
+        'products',
+        'testimonials',
+        'roles',
+        'staff',
+      ]) {
+        expect(guardRedirect(none, '/app/$p/new'), '/app/home', reason: p);
+        expect(guardRedirect(none, '/app/$p/edit/1'), '/app/home', reason: p);
+      }
+    });
+
+    test('the named questions match what the server asks', () {
+      final viewer = with_(const [Perm.posInvoiceShowAll]).bootstrap.user;
+      expect(viewer.canCreateInvoice, isFalse);
+      expect(viewer.canMailInvoice, isFalse);
+      expect(viewer.canCompleteBooking, isFalse);
+
+      final editor = with_(const [Perm.posInvoiceEdit]).bootstrap.user;
+      expect(editor.canCreateInvoice, isFalse); // the bar's + needs Add
+      expect(editor.canCompleteBooking, isFalse);
+      expect(editor.canMailInvoice, isTrue);
+      expect(editor.canEditInvoice, isTrue);
     });
   });
 }

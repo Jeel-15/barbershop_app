@@ -21,6 +21,7 @@ import 'package:barbershop_app/features/customers/presentation/customer_profile_
 import 'package:barbershop_app/features/customers/presentation/customers_page.dart';
 import 'package:barbershop_app/features/dev/connection_screen.dart';
 import 'package:barbershop_app/features/dev/gallery_screen.dart';
+import 'package:barbershop_app/features/lock/presentation/lock_screen.dart';
 import 'package:barbershop_app/features/me/presentation/profile_page.dart';
 import 'package:barbershop_app/features/me/presentation/staff_report_page.dart';
 import 'package:barbershop_app/features/me/presentation/working_hours_page.dart';
@@ -60,13 +61,18 @@ String? guardRedirect(SessionState session, String location) {
       return location == '/' ? null : '/';
     case UpdateRequired():
       return location == '/update' ? null : '/update';
+    case SessionLocked():
+      // A fingerprint-locked session: only the unlock screen, nothing else loads.
+      return location == '/lock' ? null : '/lock';
     case SignedOut():
       if (location == '/update') return '/welcome';
       return _publicPaths.contains(location) || location.startsWith('/dev/')
           ? null
           : '/sign-in';
     case SignedIn(:final bootstrap):
-      if (location == '/update' || _publicPaths.contains(location)) {
+      if (location == '/update' ||
+          location == '/lock' ||
+          _publicPaths.contains(location)) {
         return '/app/home';
       }
       if (!allowedFor(bootstrap.user, location)) return '/app/home';
@@ -123,6 +129,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           initialEmail: state.extra is String ? state.extra! as String : null,
         ),
       ),
+      GoRoute(path: '/lock', builder: (context, state) => const LockScreen()),
       GoRoute(
         path: '/update',
         builder: (context, state) => const UpdateRequiredScreen(),

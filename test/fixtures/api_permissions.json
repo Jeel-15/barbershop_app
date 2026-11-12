@@ -1,0 +1,1045 @@
+{
+ "permissions": [
+  "Appointment-View",
+  "Calender-View",
+  "Customer-Add",
+  "Customer-Delete",
+  "Customer-Edit",
+  "Dashboard-Today_Appointments",
+  "Dashboard-Top_Selling_Product",
+  "Dashboard-Top_Services",
+  "Dashboard-Upcoming_Appointments",
+  "Gallery-Add",
+  "Gallery-Delete",
+  "General_Setting-Update",
+  "Gst-Add",
+  "Gst-Delete",
+  "Gst-Edit",
+  "Payment_Setting-Update",
+  "Pos_invoice-Add",
+  "Pos_invoice-Edit",
+  "Product-Add",
+  "Product-Delete",
+  "Product-Edit",
+  "Report-View",
+  "Role-Add",
+  "Role-Delete",
+  "Role-Edit",
+  "Service_Category-Add",
+  "Service_Category-Delete",
+  "Service_Category-Edit",
+  "Service-Add",
+  "Service-Delete",
+  "Service-Edit",
+  "Setting-Payment_Method",
+  "Shop_Closures-Add",
+  "Shop_Closures-Delete",
+  "Shop_Closures-Edit",
+  "Slot-Update",
+  "Staff-Add",
+  "Staff-Delete",
+  "Staff-Edit",
+  "Testimonial-Add",
+  "Testimonial-Delete",
+  "Testimonial-Edit"
+ ],
+ "routes": [
+  {
+   "method": "GET",
+   "uri": "{any}",
+   "needs": []
+  },
+  {
+   "method": "POST",
+   "uri": "appointments/{id}/cancel",
+   "needs": [
+    "Appointment-View"
+   ]
+  },
+  {
+   "method": "POST",
+   "uri": "appointments/{id}/complete",
+   "needs": [
+    "Pos_invoice-Add"
+   ]
+  },
+  {
+   "method": "POST",
+   "uri": "appointments/{id}/confirm",
+   "needs": [
+    "Appointment-View"
+   ]
+  },
+  {
+   "method": "POST",
+   "uri": "appointments/{id}/reschedule",
+   "needs": [
+    "Appointment-View"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "appointments/{id}",
+   "needs": [
+    "Appointment-View"
+   ]
+  },
+  {
+   "method": "PUT",
+   "uri": "appointments/{id}",
+   "needs": [
+    "Calender-View"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "appointments/counts",
+   "needs": [
+    "Appointment-View"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "appointments/slots",
+   "needs": [
+    "Appointment-View",
+    "Calender-View"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "appointments/staff-by-service",
+   "needs": [
+    "Appointment-View",
+    "Calender-View"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "appointments",
+   "needs": [
+    "Appointment-View"
+   ]
+  },
+  {
+   "method": "POST",
+   "uri": "appointments",
+   "needs": [
+    "Calender-View"
+   ]
+  },
+  {
+   "method": "POST",
+   "uri": "auth/forgot-password",
+   "needs": []
+  },
+  {
+   "method": "POST",
+   "uri": "auth/login",
+   "needs": []
+  },
+  {
+   "method": "POST",
+   "uri": "auth/logout-all",
+   "needs": []
+  },
+  {
+   "method": "POST",
+   "uri": "auth/logout",
+   "needs": []
+  },
+  {
+   "method": "GET",
+   "uri": "auth/me",
+   "needs": []
+  },
+  {
+   "method": "POST",
+   "uri": "auth/resend-otp",
+   "needs": []
+  },
+  {
+   "method": "POST",
+   "uri": "auth/reset-password",
+   "needs": []
+  },
+  {
+   "method": "POST",
+   "uri": "auth/verify-otp",
+   "needs": []
+  },
+  {
+   "method": "GET",
+   "uri": "bootstrap",
+   "needs": []
+  },
+  {
+   "method": "GET",
+   "uri": "calendar/availability",
+   "needs": [
+    "Calender-View"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "calendar/booking-options",
+   "needs": [
+    "Calender-View"
+   ]
+  },
+  {
+   "method": "POST",
+   "uri": "calendar/breaks",
+   "needs": [
+    "Calender-View"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "calendar/events",
+   "needs": [
+    "Calender-View"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "customers/{id}/appointments",
+   "needs": [
+    "Customer-Add",
+    "Customer-Edit",
+    "Customer-Delete"
+   ]
+  },
+  {
+   "method": "DELETE",
+   "uri": "customers/{id}",
+   "needs": [
+    "Customer-Add",
+    "Customer-Edit",
+    "Customer-Delete",
+    "Customer-Delete"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "customers/{id}",
+   "needs": [
+    "Customer-Add",
+    "Customer-Edit",
+    "Customer-Delete"
+   ]
+  },
+  {
+   "method": "PUT",
+   "uri": "customers/{id}",
+   "needs": [
+    "Customer-Add",
+    "Customer-Edit",
+    "Customer-Delete",
+    "Customer-Edit"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "customers",
+   "needs": [
+    "Customer-Add",
+    "Customer-Edit",
+    "Customer-Delete"
+   ]
+  },
+  {
+   "method": "POST",
+   "uri": "customers",
+   "needs": [
+    "Customer-Add",
+    "Customer-Edit",
+    "Customer-Delete",
+    "Customer-Add"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "dashboard/staff-performance",
+   "needs": [
+    "Dashboard-Top_Services",
+    "Dashboard-Top_Staff"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "dashboard/summary",
+   "needs": [
+    "Dashboard-Today_Appointments",
+    "Dashboard-Upcoming_Appointments",
+    "Dashboard-Top_Services",
+    "Dashboard-Top_Staff"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "dashboard/today",
+   "needs": [
+    "Dashboard-Today_Appointments"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "dashboard/top-products",
+   "needs": [
+    "Dashboard-Top_Selling_Product"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "dashboard/top-services",
+   "needs": [
+    "Dashboard-Top_Services"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "dashboard/upcoming",
+   "needs": [
+    "Dashboard-Upcoming_Appointments"
+   ]
+  },
+  {
+   "method": "DELETE",
+   "uri": "gallery/{id}",
+   "needs": [
+    "Gallery-Add",
+    "Gallery-Edit",
+    "Gallery-Delete",
+    "Gallery-Delete"
+   ]
+  },
+  {
+   "method": "PUT",
+   "uri": "gallery/{id}",
+   "needs": [
+    "Gallery-Add",
+    "Gallery-Edit",
+    "Gallery-Delete",
+    "Gallery-Add",
+    "Gallery-Edit"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "gallery",
+   "needs": [
+    "Gallery-Add",
+    "Gallery-Edit",
+    "Gallery-Delete"
+   ]
+  },
+  {
+   "method": "POST",
+   "uri": "gallery",
+   "needs": [
+    "Gallery-Add",
+    "Gallery-Edit",
+    "Gallery-Delete",
+    "Gallery-Add"
+   ]
+  },
+  {
+   "method": "POST",
+   "uri": "gst/{id}/default",
+   "needs": [
+    "Gst-Add",
+    "Gst-Edit",
+    "Gst-Delete",
+    "Gst-Edit"
+   ]
+  },
+  {
+   "method": "DELETE",
+   "uri": "gst/{id}",
+   "needs": [
+    "Gst-Add",
+    "Gst-Edit",
+    "Gst-Delete",
+    "Gst-Delete"
+   ]
+  },
+  {
+   "method": "PUT",
+   "uri": "gst/{id}",
+   "needs": [
+    "Gst-Add",
+    "Gst-Edit",
+    "Gst-Delete",
+    "Gst-Edit"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "gst",
+   "needs": [
+    "Gst-Add",
+    "Gst-Edit",
+    "Gst-Delete"
+   ]
+  },
+  {
+   "method": "POST",
+   "uri": "gst",
+   "needs": [
+    "Gst-Add",
+    "Gst-Edit",
+    "Gst-Delete",
+    "Gst-Add"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "health",
+   "needs": []
+  },
+  {
+   "method": "POST",
+   "uri": "invoices/{id}/email",
+   "needs": [
+    "Pos_invoice-Add",
+    "Pos_invoice-Edit"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "invoices/{id}",
+   "needs": [
+    "Pos_invoice-Add",
+    "Pos_invoice-Edit",
+    "Pos_invoice-Show_All"
+   ]
+  },
+  {
+   "method": "PUT",
+   "uri": "invoices/{id}",
+   "needs": [
+    "Pos_invoice-Edit"
+   ]
+  },
+  {
+   "method": "POST",
+   "uri": "invoices/preview",
+   "needs": [
+    "Pos_invoice-Add",
+    "Pos_invoice-Edit"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "invoices",
+   "needs": [
+    "Pos_invoice-Add",
+    "Pos_invoice-Edit",
+    "Pos_invoice-Show_All"
+   ]
+  },
+  {
+   "method": "POST",
+   "uri": "invoices",
+   "needs": [
+    "Pos_invoice-Add"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "me/profile",
+   "needs": []
+  },
+  {
+   "method": "POST",
+   "uri": "me/profile",
+   "needs": []
+  },
+  {
+   "method": "GET",
+   "uri": "me/report/appointments",
+   "needs": [
+    "Report-View"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "me/report/earnings",
+   "needs": [
+    "Report-View"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "me/report/services",
+   "needs": [
+    "Report-View"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "me/report/summary",
+   "needs": [
+    "Report-View"
+   ]
+  },
+  {
+   "method": "DELETE",
+   "uri": "me/working-hours/{id}",
+   "needs": [
+    "Calender-View"
+   ]
+  },
+  {
+   "method": "PUT",
+   "uri": "me/working-hours/{id}",
+   "needs": [
+    "Calender-View"
+   ]
+  },
+  {
+   "method": "PUT",
+   "uri": "me/working-hours/days/{slotId}/day-off",
+   "needs": [
+    "Calender-View"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "me/working-hours",
+   "needs": [
+    "Calender-View"
+   ]
+  },
+  {
+   "method": "POST",
+   "uri": "me/working-hours",
+   "needs": [
+    "Calender-View"
+   ]
+  },
+  {
+   "method": "DELETE",
+   "uri": "payment-methods/{id}",
+   "needs": [
+    "Setting-Payment_Method"
+   ]
+  },
+  {
+   "method": "PUT",
+   "uri": "payment-methods/{id}",
+   "needs": [
+    "Setting-Payment_Method"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "payment-methods",
+   "needs": [
+    "Setting-Payment_Method"
+   ]
+  },
+  {
+   "method": "POST",
+   "uri": "payment-methods",
+   "needs": [
+    "Setting-Payment_Method"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "pos/catalog",
+   "needs": [
+    "Pos_invoice-Add",
+    "Pos_invoice-Edit"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "pos/customer-lookup",
+   "needs": [
+    "Pos_invoice-Add",
+    "Pos_invoice-Edit"
+   ]
+  },
+  {
+   "method": "DELETE",
+   "uri": "products/{id}",
+   "needs": [
+    "Product-Add",
+    "Product-Edit",
+    "Product-Delete",
+    "Product-Delete"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "products/{id}",
+   "needs": [
+    "Product-Add",
+    "Product-Edit",
+    "Product-Delete"
+   ]
+  },
+  {
+   "method": "PUT",
+   "uri": "products/{id}",
+   "needs": [
+    "Product-Add",
+    "Product-Edit",
+    "Product-Delete",
+    "Product-Edit"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "products",
+   "needs": [
+    "Product-Add",
+    "Product-Edit",
+    "Product-Delete"
+   ]
+  },
+  {
+   "method": "POST",
+   "uri": "products",
+   "needs": [
+    "Product-Add",
+    "Product-Edit",
+    "Product-Delete",
+    "Product-Add"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "reports/appointments",
+   "needs": [
+    "Report-View"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "reports/customer-invoices",
+   "needs": [
+    "Report-View"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "reports/payments",
+   "needs": [
+    "Report-View"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "reports/product-sales",
+   "needs": [
+    "Report-View"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "reports/staff-earnings",
+   "needs": [
+    "Report-View"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "reports/top-products",
+   "needs": [
+    "Report-View"
+   ]
+  },
+  {
+   "method": "DELETE",
+   "uri": "roles/{id}",
+   "needs": [
+    "Role-Add",
+    "Role-Edit",
+    "Role-Delete",
+    "Role-Delete"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "roles/{id}",
+   "needs": [
+    "Role-Add",
+    "Role-Edit",
+    "Role-Delete"
+   ]
+  },
+  {
+   "method": "PUT",
+   "uri": "roles/{id}",
+   "needs": [
+    "Role-Add",
+    "Role-Edit",
+    "Role-Delete",
+    "Role-Edit"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "roles",
+   "needs": [
+    "Role-Add",
+    "Role-Edit",
+    "Role-Delete"
+   ]
+  },
+  {
+   "method": "POST",
+   "uri": "roles",
+   "needs": [
+    "Role-Add",
+    "Role-Edit",
+    "Role-Delete",
+    "Role-Add"
+   ]
+  },
+  {
+   "method": "DELETE",
+   "uri": "service-categories/{id}",
+   "needs": [
+    "Service_Category-Add",
+    "Service_Category-Edit",
+    "Service_Category-Delete",
+    "Service_Category-Delete"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "service-categories/{id}",
+   "needs": [
+    "Service_Category-Add",
+    "Service_Category-Edit",
+    "Service_Category-Delete"
+   ]
+  },
+  {
+   "method": "PUT",
+   "uri": "service-categories/{id}",
+   "needs": [
+    "Service_Category-Add",
+    "Service_Category-Edit",
+    "Service_Category-Delete",
+    "Service_Category-Edit"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "service-categories",
+   "needs": [
+    "Service_Category-Add",
+    "Service_Category-Edit",
+    "Service_Category-Delete",
+    "Service-Add",
+    "Service-Edit",
+    "Service-Delete",
+    "Product-Add",
+    "Product-Edit",
+    "Product-Delete"
+   ]
+  },
+  {
+   "method": "POST",
+   "uri": "service-categories",
+   "needs": [
+    "Service_Category-Add",
+    "Service_Category-Edit",
+    "Service_Category-Delete",
+    "Service_Category-Add"
+   ]
+  },
+  {
+   "method": "PATCH",
+   "uri": "services/{id}/home-section",
+   "needs": [
+    "Service-Add",
+    "Service-Edit",
+    "Service-Delete",
+    "Service-Edit"
+   ]
+  },
+  {
+   "method": "DELETE",
+   "uri": "services/{id}",
+   "needs": [
+    "Service-Add",
+    "Service-Edit",
+    "Service-Delete",
+    "Service-Delete"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "services/{id}",
+   "needs": [
+    "Service-Add",
+    "Service-Edit",
+    "Service-Delete"
+   ]
+  },
+  {
+   "method": "PUT",
+   "uri": "services/{id}",
+   "needs": [
+    "Service-Add",
+    "Service-Edit",
+    "Service-Delete",
+    "Service-Edit"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "services",
+   "needs": [
+    "Service-Add",
+    "Service-Edit",
+    "Service-Delete"
+   ]
+  },
+  {
+   "method": "POST",
+   "uri": "services",
+   "needs": [
+    "Service-Add",
+    "Service-Edit",
+    "Service-Delete",
+    "Service-Add"
+   ]
+  },
+  {
+   "method": "PUT",
+   "uri": "settings/contact",
+   "needs": [
+    "Setting-Payment_Method"
+   ]
+  },
+  {
+   "method": "PUT",
+   "uri": "settings/general",
+   "needs": [
+    "Setting-Payment_Method"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "settings",
+   "needs": [
+    "Setting-Payment_Method"
+   ]
+  },
+  {
+   "method": "DELETE",
+   "uri": "shop-closures/{id}",
+   "needs": [
+    "Shop_Closures-Add",
+    "Shop_Closures-Edit",
+    "Shop_Closures-Delete",
+    "Shop_Closures-Delete"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "shop-closures/{id}",
+   "needs": [
+    "Shop_Closures-Add",
+    "Shop_Closures-Edit",
+    "Shop_Closures-Delete"
+   ]
+  },
+  {
+   "method": "PUT",
+   "uri": "shop-closures/{id}",
+   "needs": [
+    "Shop_Closures-Add",
+    "Shop_Closures-Edit",
+    "Shop_Closures-Delete",
+    "Shop_Closures-Edit"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "shop-closures",
+   "needs": [
+    "Shop_Closures-Add",
+    "Shop_Closures-Edit",
+    "Shop_Closures-Delete"
+   ]
+  },
+  {
+   "method": "POST",
+   "uri": "shop-closures",
+   "needs": [
+    "Shop_Closures-Add",
+    "Shop_Closures-Edit",
+    "Shop_Closures-Delete",
+    "Shop_Closures-Add"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "shop-hours",
+   "needs": [
+    "Slot-Update"
+   ]
+  },
+  {
+   "method": "PUT",
+   "uri": "shop-hours",
+   "needs": [
+    "Slot-Update"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "staff/{id}/appointments",
+   "needs": []
+  },
+  {
+   "method": "GET",
+   "uri": "staff/{id}/assigned-services",
+   "needs": [
+    "Staff-Add",
+    "Staff-Edit",
+    "Staff-Delete"
+   ]
+  },
+  {
+   "method": "PUT",
+   "uri": "staff/{id}/assigned-services",
+   "needs": [
+    "Staff-Add",
+    "Staff-Edit",
+    "Staff-Delete",
+    "Staff-Edit"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "staff/{id}/earnings",
+   "needs": []
+  },
+  {
+   "method": "PUT",
+   "uri": "staff/{id}/password",
+   "needs": [
+    "Staff-Add",
+    "Staff-Edit",
+    "Staff-Delete",
+    "Staff-Edit"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "staff/{id}/services",
+   "needs": []
+  },
+  {
+   "method": "DELETE",
+   "uri": "staff/{id}",
+   "needs": [
+    "Staff-Add",
+    "Staff-Edit",
+    "Staff-Delete",
+    "Staff-Delete"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "staff/{id}",
+   "needs": []
+  },
+  {
+   "method": "PUT",
+   "uri": "staff/{id}",
+   "needs": [
+    "Staff-Add",
+    "Staff-Edit",
+    "Staff-Delete",
+    "Staff-Edit"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "staff/form-options",
+   "needs": [
+    "Staff-Add",
+    "Staff-Edit",
+    "Staff-Delete"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "staff",
+   "needs": [
+    "Staff-Add",
+    "Staff-Edit",
+    "Staff-Delete"
+   ]
+  },
+  {
+   "method": "POST",
+   "uri": "staff",
+   "needs": [
+    "Staff-Add",
+    "Staff-Edit",
+    "Staff-Delete",
+    "Staff-Add"
+   ]
+  },
+  {
+   "method": "DELETE",
+   "uri": "testimonials/{id}",
+   "needs": [
+    "Testimonial-Add",
+    "Testimonial-Edit",
+    "Testimonial-Delete",
+    "Testimonial-Delete"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "testimonials/{id}",
+   "needs": [
+    "Testimonial-Add",
+    "Testimonial-Edit",
+    "Testimonial-Delete"
+   ]
+  },
+  {
+   "method": "PUT",
+   "uri": "testimonials/{id}",
+   "needs": [
+    "Testimonial-Add",
+    "Testimonial-Edit",
+    "Testimonial-Delete",
+    "Testimonial-Edit"
+   ]
+  },
+  {
+   "method": "GET",
+   "uri": "testimonials",
+   "needs": [
+    "Testimonial-Add",
+    "Testimonial-Edit",
+    "Testimonial-Delete"
+   ]
+  },
+  {
+   "method": "POST",
+   "uri": "testimonials",
+   "needs": [
+    "Testimonial-Add",
+    "Testimonial-Edit",
+    "Testimonial-Delete",
+    "Testimonial-Add"
+   ]
+  }
+ ]
+}

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware\Api;
 
+use App\Services\Api\UserPresenter;
 use Closure;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
@@ -23,6 +24,31 @@ use Throwable;
 class ApiEnvelope
 {
     public function handle(Request $request, Closure $next)
+    {
+        return $this->withPermissionsVersion($request, $this->run($request, $next));
+    }
+
+    /**
+     * Every answer to a signed-in user carries `X-Permissions-Version`. The app compares it
+     * with the one it holds and quietly re-reads /bootstrap when an admin changed this
+     * user's role or permissions, so no sign-out is needed. Errors carry it too (a 403
+     * is exactly when the app wants to know). Never allowed to break the real answer.
+     */
+    protected function withPermissionsVersion(Request $request, $response)
+    {
+        try {
+            $user = $request->user();
+            if ($user && (int) $user->active_status === 1) {
+                $response->headers->set('X-Permissions-Version', UserPresenter::version($user, true));
+            }
+        } catch (Throwable $e) {
+            report($e);
+        }
+
+        return $response;
+    }
+
+    protected function run(Request $request, Closure $next)
     {
         try {
             $response = $next($request);

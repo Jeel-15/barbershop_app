@@ -8,6 +8,7 @@ import 'package:barbershop_app/shared/contact_actions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:barbershop_app/features/auth/domain/perm.dart';
 
 /// The web's Customers page ("Manage your customer directory"): a searchable
 /// list with Add Customer, and per row View / Edit / Delete by permission.
@@ -115,7 +116,7 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
                       style: AppType.heading.copyWith(color: t.text),
                     ),
                   ),
-                  if (user.can('Customer-Add'))
+                  if (user.can(Perm.customerAdd))
                     HeaderIconButton(
                       icon: Icons.person_add_alt_1_rounded,
                       label: 'Add Customer',
@@ -160,8 +161,8 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
                   AsyncData(:final value) => _List(
                     state: value,
                     controller: _scroll,
-                    canEdit: user.can('Customer-Edit'),
-                    canDelete: user.can('Customer-Delete'),
+                    canEdit: user.can(Perm.customerEdit),
+                    canDelete: user.can(Perm.customerDelete),
                     searching: query.trim().isNotEmpty,
                     onOpen: (c) => context.push('/app/customer/${c.id}'),
                     onEdit: _edit,

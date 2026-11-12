@@ -182,3 +182,66 @@ _Last updated: 2026-10-26. Source of truth for details and evidence: `docs/API_P
 
 - Payment methods, GST, categories, services, products and staff are **soft deleted**, but the name / e-mail stays reserved: after deleting a payment method "Cash2" you cannot add "Cash2" again ("The name has already been taken."), and a deleted staff member's e-mail can never be used again.
 - Deleting a service **category** does not delete or hide its services; they stay in the list with a category that no longer exists.
+
+## Q65 - Live permissions for the app (API addition, nothing in the web changed)
+
+- When an admin changes a user's role or permissions on the web, the app must follow without a sign-out. The API now sends a short fingerprint of the user's access:
+  - `X-Permissions-Version: <12 characters>` on **every answer to a signed-in user** (200, 403, 422... not on public routes or on a 401). Added in `ApiEnvelope::withPermissionsVersion`.
+  - `permissions_version` in `data.user` and at the top of `data` of `POST /auth/login`, `GET /auth/me` and `GET /bootstrap` (`UserPresenter::version`).
+- The hash covers: panel role, spatie roles, every permission (direct and via roles), the module flags, home module, staff scope, barber flag. It changes when any of these change and only then (verified: revoking one permission changes it, rolling back restores it).
+- Cost: the role/permission relations are re-read once per request (2-3 small queries) so a change made in the same request is counted.
+- The app re-reads `/bootstrap` when the header differs from the one it holds, on a 403, and when it returns to the foreground (once a minute at most). No polling.
+- Deploy: these four files only (`UserPresenter.php`, `ApiEnvelope.php`, `AuthController.php`, `BootstrapController.php`); no migration, no config.
+
+## Q66 - Super-admin is a normal role: its permissions can be removed, which can lock everyone out (found while testing live permissions)
+
+- The web has no "Super-admin bypass" (no `Gate::before` anywhere in `app/`). `Super-admin` is just a spatie role that happens to have every permission ticked; `$user->can('X')` is true only while that row exists in `role_has_permissions`.
+- On the Roles page (`RolesController::update`, line ~176) the permission ticks of **any** role, Super-admin included, can be removed, and with nothing ticked `syncPermissions([])` empties the role completely. Only the *rename* and the *delete button* are protected for roles 1, 2 and 4.
+- Result: an admin who unticks `Role-Edit` (or `Role-View`) on their own role can no longer open the Roles page. Nobody can undo it from the panel; it has to be fixed in the database. Verified on the test DB: removing `Calender-View` from Super-admin made `can()` false and the Calendar vanished for that user (and was restored afterwards).
+- Related and already listed in Q59: `Role-Edit` can grant itself any permission.
+- Suggested fix (web developer), either:
+  1. one line in `AuthServiceProvider::boot()`: `Gate::before(fn ($user) => $user->hasRole('Super-admin') ? true : null);` so Super-admin always passes every check, or
+  2. in `RolesController::update`, refuse to save a locked role (ids 1, 2, 4) without its `Role-View` / `Role-Edit` permissions, and refuse an empty permission list for Super-admin.
+- The app needs no change for either: it only follows what the server says (`permissions`, `modules`, `permissions_version`).
+- Optional API-side guard (needs the owner's OK): `RoleAdmin::update` answers 409 "System role" when a locked role would lose `Role-View` / `Role-Edit`, so the app cannot cause the lock-out either.
+
+## Q67 - Permissions that the code asks for but that do not exist (found by the app's permission contract test)
+
+- `Pos_invoice-Show_All` (web: `InvoiceController`, the `canany` middleware on the invoice routes) and `Gallery-Edit` (API gallery routes, mirrored from the web) are **not rows in the `permissions` table**. Nobody can be given them on the Roles page, so they never grant anything; spatie's `can()` on an unknown name just answers false.
+- Effect today: a Staff-role user always sees only their own invoices (the "see all" case can never be switched on), and Gallery edit is covered by `Gallery-Add` alone.
+- Fix (web developer): either add the two rows to the permissions seeder / table (then the Roles page can grant them), or stop referring to them. The app does not depend on either.
+- The app now checks this automatically: `tool/live/export_permission_contract.sh` exports the stored permissions and each route's required permission; `test/permissions_contract_test.dart` fails when the app names a permission the server does not know, when the server stores a new one the app does not know yet, or when an Add/Edit/Delete the server enforces guards no button.
+
+## Q68 - Staff money: commission audit (checked against the local database, 2026-11-04)
+
+**Fix first (🔴 wrong money shown to the owner):**
+
+1. **Staff > a staff member > Earnings tab: the same product commission on every day row.** `StaffController.php` lines ~123-154: `$productSub` is grouped by `staff_id` only (the staff's whole product commission) and joined to the daily rows with `s.staff_id = p.staff_id`, then the rows are grouped by `a.date, s.staff_id, p.product_commission`. So every day shows the staff's **total**, and `total_earn` per day is inflated by it. Proof (staff 49, six day rows): the table shows **$63.85 on every row**; the real product commission per day is **4.60, 1.70, 0.00, 3.30, 0.00, 1.00** (sum 63.85). The summary cards above the table are correct. Fix: group `$productSub` by `appointment_id, staff_id`, join it on `a.appointment_id = p.appointment_id AND p.staff_id = s.staff_id`, and use `SUM(p.product_commission)` per date.
+2. **`SUM(DISTINCT ...)` on commission and tip (Reports > Staff tab, the barber's own Staff Report, dashboard Top Services).** It adds each *different amount* once, so every repeated amount (most services have a fixed price, so most commissions repeat) disappears. Measured for staff 49, October 2026, 150 invoices: real service commission **$1,336.28**, `SUM(DISTINCT)` gives **$284.13** (under-reported by about 79%). Same issue for tips and for `SUM(DISTINCT total_amt)` revenue. Fix: sum per appointment without `DISTINCT` (the join is already one row per appointment and staff, so a plain `SUM` is right); keep `COUNT(DISTINCT appointment_id)` for counts. This is Q1/Q36 with real numbers: please treat it as the top priority, the owner uses these figures to pay staff.
+
+**Cleanup (🟡):**
+
+3. **`users.commission` is never used.** The Staff form has a "Commission" field and 25 staff have a value (up to 55%), but every invoice takes its commission from the **service** (`tbl_service.commission`) and the **product** (`tbl_product.commission`). Changing the staff value changes nothing, which will mislead whoever sets it. Fix: remove the field, or really use it (and say which of the two wins).
+4. **Commission is on the discounted price** (a 10% invoice discount lowers the stored commission: a $35 skin fade at 10% pays $3.15, not $3.50). That is consistent, but nobody has said it is intended; confirm it with the owner. The app copies it.
+
+**Checked and correct (no change needed):** invoice total = lines - discount + tip (1150 of 1150 invoices; tax is included in the price, `total_tax` is informational); `appointment.total_tip` = sum of the line tips (1150/1150); stored product commission = product amount x product % (132/132); no commission on cancelled or non-invoiced appointments; no orphan service/product lines; no duplicate invoice numbers; no invoiced appointment without lines; no negative stock. Tip split still has 15 lines with more than 2 decimals (Q39).
+
+**After you fix it:** the app's Earnings tab and Reports use the same API code, so we change the same queries (own API classes, no web code touched) and add tests with the numbers above.
+
+## Q69 - Security and hygiene found in the web code (audit 2026-11-04)
+
+**Fix first (🔴):**
+
+1. **Public maintenance URLs, no login.** `routes/web.php` lines 60-90: `GET /cache-clear` (runs `cache:clear`, `route:clear`, `view:clear`, `config:cache`, `config:clear`), `GET /storage-link` and `GET /mail` are reachable by anyone (tested: `/rosen_barber/public/cache-clear` answers 200). `/mail` sends a real mail through the live SMTP account to a personal address and ends in `dd()`. Anyone can hit them in a loop (slow site, mail abuse). Fix: delete these three routes (run the commands from the terminal).
+2. **`GET /admin/assign-role-super-admin`** (`routes/web.php` line 252, `AuthController@RoleAssignSuperAdmin`): left-over helper that gives user id 2 the role id 4. It sits inside the `checklogin` group, so **any logged-in user** can call it. Fix: delete the route and the method.
+3. **No brute-force protection on the admin login** (`admin/post-login`, `AuthController@postLogin`): no throttle, no lockout, and it accepts the phone number as login too. Only the SEO login (`throttle:5,1`) and forgot-password are limited. Fix: `->middleware('throttle:5,1')` on the route, or a `RateLimiter` keyed by login + IP; log failed attempts.
+4. **Booking tracking can be enumerated** (`track-booking/search`, `TrackingController@search`). The booking code is `BCB-YYYYMMDD-NNNN` (date + a 4-digit counter), so anyone can guess other people's codes and see the booking page (name, services, staff). There is no throttle or captcha. Fix: add a random part to the code (6+ characters), `throttle:10,1`, and show only what the person needs. (Also: the `BCB` prefix is another brand, see Q20.)
+5. **Debug mode and secrets.** `.env` has `APP_DEBUG=true` and `APP_ENV=local`. With debug on, any error page shows code, queries and environment values. The live SMTP password is in the local `.env` and `backup/.env` (a copy of `.env` inside the project folder). Fix on the live server: `APP_ENV=production`, `APP_DEBUG=false`; delete `backup/.env`; rotate the SMTP password if the project folder was ever shared or zipped.
+
+**Cleanup (🟡):**
+
+6. **Weak password rule:** staff passwords only need 6 characters (`StaffController` lines 493, 567, 707). Fix: minimum 10, and refuse very common passwords (`Password::min(10)->uncompromised()`).
+7. **Public booking forms have no throttle or captcha** (`submit-appointment-details`, `get-slot-by-staff`, `get-staff-service`): a script can fill the calendar with fake bookings. Fix: `throttle:20,1` plus a honeypot field or captcha on the submit.
+8. **Sessions** use the `file` driver with a 120-minute lifetime and `SESSION_SECURE_COOKIE` / `SESSION_ENCRYPT` are not set. Fix on live (HTTPS): `SESSION_SECURE_COOKIE=true`, `SESSION_SAME_SITE=lax`.
+
+**Checked and fine:** no raw SQL built from user input in the admin controllers; every `{!! !!}` in the views is wrapped in `e()`; image uploads validate type and size (2 MB); no `$guarded = []` models; CSRF has no exceptions; no duplicate customer phones, no double-booked staff, no customer ids pointing nowhere, all passwords are bcrypt.

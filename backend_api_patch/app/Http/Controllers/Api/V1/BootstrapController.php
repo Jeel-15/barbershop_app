@@ -24,8 +24,11 @@ class BootstrapController extends ApiController
         $setting = Setting::where('id', 1)->first();
         $gst = Gst::where('default_status', 1)->first();
 
+        $presented = UserPresenter::make($user);
+
         return $this->ok([
-            'user' => UserPresenter::make($user),
+            'user' => $presented,
+            'permissions_version' => $presented['permissions_version'],
 
             'shop' => [
                 'name' => config('api_v1.shop_name'),

@@ -9,6 +9,7 @@ import 'package:barbershop_app/features/shop/data/shop_repository.dart';
 import 'package:barbershop_app/features/shop/domain/shop_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:barbershop_app/features/auth/domain/perm.dart';
 
 class _ClosureQuery extends Notifier<String> {
   @override
@@ -92,13 +93,13 @@ class ClosuresPage extends ConsumerWidget {
     final t = context.tokens;
     final user = ref.watch(currentUserProvider);
     final query = ref.watch(closureQueryProvider);
-    final canEdit = user.can('Shop_Closures-Edit');
-    final canDelete = user.can('Shop_Closures-Delete');
+    final canEdit = user.can(Perm.shopClosuresEdit);
+    final canDelete = user.can(Perm.shopClosuresDelete);
     return AdminListShell(
       title: 'Shop Closures',
       subtitle: 'Schedule full-day or partial shop closures',
       addLabel: 'Add Closures',
-      onAdd: user.can('Shop_Closures-Add') ? () => _edit(context, ref) : null,
+      onAdd: user.can(Perm.shopClosuresAdd) ? () => _edit(context, ref) : null,
       searchHint: 'Search reason',
       query: query,
       onSearch: (q) => ref.read(closureQueryProvider.notifier).set(q),

@@ -30,6 +30,9 @@ class ApiClient {
     required String baseUrl,
     required TokenReader readToken,
     void Function()? onUnauthorized,
+    void Function(String version)? onPermissionsVersion,
+    void Function()? onForbidden,
+    Map<String, String> headers = const {},
     Dio? dio,
     bool log = kDebugMode,
   }) : _dio = dio ?? Dio() {
@@ -38,12 +41,13 @@ class ApiClient {
       ..connectTimeout = const Duration(seconds: 12)
       ..sendTimeout = const Duration(seconds: 30)
       ..receiveTimeout = const Duration(seconds: 30)
-      ..headers = {'Accept': 'application/json'}
+      ..headers = {'Accept': 'application/json', ...headers}
       ..validateStatus = (s) => s != null && s >= 200 && s < 300;
 
     _dio.interceptors.addAll([
       _AuthInterceptor(readToken, onUnauthorized),
       _RetryInterceptor(_dio),
+      _PermissionsInterceptor(onPermissionsVersion, onForbidden),
       if (log) _LogInterceptor(),
     ]);
   }
@@ -246,6 +250,49 @@ class _AuthInterceptor extends Interceptor {
     final isLogin = err.requestOptions.path.contains('auth/login');
     if (err.response?.statusCode == 401 && !isLogin) {
       _onUnauthorized?.call();
+    }
+    handler.next(err);
+  }
+}
+
+/// Tells the app when an administrator has changed this user's access.
+///
+/// The server puts `X-Permissions-Version` on every signed-in answer; when it is
+/// not the one the app holds, [onVersion] is called with it. A 403 calls
+/// [onForbidden] (the app may be showing something it can no longer do). Calls to
+/// `/bootstrap` and `/auth/*` are ignored: the refresh itself must not trigger a
+/// refresh. A server that sends no header simply never triggers anything.
+class _PermissionsInterceptor extends Interceptor {
+  _PermissionsInterceptor(this._onVersion, this._onForbidden);
+
+  final void Function(String version)? _onVersion;
+  final void Function()? _onForbidden;
+
+  static bool _ignored(RequestOptions o) =>
+      o.path.contains('bootstrap') || o.path.contains('auth/');
+
+  @override
+  void onResponse(
+    Response<dynamic> response,
+    ResponseInterceptorHandler handler,
+  ) {
+    if (!_ignored(response.requestOptions)) {
+      final v = response.headers.value('x-permissions-version');
+      if (v != null && v.isNotEmpty) _onVersion?.call(v);
+    }
+    handler.next(response);
+  }
+
+  @override
+  void onError(DioException err, ErrorInterceptorHandler handler) {
+    final res = err.response;
+    if (res != null && !_ignored(err.requestOptions)) {
+      if (res.statusCode == 403) {
+        _onForbidden?.call();
+      } else {
+        final v = res.headers.value('x-permissions-version');
+        if (v != null && v.isNotEmpty) _onVersion?.call(v);
+      }
     }
     handler.next(err);
   }

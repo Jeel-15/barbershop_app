@@ -8,6 +8,7 @@ import 'package:barbershop_app/features/catalog/presentation/widgets/admin_widge
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:barbershop_app/features/auth/domain/perm.dart';
 
 /// The web's Services page ("Manage service offerings, pricing, and duration").
 class ServicesPage extends ConsumerWidget {
@@ -73,13 +74,13 @@ class ServicesPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(currentUserProvider);
     final query = ref.watch(serviceQueryProvider);
-    final canEdit = user.can('Service-Edit');
-    final canDelete = user.can('Service-Delete');
+    final canEdit = user.can(Perm.serviceEdit);
+    final canDelete = user.can(Perm.serviceDelete);
     return AdminListShell(
       title: 'Services',
       subtitle: 'Manage service offerings, pricing, and duration',
       addLabel: 'Add Service',
-      onAdd: user.can('Service-Add') ? () => _form(context, ref) : null,
+      onAdd: user.can(Perm.serviceAdd) ? () => _form(context, ref) : null,
       searchHint: 'Search service, category, duration or price',
       query: query,
       onSearch: (q) => ref.read(serviceQueryProvider.notifier).set(q),

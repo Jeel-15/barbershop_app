@@ -1,4 +1,5 @@
 import 'package:barbershop_app/core/errors/failure.dart';
+import 'package:barbershop_app/core/utils/money.dart';
 import 'package:barbershop_app/core/utils/shop_time.dart';
 import 'package:barbershop_app/design_system/design_system.dart';
 import 'package:barbershop_app/features/appointments/application/booking_form_controller.dart';
@@ -64,6 +65,90 @@ class _BookingFormPageState extends ConsumerState<BookingFormPage> {
     showSuccessBurst(context);
     showToast(context, saved, kind: ToastKind.success);
     context.pop();
+  }
+
+  /// "Check before you save": who, what, with whom and when, with anything
+  /// unusual called out. Edit goes back to the form untouched; Done saves.
+  Future<void> _review() async {
+    FocusScope.of(context).unfocus();
+    // The state as it is now, not as it was when the button was last built.
+    final s = ref.read(bookingFormProvider(widget.target));
+    final d = s.draft;
+    final String? problem = d.name.trim().isEmpty
+        ? 'Full Name is required.'
+        : d.phone.trim().isEmpty
+        ? 'Phone is required.'
+        : d.lines.isEmpty
+        ? 'Please select at least one service.'
+        : d.staffId == null
+        ? 'Select Staff'
+        : d.slot == null
+        ? 'Please Select Slot!!'
+        : null;
+    if (problem != null) {
+      showToast(context, problem, kind: ToastKind.error);
+      return;
+    }
+    final slot = d.slot!;
+    final barber = [
+      ...s.barbers,
+      ...s.allBarbers,
+    ].where((b) => b.id == d.staffId).firstOrNull;
+    final date = d.date == null
+        ? ShopTime.today()
+        : ShopTime.parseDate(d.date!);
+    final time = slot.custom || slot.startLabel == slot.endLabel
+        ? slot.startLabel
+        : '${slot.startLabel} – ${slot.endLabel}';
+
+    final warnings = <String>[];
+    final today = ShopTime.today();
+    final now = ShopTime.now();
+    if (date.isBefore(today)) {
+      warnings.add('This date is in the past.');
+    } else if (ShopTime.isSameDay(date, today) &&
+        ShopTime.minutes(slot.start) < now.hour * 60 + now.minute) {
+      warnings.add('This time has already passed today.');
+    }
+    final email = d.email.trim();
+    final ok = await showReviewSheet(
+      context,
+      title: 'Check the booking',
+      intro: widget.target.editId != null
+          ? 'You are changing this appointment.'
+          : 'Make sure everything is right. Done saves it.',
+      warnings: warnings,
+      sections: [
+        ReviewSection('Customer', [
+          ReviewRow(d.name.trim(), ''),
+          ReviewRow('Phone', d.phone.trim()),
+          if (email.isNotEmpty) ReviewRow('Email', email),
+        ], icon: Icons.person_rounded),
+        ReviewSection('Services', [
+          for (final l in d.lines)
+            ReviewRow(
+              l.qty > 1 ? '${l.service.name} x ${l.qty}' : l.service.name,
+              Money(l.service.price.cents * l.qty).format(),
+              note: '${l.service.durationMinutes * l.qty} min',
+            ),
+        ], icon: Icons.content_cut_rounded),
+        ReviewSection('When and with whom', [
+          ReviewRow('Barber', barber?.name ?? 'Selected barber'),
+          ReviewRow(
+            'Date',
+            '${ShopTime.weekdayLong(date)}, ${ShopTime.fullDate(date)}',
+          ),
+          ReviewRow('Time', time),
+          ReviewRow('Duration', '${d.totalMinutes} min'),
+          if (d.notes.trim().isNotEmpty) ReviewRow('Notes', d.notes.trim()),
+        ], icon: Icons.event_rounded),
+      ],
+      total: ReviewRow('Total', d.total.format()),
+    );
+    // Closing the sheet hands focus back to the last field and opens the
+    // keyboard; the form should look as it did.
+    if (mounted) FocusScope.of(context).unfocus();
+    if (ok && mounted) await _save();
   }
 
   @override
@@ -139,8 +224,8 @@ class _BookingFormPageState extends ConsumerState<BookingFormPage> {
             if (!s.loading && s.loadError == null)
               _SaveBar(
                 s: s,
-                label: editing ? 'Update' : 'Save Appointment',
-                onPressed: s.submitting ? null : _save,
+                label: editing ? 'Review changes' : 'Review appointment',
+                onPressed: s.submitting ? null : _review,
               ),
           ],
         ),
@@ -212,6 +297,8 @@ class _Body extends ConsumerWidget {
               AppTextField(
                 label: 'Phone',
                 hint: 'Enter phone number',
+                prefixIcon: Icons.phone_outlined,
+                clearable: true,
                 controller: phone,
                 keyboardType: TextInputType.phone,
                 textInputAction: TextInputAction.next,
@@ -239,6 +326,8 @@ class _Body extends ConsumerWidget {
               AppTextField(
                 label: 'Full Name',
                 hint: 'Enter customer name',
+                prefixIcon: Icons.person_outline_rounded,
+                clearable: true,
                 controller: name,
                 textCapitalization: TextCapitalization.words,
                 textInputAction: TextInputAction.next,
@@ -251,6 +340,8 @@ class _Body extends ConsumerWidget {
               AppTextField(
                 label: 'Email',
                 hint: 'Optional',
+                prefixIcon: Icons.mail_outline_rounded,
+                clearable: true,
                 controller: email,
                 keyboardType: TextInputType.emailAddress,
                 onChanged: (v) => ctl.setCustomer(email: v),
@@ -378,7 +469,7 @@ class _Body extends ConsumerWidget {
           onChanged: (v) => ctl.setCustomer(notes: v),
         ),
         // The web's update modal also has "Make Payment" (the invoice page).
-        if (target.editId != null && user.modules.invoiceWrite) ...[
+        if (target.editId != null && user.canCompleteBooking) ...[
           const SizedBox(height: AppSpace.lg),
           AppButton(
             label: 'Make Payment',
@@ -566,7 +657,7 @@ class _SaveBar extends StatelessWidget {
           Expanded(
             child: AppButton(
               label: label,
-              icon: Icons.check_rounded,
+              icon: Icons.fact_check_rounded,
               loading: s.submitting,
               onPressed: onPressed,
             ),

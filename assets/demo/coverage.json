@@ -1,0 +1,666 @@
+{
+  "_about": "Everything a person can see or do in the app (Super-admin flow), grouped in tour chapters. Source of truth for the demo tour: every element must be covered by at least one beat of the script (tool/demo/coverage_check.mjs and test/features/demo/coverage_test.dart). Element = [id, keywords the narration must contain (any one, lowercase, | separated), kind]. kind: i explain, c press, d type, s sideways scroll, v sheet/dialog/picker, g gesture. 'waive' lists what is deliberately not shown, with the reason.",
+  "chapters": [
+    {
+      "id": "c00",
+      "name": "Welcome and the app shell",
+      "screens": [
+        {
+          "id": "shell",
+          "route": "/app/home",
+          "els": [
+            ["shell.nav", "bottom bar|navigation bar|tabs", "i"],
+            ["shell.nav.dashboard", "dashboard", "c"],
+            ["shell.nav.appointments", "appointments", "c"],
+            ["shell.nav.plus", "plus button|big plus|new invoice", "c"],
+            ["shell.nav.calendar", "calendar", "c"],
+            ["shell.nav.more", "more", "c"],
+            ["shell.sound", "voice|subtitles|replay", "i"],
+            ["ux.motion", "smooth|animation|animated", "i"],
+            ["ux.toast", "confirmation|check mark|toast", "i"],
+            ["ux.loading", "loading|skeleton|shimmer", "i"],
+            ["ux.permissions", "only what you allow|permissions", "i"],
+            ["ux.live", "follows by itself|without signing out", "i"],
+            ["ux.themes", "dark|light", "i"]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c01",
+      "name": "Dashboard",
+      "screens": [
+        {
+          "id": "home",
+          "route": "/app/home",
+          "els": [
+            ["home.greeting", "good morning|greeting|today's date", "i"],
+            ["home.avatar", "your picture|avatar|profile picture", "c"],
+            ["home.chips", "small chips|chips", "i"],
+            ["home.fab", "new button|new appointment", "i"],
+            ["home.tile.upcoming", "upcoming", "i"],
+            ["home.tile.customers", "customers", "i"],
+            ["home.tile.completed", "completed", "i"],
+            ["home.tile.tap", "tap any number|tap a number|opens the list", "c"],
+            ["home.nextup", "next up|next appointment", "i"],
+            ["home.nextup.confirm", "confirm", "c"],
+            ["home.nextup.call", "call", "c"],
+            ["home.staffcal.header", "staff calendar", "i"],
+            ["home.staffcal.open", "open full calendar", "c"],
+            ["home.staffcal.now", "current time|now marker|opens at", "i"],
+            ["home.staffcal.counters", "with a client|free now|not in", "i"],
+            ["home.staffcal.lane", "each barber|barber card", "i"],
+            ["home.staffcal.status", "not in yet|with client|free|off today", "i"],
+            ["home.staffcal.daybar", "thin bar|day bar|bar of their day", "i"],
+            ["home.staffcal.dayopen", "open their whole day|tap a barber", "c"],
+            ["home.staffcal.free", "free slot|free time|green", "i"],
+            ["home.staffcal.freeplus", "plus on a free|book a free", "c"],
+            ["home.staffcal.break", "break", "i"],
+            ["home.staffcal.more", "more barbers|show more barbers", "c"],
+            ["home.staffcal.nohours", "no hours set|working hours", "i"],
+            ["home.appts.header", "appointments", "i"],
+            ["home.appts.viewall", "view all", "c"],
+            ["home.appts.switch", "today and upcoming|today or upcoming|switch between", "c"],
+            ["home.appts.tile", "tap a booking|tap an appointment|open any booking", "c"],
+            ["home.appts.more", "show more|first ten|four are shown", "c"],
+            ["home.highlights", "top services|best selling", "i"],
+            ["home.highlights.product", "top selling product|retail", "i"],
+            ["home.highlights.more", "show more|full list", "c"],
+            ["home.pull", "pull down|refresh", "g"]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c02",
+      "name": "Appointments",
+      "screens": [
+        {
+          "id": "appts",
+          "route": "/app/appointments",
+          "els": [
+            ["appts.title", "appointments list|every booking", "i"],
+            ["appts.chips", "status|pending|confirmed", "s"],
+            ["appts.counts", "numbers|count", "i"],
+            ["appts.group", "grouped by day|day heading|date heading", "i"],
+            ["appts.row", "time|customer|phone", "i"],
+            ["appts.pill", "status pill|status label|coloured", "i"],
+            ["appts.search", "search", "c"],
+            ["appts.search.type", "name|phone", "d"],
+            ["appts.filter", "filter", "c"],
+            ["appts.filter.dates", "start date|end date|date range", "v"],
+            ["appts.filter.daytype", "day type|morning|evening", "v"],
+            ["appts.filter.staff", "staff name|by barber|one barber", "v"],
+            ["appts.filter.show", "show results", "c"],
+            ["appts.filter.clear", "clear", "c"],
+            ["appts.empty", "no bookings found|nothing found", "i"],
+            ["appts.scroll", "keeps loading|scroll down|more loads", "g"]
+          ]
+        },
+        {
+          "id": "sheet",
+          "route": "(sheet)",
+          "els": [
+            ["sheet.pill", "status", "i"],
+            ["sheet.edit", "edit", "c"],
+            ["sheet.close", "close", "c"],
+            ["sheet.customer", "customer name|who it is for", "i"],
+            ["sheet.call", "call", "c"],
+            ["sheet.message", "message|text message|sms", "c"],
+            ["sheet.copy", "copy", "c"],
+            ["sheet.when", "date|time", "i"],
+            ["sheet.staff", "barber|staff", "i"],
+            ["sheet.services", "services|price|duration", "i"],
+            ["sheet.total", "total", "i"],
+            ["sheet.facts", "visits|last service|total spend|history", "i"],
+            ["sheet.confirm", "confirm", "c"],
+            ["sheet.complete", "complete|invoice", "c"],
+            ["sheet.cancel", "cancel", "c"],
+            ["sheet.cancel.ask", "are you sure|asks you to confirm|asks first", "v"],
+            ["sheet.reschedule", "reschedule", "c"],
+            ["sheet.reschedule.strip", "pick a new day|new day|date strip", "s"],
+            ["sheet.reschedule.times", "free times|select time", "v"],
+            ["sheet.invoiced", "invoiced", "i"]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c03",
+      "name": "Calendar",
+      "screens": [
+        {
+          "id": "cal",
+          "route": "/app/calendar",
+          "els": [
+            ["cal.title", "today|day name|weekday", "i"],
+            ["cal.datepicker", "jump to any date|date picker|pick any date", "c"],
+            ["cal.staff", "filter by staff|staff icon|people icon|one barber", "c"],
+            ["cal.staff.order", "column order|drag|reorder", "g"],
+            ["cal.add", "add appointment|plus", "c"],
+            ["cal.break", "break|coffee", "c"],
+            ["cal.break.sheet", "rest of the day|how long", "v"],
+            ["cal.strip", "date strip|swipe through the days|days across the top", "s"],
+            ["cal.strip.dots", "dot|busy day", "i"],
+            ["cal.legend", "pending|confirmed", "s"],
+            ["cal.legend.tap", "tap a status|highlight|bright", "c"],
+            ["cal.guide", "guide|how to read", "v"],
+            ["cal.zoom", "zoom", "c"],
+            ["cal.pinch", "pinch", "g"],
+            ["cal.zoom.reset", "double tap|reset", "g"],
+            ["cal.hint", "two fingers", "i"],
+            ["cal.landscape", "landscape|rotate|full screen|fullscreen", "c"],
+            ["cal.lanes", "one column|each barber has", "i"],
+            ["cal.lanes.scroll", "swipe left|scroll left|sideways", "s"],
+            ["cal.lane.head", "booked|free time|photo", "i"],
+            ["cal.axis", "hours|time on the left|time axis", "i"],
+            ["cal.card", "booking card|colour coded|colour-coded", "i"],
+            ["cal.card.tap", "tap a booking", "c"],
+            ["cal.free", "green|free time", "i"],
+            ["cal.free.tap", "tap a free|book from a free", "c"],
+            ["cal.unavailable", "hatched|not available|not working", "i"],
+            ["cal.breakblock", "break", "i"],
+            ["cal.now", "now line|current time", "i"],
+            ["cal.closed", "shop is closed|closed day|holiday", "i"]
+          ]
+        },
+        {
+          "id": "land",
+          "route": "/app/calendar/landscape",
+          "els": [
+            ["land.close", "close", "c"],
+            ["land.prevnext", "previous day|next day|arrows", "c"],
+            ["land.today", "today", "c"],
+            ["land.fit", "whole day|more detail", "c"],
+            ["land.add", "add", "c"],
+            ["land.lanes", "barber rows|row for each barber", "i"],
+            ["land.axis", "time runs sideways|time runs across|across the screen", "s"],
+            ["land.pinch", "pinch", "g"],
+            ["land.legend", "legend|colours", "i"]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c04",
+      "name": "Book an appointment",
+      "screens": [
+        {
+          "id": "book",
+          "route": "/app/appointment/new",
+          "els": [
+            ["book.phone", "phone number", "d"],
+            ["book.suggest", "finds the customer|suggestion|existing customer", "i"],
+            ["book.name", "full name|name", "d"],
+            ["book.email", "email|e-mail", "d"],
+            ["book.service", "select service", "c"],
+            ["book.picker.search", "search", "d"],
+            ["book.picker.photo", "photos|photo", "i"],
+            ["book.picker.price", "price|duration", "i"],
+            ["book.picker.done", "done", "c"],
+            ["book.service.card", "quantity|remove", "c"],
+            ["book.staff", "choose the barber|barber", "c"],
+            ["book.staff.filter", "only the barbers who|only offers the barbers", "i"],
+            ["book.date", "pick the day|day", "s"],
+            ["book.slots", "free times|morning|afternoon", "i"],
+            ["book.time.custom", "choose time|any time", "c"],
+            ["book.notes", "notes", "d"],
+            ["book.bar", "total|bottom bar|live", "i"],
+            ["book.save", "save|review appointment", "c"],
+            ["book.edit", "update|edit an existing|change a booking", "i"],
+            ["book.pay", "make payment", "c"]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c05",
+      "name": "Customers",
+      "screens": [
+        {
+          "id": "cust",
+          "route": "/app/customers",
+          "els": [
+            ["cust.title", "customer directory|customers", "i"],
+            ["cust.count", "all customers|how many", "i"],
+            ["cust.search", "search", "d"],
+            ["cust.row", "initials|name and phone", "i"],
+            ["cust.call", "call", "c"],
+            ["cust.menu", "three dots|menu", "c"],
+            ["cust.edit", "edit", "c"],
+            ["cust.delete", "delete", "c"],
+            ["cust.inactive", "inactive", "i"],
+            ["cust.add", "add", "c"],
+            ["cust.scroll", "scroll|keeps loading", "g"]
+          ]
+        },
+        {
+          "id": "custform",
+          "route": "(sheet)",
+          "els": [
+            ["custform.name", "full name", "d"],
+            ["custform.email", "email", "d"],
+            ["custform.phone", "phone", "d"],
+            ["custform.status", "active|deactive|status", "c"],
+            ["custform.save", "add customer|save", "c"],
+            ["custform.validate", "required|asks|check", "i"]
+          ]
+        },
+        {
+          "id": "custprofile",
+          "route": "/app/customer/:id",
+          "els": [
+            ["custprofile.hero", "profile|member since", "i"],
+            ["custprofile.contact", "phone|email", "i"],
+            ["custprofile.actions", "call|message|copy", "c"],
+            ["custprofile.cards", "total visits|appointments", "i"],
+            ["custprofile.list", "every booking|history", "i"],
+            ["custprofile.menu", "edit|delete", "c"]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c06",
+      "name": "Invoices and POS",
+      "screens": [
+        {
+          "id": "inv",
+          "route": "/app/invoices",
+          "els": [
+            ["inv.title", "invoices", "i"],
+            ["inv.count", "all invoices|how many", "i"],
+            ["inv.search", "search", "d"],
+            ["inv.row", "invoice number|amount", "i"],
+            ["inv.paid", "paid", "i"],
+            ["inv.add", "plus|new invoice", "c"],
+            ["inv.scroll", "scroll|keeps loading", "g"]
+          ]
+        },
+        {
+          "id": "invform",
+          "route": "/app/invoice/new",
+          "els": [
+            ["invform.phone", "phone", "d"],
+            ["invform.lookup", "history|total visit|last service|total spend", "i"],
+            ["invform.name", "name", "d"],
+            ["invform.email", "email", "d"],
+            ["invform.guest", "guest", "i"],
+            ["invform.addservice", "add services|add service", "c"],
+            ["invform.addproduct", "add products|add product", "c"],
+            ["invform.picker", "photos|search", "v"],
+            ["invform.line", "quantity|remove", "c"],
+            ["invform.staff", "barber who did|who did the work|choose the barber", "s"],
+            ["invform.discount", "discount", "d"],
+            ["invform.tip", "tip", "c"],
+            ["invform.pay", "payment method|how the customer pays", "c"],
+            ["invform.notes", "notes", "d"],
+            ["invform.totals", "tax|total", "i"],
+            ["invform.bar", "total amount|bottom", "i"],
+            ["invform.create", "review invoice|create invoice", "c"],
+            ["invform.complete", "from an appointment|complete a booking", "i"],
+            ["invform.edit", "edit an invoice|edit it later", "i"]
+          ]
+        },
+        {
+          "id": "invdetail",
+          "route": "/app/invoice/:id",
+          "els": [
+            ["invdetail.paid", "paid", "i"],
+            ["invdetail.shop", "shop details|your shop", "i"],
+            ["invdetail.customer", "customer", "i"],
+            ["invdetail.number", "invoice number", "i"],
+            ["invdetail.lines", "services|products", "i"],
+            ["invdetail.totals", "subtotal|tax|tip|total", "i"],
+            ["invdetail.notes", "notes", "i"],
+            ["invdetail.mail", "e-mail|email", "c"],
+            ["invdetail.pdf", "pdf|download", "c"],
+            ["invdetail.print", "print", "c"],
+            ["invdetail.edit", "edit", "c"]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c07",
+      "name": "Reports",
+      "screens": [
+        {
+          "id": "rep",
+          "route": "/app/reports",
+          "els": [
+            ["rep.title", "reports", "i"],
+            ["rep.filter", "filter|date", "c"],
+            ["rep.filter.sheet", "start date|end date|staff", "v"],
+            ["rep.cards", "total revenue|total appointment|discount|tips", "i"],
+            ["rep.tabs", "earning|payment methods|staff|invoice|product|top selling", "s"],
+            ["rep.earning", "total earning|commission", "i"],
+            ["rep.earning.cards", "sub total|per appointment|each appointment", "i"],
+            ["rep.payments", "payment method analytics|how your customers pay", "i"],
+            ["rep.staff", "staff performance|earned", "i"],
+            ["rep.invoice", "invoices", "i"],
+            ["rep.product", "product sell history|sell unit", "i"],
+            ["rep.top", "top selling products", "i"],
+            ["rep.empty", "nothing here|no products sold", "i"]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c08",
+      "name": "Catalog",
+      "screens": [
+        {
+          "id": "svc",
+          "route": "/app/services",
+          "els": [
+            ["svc.title", "services", "i"],
+            ["svc.count", "all services|how many", "i"],
+            ["svc.search", "search", "d"],
+            ["svc.row", "photo|price|duration|category", "i"],
+            ["svc.inactive", "inactive", "i"],
+            ["svc.add", "add", "c"],
+            ["svc.menu", "three dots|menu", "c"],
+            ["svc.edit", "edit", "c"],
+            ["svc.section", "website section", "c"],
+            ["svc.section.sheet", "signature grooming menu|select section", "v"],
+            ["svc.delete", "delete", "c"]
+          ]
+        },
+        {
+          "id": "svcform",
+          "route": "/app/services/new",
+          "els": [
+            ["svcform.category", "category", "c"],
+            ["svcform.name", "service name", "d"],
+            ["svcform.price", "price", "d"],
+            ["svcform.duration", "duration", "d"],
+            ["svcform.commission", "commission", "d"],
+            ["svcform.active", "active", "c"],
+            ["svcform.tip", "eligible for tip|tips", "c"],
+            ["svcform.image", "image|photo", "c"],
+            ["svcform.desc", "description", "d"],
+            ["svcform.save", "save", "c"]
+          ]
+        },
+        {
+          "id": "cat",
+          "route": "/app/service-categories",
+          "els": [
+            ["cat.list", "categories", "i"],
+            ["cat.row", "category image|image", "i"],
+            ["cat.add", "add", "c"],
+            ["cat.form", "category name|description", "d"],
+            ["cat.menu", "edit|delete", "c"]
+          ]
+        },
+        {
+          "id": "prod",
+          "route": "/app/products",
+          "els": [
+            ["prod.title", "products", "i"],
+            ["prod.row", "stock|commission", "i"],
+            ["prod.pill", "active|deactive", "i"],
+            ["prod.add", "add", "c"],
+            ["prod.search", "search", "d"],
+            ["prod.menu", "edit|delete", "c"],
+            ["prod.form", "product name|price|stock|commission", "d"],
+            ["prod.form.image", "image|photo", "c"],
+            ["prod.form.status", "status|active", "c"]
+          ]
+        },
+        {
+          "id": "gst",
+          "route": "/app/gst",
+          "els": [
+            ["gst.title", "tax rates|gst", "i"],
+            ["gst.default", "default", "i"],
+            ["gst.include", "include|exclude", "i"],
+            ["gst.add", "add", "c"],
+            ["gst.form", "gst name|total rate", "d"],
+            ["gst.menu", "edit|delete", "c"]
+          ]
+        },
+        {
+          "id": "pay",
+          "route": "/app/payment-methods",
+          "els": [
+            ["pay.list", "payment methods", "i"],
+            ["pay.add", "add", "c"],
+            ["pay.form", "payment method", "d"],
+            ["pay.menu", "edit|delete", "c"]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c09",
+      "name": "Shop settings",
+      "screens": [
+        {
+          "id": "set",
+          "route": "/app/settings",
+          "els": [
+            ["set.tabs", "general|contact|payment options", "s"],
+            ["set.general.reminder", "reminder", "d"],
+            ["set.general.duration", "default duration", "d"],
+            ["set.general.fee", "service fee", "d"],
+            ["set.general.mail", "invoice mail|e-mail the invoice", "c"],
+            ["set.general.update", "update", "c"],
+            ["set.contact", "address|phone|e-mail|website", "d"],
+            ["set.contact.social", "social|instagram|facebook", "d"],
+            ["set.contact.where", "footer|header|website", "i"],
+            ["set.payment", "payment options|custom payment", "i"]
+          ]
+        },
+        {
+          "id": "slots",
+          "route": "/app/slots",
+          "els": [
+            ["slots.days", "every day|each day|seven days", "i"],
+            ["slots.dayoff", "day off", "c"],
+            ["slots.times", "open time|close time|opening hours", "c"],
+            ["slots.picker", "time picker|pick a time", "v"],
+            ["slots.update", "update", "c"]
+          ]
+        },
+        {
+          "id": "clos",
+          "route": "/app/shop-closures",
+          "els": [
+            ["clos.title", "closures|holidays", "i"],
+            ["clos.row", "date|reason", "i"],
+            ["clos.full", "full day", "i"],
+            ["clos.partial", "partial|early", "i"],
+            ["clos.add", "add", "c"],
+            ["clos.form", "reason|date|full day closure", "d"],
+            ["clos.times", "start time|end time|times", "v"],
+            ["clos.menu", "edit|delete", "c"],
+            ["clos.effect", "blocked|bookings", "i"]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c10",
+      "name": "Website content",
+      "screens": [
+        {
+          "id": "testi",
+          "route": "/app/testimonials",
+          "els": [
+            ["testi.title", "testimonials|reviews", "i"],
+            ["testi.row", "stars|client", "i"],
+            ["testi.pill", "active|hidden", "i"],
+            ["testi.add", "add", "c"],
+            ["testi.form", "client name|review|rating|display order", "d"],
+            ["testi.form.show", "show on website", "c"],
+            ["testi.form.photo", "client photo|photo", "c"],
+            ["testi.menu", "edit|delete", "c"]
+          ]
+        },
+        {
+          "id": "gal",
+          "route": "/app/gallery",
+          "els": [
+            ["gal.title", "gallery", "i"],
+            ["gal.empty", "no images yet|empty", "i"],
+            ["gal.add", "upload|add", "c"],
+            ["gal.form", "select image", "v"],
+            ["gal.delete", "delete", "c"]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c11",
+      "name": "Team and roles",
+      "screens": [
+        {
+          "id": "staff",
+          "route": "/app/staff",
+          "els": [
+            ["staff.title", "team|staff", "i"],
+            ["staff.row", "photo|commission|services", "i"],
+            ["staff.pill", "active|deactive", "i"],
+            ["staff.search", "search", "d"],
+            ["staff.add", "add", "c"],
+            ["staff.menu", "edit|assign services|change password|delete", "c"]
+          ]
+        },
+        {
+          "id": "staffform",
+          "route": "/app/staff/new",
+          "els": [
+            ["staffform.photo", "photo|picture", "c"],
+            ["staffform.name", "name", "d"],
+            ["staffform.email", "e-mail|email", "d"],
+            ["staffform.phone", "phone", "d"],
+            ["staffform.password", "password", "d"],
+            ["staffform.barber", "barber", "c"],
+            ["staffform.services", "services", "c"],
+            ["staffform.commission", "commission", "d"],
+            ["staffform.status", "active|status", "c"]
+          ]
+        },
+        {
+          "id": "staffprof",
+          "route": "/app/staff/:id",
+          "els": [
+            ["staffprof.hero", "profile|contact", "i"],
+            ["staffprof.cards", "total visits|total earning|tip", "i"],
+            ["staffprof.tabs", "appointments|assign services|earnings", "s"],
+            ["staffprof.dates", "start date|end date", "c"],
+            ["staffprof.menu", "edit|assign services|change password", "c"]
+          ]
+        },
+        {
+          "id": "assign",
+          "route": "(sheet)",
+          "els": [
+            ["assign.list", "assign|services", "v"],
+            ["assign.save", "save assignments|save", "c"]
+          ]
+        },
+        {
+          "id": "pwd",
+          "route": "(sheet)",
+          "els": [
+            ["pwd.fields", "new password|confirm", "d"],
+            ["pwd.eye", "eye|show the password", "c"],
+            ["pwd.update", "update password", "c"]
+          ]
+        },
+        {
+          "id": "roles",
+          "route": "/app/roles",
+          "els": [
+            ["roles.title", "roles", "i"],
+            ["roles.row", "permissions|users", "i"],
+            ["roles.system", "system", "i"],
+            ["roles.search", "search", "d"],
+            ["roles.add", "add", "c"],
+            ["roles.menu", "edit|delete", "c"]
+          ]
+        },
+        {
+          "id": "roleform",
+          "route": "/app/roles/edit/:id",
+          "els": [
+            ["roleform.name", "role name", "d"],
+            ["roleform.perms", "permissions", "c"],
+            ["roleform.admin", "administrator access|select all", "c"],
+            ["roleform.submit", "submit", "c"],
+            ["roleform.live", "no sign out|follows by itself|without signing out", "i"]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c12",
+      "name": "Your account and the app",
+      "screens": [
+        {
+          "id": "more",
+          "route": "/app/more",
+          "els": [
+            ["more.card", "your name|role", "i"],
+            ["more.revenue", "total revenue|my earnings|money card", "i"],
+            ["more.revenue.eye", "eye|hidden|dots", "c"],
+            ["more.groups", "work|catalog|shop|team", "i"],
+            ["more.appearance", "dark|light|auto", "c"],
+            ["more.haptics", "haptic|vibration", "c"],
+            ["more.about", "version", "i"],
+            ["more.security", "fingerprint", "i"],
+            ["more.lockafter", "lock after|lock again", "c"],
+            ["more.signout", "sign out", "i"],
+            ["more.signoutall", "all devices", "i"]
+          ]
+        },
+        {
+          "id": "prof",
+          "route": "/app/profile",
+          "els": [
+            ["prof.hero", "profile", "i"],
+            ["prof.stats", "stats|numbers", "i"],
+            ["prof.edit", "edit profile", "c"],
+            ["prof.fields", "name|email|phone", "d"],
+            ["prof.photo", "photo", "c"],
+            ["prof.save", "save changes", "c"],
+            ["prof.assigned", "assigned services", "i"]
+          ]
+        }
+      ]
+    }
+  ],
+  "waive": [
+    [
+      "Sign in, Forgot password, Welcome slides",
+      "Before sign-in: not reachable from a signed-in tour. Recorded separately (optional chapter c13)."
+    ],
+    [
+      "Fingerprint prompt, lock screen, biometric offer",
+      "Needs a real finger: shown by narration over the More screen only."
+    ],
+    [
+      "Working Hours, Staff Report",
+      "Staff-only pages (the Super-admin does not have them): a separate Staff tour later."
+    ],
+    [
+      "Developer group, Design gallery, Connection test",
+      "Dev builds only."
+    ],
+    [
+      "Update required screen, offline banner, error screens",
+      "Failure states: not part of a sales demo."
+    ],
+    [
+      "Invoice mail actually sent",
+      "Would send a real e-mail: the button is explained, not pressed."
+    ],
+    [
+      "Photo pickers (camera and gallery)",
+      "System dialogs: explained, not opened."
+    ]
+  ]
+}

@@ -7,6 +7,7 @@ import 'package:barbershop_app/features/catalog/presentation/widgets/admin_widge
 import 'package:barbershop_app/features/catalog/presentation/widgets/image_pick.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:barbershop_app/features/auth/domain/perm.dart';
 
 /// A short list (no paging) with pull-to-refresh and the usual states.
 class _ShortList<T> extends StatelessWidget {
@@ -134,8 +135,8 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> {
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(currentUserProvider);
-    final canEdit = user.can('Service_Category-Edit');
-    final canDelete = user.can('Service_Category-Delete');
+    final canEdit = user.can(Perm.serviceCategoryEdit);
+    final canDelete = user.can(Perm.serviceCategoryDelete);
     final async = ref.watch(categoriesProvider);
     final needle = _q.trim().toLowerCase();
     final filtered = async.whenData(
@@ -148,7 +149,7 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> {
       title: 'Service Categories',
       subtitle: 'Organize services into categories',
       addLabel: 'Add Service Category',
-      onAdd: user.can('Service_Category-Add') ? () => _edit() : null,
+      onAdd: user.can(Perm.serviceCategoryAdd) ? () => _edit() : null,
       searchHint: 'Search category',
       query: _q,
       onSearch: (q) => setState(() => _q = q),
@@ -264,6 +265,7 @@ class _CategoryFormState extends ConsumerState<_CategoryForm> {
         AppTextField(
           label: 'Category Name *',
           hint: 'Enter Category Name',
+          clearable: true,
           controller: _name,
           errorText: _nameError,
           textCapitalization: TextCapitalization.words,
@@ -328,13 +330,13 @@ class GstPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = context.tokens;
     final user = ref.watch(currentUserProvider);
-    final canEdit = user.can('Gst-Edit');
-    final canDelete = user.can('Gst-Delete');
+    final canEdit = user.can(Perm.gstEdit);
+    final canDelete = user.can(Perm.gstDelete);
     return AdminListShell(
       title: 'GST Settings',
       subtitle: 'Configure tax rates for services and products',
       addLabel: 'Add GST',
-      onAdd: user.can('Gst-Add') ? () => _edit(context, ref) : null,
+      onAdd: user.can(Perm.gstAdd) ? () => _edit(context, ref) : null,
       body: _ShortList<GstItem>(
         async: ref.watch(gstListProvider),
         countLabel: 'TAX RATES',
@@ -450,6 +452,7 @@ class _GstFormState extends ConsumerState<_GstForm> {
         AppTextField(
           label: 'Total Rate',
           hint: 'Enter GST Rate',
+          suffixText: '%',
           controller: _rate,
           errorText: _rateError,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),

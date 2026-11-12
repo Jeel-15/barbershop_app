@@ -97,6 +97,8 @@ class _CustomerFormState extends ConsumerState<_CustomerForm> {
         AppTextField(
           label: 'Full Name *',
           hint: 'Enter Full Name',
+          prefixIcon: Icons.person_outline_rounded,
+          clearable: true,
           controller: _name,
           errorText: _nameError,
           textCapitalization: TextCapitalization.words,
@@ -107,6 +109,12 @@ class _CustomerFormState extends ConsumerState<_CustomerForm> {
         AppTextField(
           label: 'Email (Optional)',
           hint: 'Enter Email Address',
+          prefixIcon: Icons.mail_outline_rounded,
+          clearable: true,
+          validator: (v) =>
+              RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(v.trim())
+              ? null
+              : 'Enter a valid email address.',
           controller: _email,
           errorText: _emailError,
           keyboardType: TextInputType.emailAddress,
@@ -116,6 +124,8 @@ class _CustomerFormState extends ConsumerState<_CustomerForm> {
         AppTextField(
           label: 'Phone Number *',
           hint: 'Enter Phone No.',
+          prefixIcon: Icons.phone_outlined,
+          clearable: true,
           controller: _phone,
           errorText: _phoneError,
           keyboardType: TextInputType.phone,

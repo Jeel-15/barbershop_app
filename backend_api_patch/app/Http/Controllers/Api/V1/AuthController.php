@@ -53,13 +53,19 @@ class AuthController extends ApiController
             'token' => $token->plainTextToken,
             'token_type' => 'Bearer',
             'expires_at' => optional($token->accessToken->expires_at)->toIso8601String(),
-            'user' => UserPresenter::make($user),
+            'user' => $presented = UserPresenter::make($user),
+            'permissions_version' => $presented['permissions_version'],
         ], 'You have successfully logged in.');
     }
 
     public function me(Request $request)
     {
-        return $this->ok(['user' => UserPresenter::make($request->user())]);
+        $presented = UserPresenter::make($request->user());
+
+        return $this->ok([
+            'user' => $presented,
+            'permissions_version' => $presented['permissions_version'],
+        ]);
     }
 
     public function logout(Request $request)

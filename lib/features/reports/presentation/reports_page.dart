@@ -407,7 +407,7 @@ class _MiniCards extends StatelessWidget {
     final t = context.tokens;
     Widget small(String label, String value) => Expanded(
       child: Container(
-        padding: const EdgeInsets.all(AppSpace.md),
+        padding: const EdgeInsets.all(AppSpace.sm + 2),
         decoration: BoxDecoration(
           color: t.surface,
           borderRadius: AppRadius.card,
@@ -416,11 +416,24 @@ class _MiniCards extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(value, style: AppType.bodyStrong.copyWith(color: t.text)),
+            // An amount never wraps into two lines: it shrinks to fit the tile.
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                value,
+                maxLines: 1,
+                style: AppType.bodyStrong.copyWith(color: t.text),
+              ),
+            ),
+            const SizedBox(height: 2),
             Text(
               label,
               maxLines: 2,
-              style: AppType.caption.copyWith(color: t.textSecondary),
+              style: AppType.caption.copyWith(
+                color: t.textSecondary,
+                fontSize: 11.5,
+              ),
             ),
           ],
         ),

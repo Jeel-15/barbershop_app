@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:barbershop_app/core/config/env.dart';
 import 'package:barbershop_app/core/errors/failure.dart';
 import 'package:barbershop_app/core/providers.dart';
@@ -5,6 +7,10 @@ import 'package:barbershop_app/design_system/design_system.dart';
 import 'package:barbershop_app/features/auth/application/current_user.dart';
 import 'package:barbershop_app/features/auth/application/session_controller.dart';
 import 'package:barbershop_app/features/auth/domain/auth_user.dart';
+import 'package:barbershop_app/features/demo/application/demo_tour.dart';
+import 'package:barbershop_app/features/demo/application/tour_script.dart';
+import 'package:barbershop_app/features/home/presentation/widgets/money_card.dart';
+import 'package:barbershop_app/features/lock/presentation/security_group.dart';
 import 'package:barbershop_app/features/shell/nav_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -162,6 +168,11 @@ class MorePage extends ConsumerWidget {
                   ? () => context.push('/app/profile')
                   : null,
             ),
+            // Shop revenue (admin) or own earnings (staff), hidden until the eye.
+            if (user.modules.dashboard) ...[
+              const SizedBox(height: AppSpace.md),
+              const MoneyCard(),
+            ],
             for (final g in _groups)
               if (g.entries.any((e) => e.visible(user.modules)))
                 AppListGroup(
@@ -212,6 +223,15 @@ class MorePage extends ConsumerWidget {
                     prefs.setHaptics(v);
                   },
                 ),
+                // A narrated, hands-free walkthrough of the whole app (dev and demo builds).
+                if (!Env.isProd)
+                  AppListRow(
+                    title: 'Demo tour',
+                    subtitle: 'A guided, narrated walkthrough',
+                    leading: const _Leading(icon: Icons.play_circle_rounded),
+                    chevron: true,
+                    onTap: () => _startTour(context, ref),
+                  ),
                 AppListRow(
                   title: 'About',
                   subtitle:
@@ -224,6 +244,8 @@ class MorePage extends ConsumerWidget {
                 ),
               ],
             ),
+            // Fingerprint / screen lock: hidden on a phone that cannot do it.
+            SecurityGroup(leading: (icon) => _Leading(icon: icon)),
             AppListGroup(
               title: 'Account',
               children: [
@@ -266,6 +288,56 @@ class MorePage extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  /// Lets the person pick what the narrated tour plays: everything, or one chapter.
+  Future<void> _startTour(BuildContext context, WidgetRef ref) async {
+    final tour = ref.read(demoTourProvider.notifier);
+    final List<TourChapter> chapters;
+    try {
+      chapters = await tour.chapters();
+    } catch (_) {
+      if (context.mounted) {
+        showToast(
+          context,
+          'The tour script could not be read.',
+          kind: ToastKind.error,
+        );
+      }
+      return;
+    }
+    if (!context.mounted) return;
+    final t = context.tokens;
+    final picked = await showAppSheet<List<TourChapter>>(
+      context,
+      title: 'Demo tour',
+      builder: (ctx) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'It plays by itself with a voice, pressing real buttons. Some '
+            'chapters create real demo data: use it on the test server only.',
+            style: AppType.caption.copyWith(color: t.textSecondary),
+          ),
+          const SizedBox(height: AppSpace.md),
+          AppListRow(
+            title: 'Play all chapters',
+            subtitle: '${chapters.length} chapters',
+            leading: const _Leading(icon: Icons.play_circle_rounded),
+            onTap: () => Navigator.of(ctx).pop(chapters),
+          ),
+          for (final c in chapters)
+            AppListRow(
+              title: c.name,
+              subtitle: '${c.beats.length} parts',
+              leading: const _Leading(icon: Icons.play_arrow_rounded),
+              onTap: () => Navigator.of(ctx).pop([c]),
+            ),
+        ],
+      ),
+    );
+    if (picked == null || picked.isEmpty) return;
+    unawaited(tour.start(chapters: picked));
   }
 
   Future<void> _signOut(

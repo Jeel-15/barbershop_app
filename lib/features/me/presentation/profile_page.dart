@@ -237,85 +237,82 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       _Stats(stats: p.stats!),
                     ],
                     const SizedBox(height: AppSpace.xl),
-                    Text(
-                      'Edit Profile',
-                      style: AppType.subheading.copyWith(color: t.text),
-                    ),
-                    const SizedBox(height: AppSpace.sm + 2),
-                    Container(
-                      padding: const EdgeInsets.all(AppSpace.lg),
-                      decoration: BoxDecoration(
-                        color: t.surface,
-                        borderRadius: AppRadius.card,
-                        border: Border.all(color: t.border),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          AppTextField(
-                            label: 'Name *',
-                            controller: _name,
-                            errorText: _nameError,
-                            textCapitalization: TextCapitalization.words,
-                            textInputAction: TextInputAction.next,
-                          ),
-                          const SizedBox(height: AppSpace.lg),
-                          AppTextField(
-                            label: 'Email *',
-                            controller: _email,
-                            errorText: _emailError,
-                            keyboardType: TextInputType.emailAddress,
-                            textInputAction: TextInputAction.next,
-                          ),
-                          const SizedBox(height: AppSpace.lg),
-                          AppTextField(
-                            label: 'Phone',
-                            controller: _phone,
-                            errorText: _phoneError,
-                            keyboardType: TextInputType.phone,
-                            maxLength: 20,
-                          ),
-                          const SizedBox(height: AppSpace.lg),
-                          AppTextField(
-                            label: 'Role',
-                            controller: _role,
-                            enabled: false,
-                          ),
-                          const SizedBox(height: AppSpace.lg),
-                          Text(
-                            'Profile Photo',
-                            style: AppType.label.copyWith(
-                              color: t.textSecondary,
+                    FormSection(
+                      title: 'Edit Profile',
+                      icon: Icons.edit_rounded,
+                      children: [
+                        AppTextField(
+                          label: 'Name *',
+                          prefixIcon: Icons.person_outline_rounded,
+                          controller: _name,
+                          errorText: _nameError,
+                          textCapitalization: TextCapitalization.words,
+                          textInputAction: TextInputAction.next,
+                          clearable: true,
+                        ),
+                        AppTextField(
+                          label: 'Email *',
+                          prefixIcon: Icons.mail_outline_rounded,
+                          controller: _email,
+                          errorText: _emailError,
+                          validator: (v) =>
+                              RegExp(
+                                r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
+                              ).hasMatch(v.trim())
+                              ? null
+                              : 'Enter a valid email address.',
+                          keyboardType: TextInputType.emailAddress,
+                          textInputAction: TextInputAction.next,
+                          clearable: true,
+                        ),
+                        AppTextField(
+                          label: 'Phone',
+                          prefixIcon: Icons.phone_outlined,
+                          controller: _phone,
+                          errorText: _phoneError,
+                          keyboardType: TextInputType.phone,
+                          maxLength: 20,
+                          clearable: true,
+                        ),
+                        AppTextField(
+                          label: 'Role',
+                          prefixIcon: Icons.badge_outlined,
+                          controller: _role,
+                          enabled: false,
+                          helperText: 'Set by an administrator.',
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const FieldLabel('Profile Photo'),
+                            const SizedBox(height: 8),
+                            AppButton(
+                              label: _photo == null
+                                  ? 'Choose photo'
+                                  : 'Photo chosen: ${_photo!.split(RegExp(r'[\\/]')).last}',
+                              icon: Icons.photo_library_rounded,
+                              variant: AppButtonVariant.secondary,
+                              compact: true,
+                              onPressed: _pickPhoto,
                             ),
-                          ),
-                          const SizedBox(height: 8),
-                          AppButton(
-                            label: _photo == null
-                                ? 'Choose photo'
-                                : 'Photo chosen: ${_photo!.split(RegExp(r'[\\/]')).last}',
-                            icon: Icons.photo_library_rounded,
-                            variant: AppButtonVariant.secondary,
-                            compact: true,
-                            onPressed: _pickPhoto,
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            _photoError ?? 'JPG, PNG or GIF. Max 2MB.',
-                            style: AppType.caption.copyWith(
-                              color: _photoError == null
-                                  ? t.textMuted
-                                  : t.danger,
+                            const SizedBox(height: 6),
+                            Text(
+                              _photoError ?? 'JPG, PNG or GIF. Max 2MB.',
+                              style: AppType.caption.copyWith(
+                                color: _photoError == null
+                                    ? t.textMuted
+                                    : t.danger,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: AppSpace.xl),
-                          AppButton(
-                            label: 'Save Changes',
-                            icon: Icons.check_rounded,
-                            loading: _busy,
-                            onPressed: _save,
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
+                        AppButton(
+                          label: 'Save Changes',
+                          icon: Icons.check_rounded,
+                          loading: _busy,
+                          onPressed: _save,
+                        ),
+                      ],
                     ),
                   ],
                 ),

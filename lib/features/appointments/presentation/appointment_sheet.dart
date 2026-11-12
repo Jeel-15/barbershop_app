@@ -242,10 +242,10 @@ class _Details extends ConsumerWidget {
     final phone = (row.customerPhone ?? '').trim();
     final email = (d?.customerEmail ?? '').trim();
     final user = ref.watch(currentUserProvider);
-    // "Complete" creates an invoice, so it needs the invoice permission.
+    // "Complete" creates an invoice, so it needs the permission to add one.
     final actions = [
       for (final a in row.actions)
-        if (a != 'view' && (a != 'complete' || user.modules.invoiceWrite)) a,
+        if (a != 'view' && (a != 'complete' || user.canCompleteBooking)) a,
     ];
     final customerId = d?.customerId;
     final summary = (customerId != null && user.modules.customers)

@@ -9,6 +9,7 @@ import 'package:barbershop_app/shared/contact_actions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:barbershop_app/features/auth/domain/perm.dart';
 
 /// The web's Customer Profile ("View visit history and pending appointments"):
 /// who they are, Total Visits, and every appointment with date, time, staff and status.
@@ -86,8 +87,8 @@ class _CustomerProfilePageState extends ConsumerState<CustomerProfilePage> {
     final summary = ref.watch(customerSummaryProvider(widget.customerId));
     final appts = ref.watch(customerAppointmentsProvider(widget.customerId));
     final c = summary.value;
-    final canEdit = user.can('Customer-Edit');
-    final canDelete = user.can('Customer-Delete');
+    final canEdit = user.can(Perm.customerEdit);
+    final canDelete = user.can(Perm.customerDelete);
 
     return Scaffold(
       body: SafeArea(

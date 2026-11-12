@@ -1,0 +1,7155 @@
+{
+  "voice": "en-CA-ClaraNeural",
+  "chapters": [
+    {
+      "id": "c00",
+      "name": "Welcome and the app shell",
+      "start": "/app/home",
+      "ready": [
+        "starts",
+        "Good "
+      ],
+      "beats": [
+        {
+          "id": "c00_01",
+          "quick": true,
+          "covers": [
+            "shell.sound"
+          ],
+          "say": "Welcome to the Rosenthal Barbershop app. In this tour I will show you every screen, exactly as your team uses it, one thing at a time.",
+          "pre": [
+            [
+              "scroll",
+              -100000,
+              400
+            ]
+          ],
+          "do": []
+        },
+        {
+          "id": "c00_02",
+          "quick": true,
+          "covers": [
+            "shell.nav",
+            "shell.nav.dashboard",
+            "shell.nav.appointments",
+            "shell.nav.plus",
+            "shell.nav.calendar",
+            "shell.nav.more"
+          ],
+          "say": "At the bottom is the main bar. Dashboard, Appointments, the big plus button for a new invoice, Calendar, and More.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "icon",
+                  "home_outlined|home_rounded",
+                  {
+                    "sel": "lowest",
+                    "grow": "tap"
+                  }
+                ],
+                [
+                  "icon",
+                  "event_note_outlined|event_note_rounded",
+                  {
+                    "sel": "lowest",
+                    "grow": "tap"
+                  }
+                ],
+                [
+                  "icon",
+                  "add_rounded",
+                  {
+                    "sel": "lowest",
+                    "grow": "tap"
+                  }
+                ],
+                [
+                  "icon",
+                  "calendar_month_outlined|calendar_month_rounded",
+                  {
+                    "sel": "lowest",
+                    "grow": "tap"
+                  }
+                ],
+                [
+                  "icon",
+                  "menu_rounded",
+                  {
+                    "sel": "lowest",
+                    "grow": "tap"
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c00_03",
+          "covers": [
+            "ux.motion"
+          ],
+          "say": "The whole app is smooth and animated, because a busy shop needs something that feels quick.",
+          "do": []
+        },
+        {
+          "id": "c00_04",
+          "covers": [
+            "ux.toast"
+          ],
+          "say": "Whenever you save something, you get a clear confirmation, so you never wonder whether it worked.",
+          "do": []
+        },
+        {
+          "id": "c00_05",
+          "covers": [
+            "ux.loading"
+          ],
+          "say": "While information loads, you see soft placeholders instead of a blank screen.",
+          "do": []
+        },
+        {
+          "id": "c00_06",
+          "quick": true,
+          "covers": [
+            "ux.permissions",
+            "ux.live"
+          ],
+          "say": "Each person sees only what you allow. Change someone's role on the website, and their app updates by itself, without signing out.",
+          "do": []
+        },
+        {
+          "id": "c00_07",
+          "covers": [
+            "ux.themes"
+          ],
+          "say": "It also comes in dark and light, which I will show you at the end.",
+          "do": []
+        }
+      ]
+    },
+    {
+      "id": "c01",
+      "name": "Dashboard",
+      "start": "/app/home",
+      "ready": [
+        "starts",
+        "Good "
+      ],
+      "beats": [
+        {
+          "id": "c01_01",
+          "quick": true,
+          "covers": [
+            "home.greeting"
+          ],
+          "say": "This is the dashboard. It greets you by name and shows today's date, so you always know which day you are looking at.",
+          "pre": [
+            [
+              "scroll",
+              -100000,
+              500
+            ]
+          ],
+          "do": [
+            [
+              "ring",
+              "starts",
+              "Good "
+            ]
+          ]
+        },
+        {
+          "id": "c01_02",
+          "covers": [
+            "home.avatar"
+          ],
+          "say": "Your picture is at the top right. Tap it to open your profile and the full menu.",
+          "do": [
+            [
+              "ring",
+              "label",
+              "Open profile and menu",
+              {
+                "grow": "tap"
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c01_03",
+          "quick": true,
+          "covers": [
+            "home.chips"
+          ],
+          "say": "Under the greeting are small chips with your numbers. They slide sideways, and they show bookings only, never money.",
+          "do": [
+            [
+              "ring",
+              "text",
+              "Upcoming",
+              {
+                "grow": "tap"
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c01_04",
+          "quick": true,
+          "covers": [
+            "home.tile.upcoming",
+            "home.tile.customers",
+            "home.tile.completed"
+          ],
+          "say": "The chips are Upcoming bookings still to come, your customers, and completed visits.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Upcoming",
+                  {
+                    "grow": "tap"
+                  }
+                ],
+                [
+                  "text",
+                  "Customers",
+                  {
+                    "grow": "tap"
+                  }
+                ],
+                [
+                  "text",
+                  "Completed",
+                  {
+                    "grow": "tap"
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c01_05",
+          "covers": [
+            "home.tile.tap"
+          ],
+          "say": "Tap any of these numbers and the app opens the matching list. Upcoming opens all the bookings still to come.",
+          "do": [
+            [
+              "tap",
+              "text",
+              "Upcoming",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              2200
+            ],
+            [
+              "nav",
+              "home"
+            ],
+            [
+              "pause",
+              600
+            ]
+          ]
+        },
+        {
+          "id": "c01_32",
+          "covers": [
+            "home.fab"
+          ],
+          "say": "The gold New button at the bottom right starts a new appointment from anywhere on this page. Scroll down and it shrinks to a plus, scroll up and the word comes back.",
+          "pre": [
+            [
+              "scroll",
+              -100000,
+              500
+            ]
+          ],
+          "do": [
+            [
+              "ring",
+              "label",
+              "New appointment",
+              {
+                "grow": "tap"
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c01_06",
+          "quick": true,
+          "covers": [
+            "home.nextup"
+          ],
+          "if": [
+            "starts",
+            "NEXT UP"
+          ],
+          "say": "Next up shows the very next appointment waiting for you. The time, the customer, the barber, and the service. It appears only when the booking is within two hours, so the page stays calm.",
+          "pre": [
+            [
+              "scroll",
+              -100000,
+              500
+            ]
+          ],
+          "do": [
+            [
+              "ring",
+              "starts",
+              "NEXT UP",
+              {
+                "grow": "card"
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c01_07",
+          "covers": [
+            "home.nextup.confirm"
+          ],
+          "if": [
+            "starts",
+            "NEXT UP"
+          ],
+          "say": "If a booking is still pending, one tap on Confirm confirms it, right from the dashboard.",
+          "do": [
+            [
+              "ring",
+              "text",
+              "Confirm",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c01_08",
+          "covers": [
+            "home.nextup.call"
+          ],
+          "if": [
+            "starts",
+            "NEXT UP"
+          ],
+          "say": "And Call dials the customer straight away.",
+          "do": [
+            [
+              "ring",
+              "text",
+              "Call",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c01_21",
+          "quick": true,
+          "covers": [
+            "home.appts.header"
+          ],
+          "say": "Next, your appointments. Today's bookings and the upcoming ones, without leaving the dashboard.",
+          "pre": [
+            [
+              "scrollTo",
+              "text",
+              "Appointments",
+              {
+                "sel": "lowest"
+              }
+            ]
+          ],
+          "do": [
+            [
+              "ring",
+              "text",
+              "Appointments",
+              {
+                "sel": "lowest"
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c01_22",
+          "covers": [
+            "home.appts.switch"
+          ],
+          "say": "A switch flips between today's bookings and the upcoming ones.",
+          "do": [
+            [
+              "tap",
+              "text",
+              "Upcoming",
+              {
+                "sel": "lowest",
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              1500
+            ],
+            [
+              "tap",
+              "text",
+              "Today",
+              {
+                "sel": "lowest",
+                "grow": "tap"
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c01_23",
+          "quick": true,
+          "covers": [
+            "home.appts.tile"
+          ],
+          "say": "Each row shows the time, the customer, the barber and the service, and its status. Tap a row to open the booking.",
+          "do": [
+            [
+              "ring",
+              "regex",
+              "^\\d{1,2}:\\d{2}$",
+              {
+                "in": "AppointmentTile",
+                "grow": "card"
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c01_24",
+          "covers": [
+            "home.appts.more"
+          ],
+          "say": "Only four are shown at a time. Show more opens the first ten in a sheet from the bottom, so the dashboard keeps its place.",
+          "do": [
+            [
+              "tap",
+              "regex",
+              "^Show \\d+ more$",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              2200
+            ],
+            [
+              "ring",
+              "starts",
+              "View all ",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ],
+            [
+              "pause",
+              900
+            ],
+            [
+              "closeSheet"
+            ]
+          ]
+        },
+        {
+          "id": "c01_25",
+          "covers": [
+            "home.appts.viewall"
+          ],
+          "say": "View all opens the complete appointments list.",
+          "pre": [
+            [
+              "scrollTo",
+              "text",
+              "View All"
+            ]
+          ],
+          "do": [
+            [
+              "ring",
+              "text",
+              "View All",
+              {
+                "grow": "tap"
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c01_09",
+          "quick": true,
+          "covers": [
+            "home.staffcal.header"
+          ],
+          "say": "Now the staff calendar. A live picture of today, barber by barber.",
+          "pre": [
+            [
+              "scrollTo",
+              "text",
+              "Staff Calendar"
+            ]
+          ],
+          "do": [
+            [
+              "ring",
+              "text",
+              "Staff Calendar"
+            ]
+          ]
+        },
+        {
+          "id": "c01_10",
+          "covers": [
+            "home.staffcal.open"
+          ],
+          "say": "This link opens the full calendar whenever you want more room.",
+          "do": [
+            [
+              "ring",
+              "text",
+              "Open Full Calendar",
+              {
+                "grow": "tap"
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c01_11",
+          "covers": [
+            "home.staffcal.now"
+          ],
+          "say": "The red marker shows the current time, and beside it, when the shop opens or closes today.",
+          "do": [
+            [
+              "ring",
+              "regex",
+              "^NOW \\d",
+              {
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c01_12",
+          "quick": true,
+          "covers": [
+            "home.staffcal.counters"
+          ],
+          "say": "Three counters tell you at a glance how many barbers are with a client, how many are free right now, and how many have not started yet.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "regex",
+                  "with client$",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "regex",
+                  "free now$",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "regex",
+                  "not in$",
+                  {
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c01_13",
+          "quick": true,
+          "covers": [
+            "home.staffcal.lane"
+          ],
+          "say": "Every barber has one row with their photo, a coloured dot, and what they are doing right now.",
+          "pre": [
+            [
+              "scrollTo",
+              "text",
+              "Mike",
+              {
+                "opt": true
+              }
+            ]
+          ],
+          "do": [
+            [
+              "ring",
+              "text",
+              "Mike",
+              {
+                "grow": "card",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c01_14",
+          "covers": [
+            "home.staffcal.status"
+          ],
+          "say": "The dot and the words tell you at once. With a client, free now, or not in yet. A green plus on a free barber books them right now.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "starts",
+                  "With ",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Free now",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Not in yet",
+                  {
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c01_15",
+          "covers": [
+            "home.staffcal.daybar"
+          ],
+          "say": "Under each barber is a thin bar of their day. Green is free time, colours are bookings, and the red tick is right now.",
+          "do": [
+            [
+              "ring",
+              "regex",
+              "^\\d{1,2}:00 [AP]M$",
+              {
+                "grow": "card",
+                "opt": true
+              }
+            ]
+          ],
+          "quick": true
+        },
+        {
+          "id": "c01_33",
+          "covers": [
+            "home.staffcal.dayopen"
+          ],
+          "say": "Tap a barber to open their whole day in a sheet, one booking, break or free time after another.",
+          "pre": [
+            [
+              "scrollTo",
+              "text",
+              "Mike",
+              {
+                "opt": true
+              }
+            ]
+          ],
+          "do": [
+            [
+              "tap",
+              "text",
+              "Mike",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ],
+            [
+              "pause",
+              1800
+            ]
+          ]
+        },
+        {
+          "id": "c01_16",
+          "covers": [
+            "home.staffcal.free"
+          ],
+          "say": "Inside the day, green blocks are free time that can still be sold, with how long each one lasts.",
+          "do": [
+            [
+              "ring",
+              "starts",
+              "Free ·",
+              {
+                "grow": "card",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c01_17",
+          "covers": [
+            "home.staffcal.freeplus"
+          ],
+          "say": "A green plus on a free block starts a booking for exactly that time.",
+          "do": [
+            [
+              "ring",
+              "icon",
+              "add_rounded",
+              {
+                "in": "_FreeCard",
+                "grow": "tap",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c01_18",
+          "covers": [
+            "home.staffcal.break"
+          ],
+          "say": "Breaks appear with a coffee cup, so nobody books into a barber's break. Closing the sheet brings you back.",
+          "do": [
+            [
+              "ring",
+              "icon",
+              "coffee_rounded",
+              {
+                "grow": "card",
+                "opt": true
+              }
+            ],
+            [
+              "pause",
+              600
+            ],
+            [
+              "closeSheet"
+            ]
+          ]
+        },
+        {
+          "id": "c01_19",
+          "covers": [
+            "home.staffcal.more"
+          ],
+          "say": "When there are more barbers than fit, this button shows the rest.",
+          "pre": [
+            [
+              "scrollTo",
+              "regex",
+              "^Show \\d+ more barbers$",
+              {
+                "opt": true
+              }
+            ]
+          ],
+          "do": [
+            [
+              "tap",
+              "regex",
+              "^Show \\d+ more barbers$",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c01_20",
+          "covers": [
+            "home.staffcal.nohours"
+          ],
+          "say": "If a barber has no working hours, the app warns you here, because without hours they cannot be booked.",
+          "pre": [
+            [
+              "scrollTo",
+              "starts",
+              "No hours set",
+              {
+                "opt": true
+              }
+            ]
+          ],
+          "do": [
+            [
+              "ring",
+              "starts",
+              "No hours set",
+              {
+                "grow": "card",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c01_26",
+          "quick": true,
+          "covers": [
+            "home.highlights"
+          ],
+          "say": "Highlights shows what sells best in your shop.",
+          "pre": [
+            [
+              "scrollTo",
+              "text",
+              "Highlights"
+            ]
+          ],
+          "do": [
+            [
+              "ring",
+              "text",
+              "Highlights"
+            ]
+          ]
+        },
+        {
+          "id": "c01_27",
+          "covers": [],
+          "say": "Top services ranks your most booked services, with a bar and a percentage that show each one's share.",
+          "do": [
+            [
+              "ring",
+              "text",
+              "Top Services",
+              {
+                "grow": "tap"
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c01_28",
+          "covers": [
+            "home.highlights.more"
+          ],
+          "say": "Show more opens the full ranking.",
+          "do": [
+            [
+              "ring",
+              "regex",
+              "^Show \\d+ more$",
+              {
+                "sel": "lowest",
+                "grow": "tap",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c01_29",
+          "covers": [
+            "home.highlights.product"
+          ],
+          "say": "Switch to top selling products to see a donut chart of which retail items move fastest.",
+          "do": [
+            [
+              "tap",
+              "starts",
+              "Top Selling Produ",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              1800
+            ],
+            [
+              "tap",
+              "text",
+              "Top Services",
+              {
+                "grow": "tap"
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c01_30",
+          "quick": true,
+          "covers": [
+            "home.pull"
+          ],
+          "say": "To refresh the numbers, pull the page down, and watch the barber pole spin while it updates.",
+          "pre": [
+            [
+              "scroll",
+              -100000,
+              700
+            ]
+          ],
+          "do": [
+            [
+              "pull"
+            ]
+          ]
+        },
+        {
+          "id": "c01_31",
+          "quick": true,
+          "covers": [],
+          "say": "That is the dashboard. Everything your shop is doing right now, on one screen.",
+          "do": []
+        }
+      ]
+    },
+    {
+      "id": "c05",
+      "name": "Customers",
+      "start": "/app/customers",
+      "ready": [
+        "text",
+        "Manage your customer directory"
+      ],
+      "beats": [
+        {
+          "id": "c05_01",
+          "quick": true,
+          "covers": [
+            "cust.title"
+          ],
+          "say": "Now your customers. This is the customer directory: everyone who has ever booked or paid is in this list.",
+          "do": [
+            [
+              "ring",
+              "text",
+              "Customers",
+              {
+                "sel": "highest"
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c05_02",
+          "covers": [
+            "cust.count"
+          ],
+          "say": "The small heading shows how many customers you have, and it changes while you search.",
+          "do": [
+            [
+              "ring",
+              "starts",
+              "ALL CUSTOMERS"
+            ]
+          ]
+        },
+        {
+          "id": "c05_03",
+          "quick": true,
+          "covers": [
+            "cust.search"
+          ],
+          "say": "Search by name, phone number or e-mail, and the list narrows as you type.",
+          "do": [
+            [
+              "type",
+              "Search name, phone or email",
+              "Gagnon"
+            ],
+            [
+              "pause",
+              1800
+            ],
+            [
+              "clear",
+              "Search name, phone or email"
+            ],
+            [
+              "pause",
+              900
+            ]
+          ]
+        },
+        {
+          "id": "c05_04",
+          "covers": [
+            "cust.row"
+          ],
+          "say": "Each row shows the customer's initials, their name, and their phone number.",
+          "do": [
+            [
+              "ring",
+              "regex",
+              "^[A-Z]{2}$",
+              {
+                "grow": "card"
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c05_05",
+          "covers": [
+            "cust.call"
+          ],
+          "say": "The phone button calls the customer straight away.",
+          "do": [
+            [
+              "ring",
+              "icon",
+              "call_rounded",
+              {
+                "grow": "tap"
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c05_06",
+          "covers": [
+            "cust.menu"
+          ],
+          "say": "The three dots open a small menu for that customer.",
+          "do": [
+            [
+              "tap",
+              "icon",
+              "more_vert_rounded",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              500
+            ]
+          ]
+        },
+        {
+          "id": "c05_07",
+          "covers": [
+            "cust.edit"
+          ],
+          "say": "Edit changes their details.",
+          "do": [
+            [
+              "ring",
+              "text",
+              "Edit",
+              {
+                "grow": "tap"
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c05_08",
+          "covers": [
+            "cust.delete"
+          ],
+          "say": "And Delete removes them, but only after asking you to confirm.",
+          "do": [
+            [
+              "ring",
+              "text",
+              "Delete",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              600
+            ],
+            [
+              "tapAt",
+              0.12,
+              0.9
+            ]
+          ]
+        },
+        {
+          "id": "c05_09",
+          "covers": [
+            "cust.inactive"
+          ],
+          "say": "A customer who is marked inactive carries a red Inactive tag, so you know at a glance.",
+          "do": [
+            [
+              "ring",
+              "text",
+              "Inactive",
+              {
+                "grow": "card",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c05_10",
+          "covers": [
+            "cust.scroll"
+          ],
+          "say": "The list loads more customers as you scroll, so even thousands of customers stay fast.",
+          "do": [
+            [
+              "swipe",
+              {
+                "at": [
+                  0.5,
+                  0.65
+                ],
+                "dx": 0,
+                "dy": -380,
+                "ms": 900
+              }
+            ],
+            [
+              "pause",
+              500
+            ],
+            [
+              "swipe",
+              {
+                "at": [
+                  0.5,
+                  0.45
+                ],
+                "dx": 0,
+                "dy": 380,
+                "ms": 900
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c05_11",
+          "quick": true,
+          "covers": [
+            "cust.add"
+          ],
+          "say": "To add a customer, tap the add button at the top right.",
+          "do": [
+            [
+              "tap",
+              "icon",
+              "person_add_alt_1_rounded",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              900
+            ]
+          ]
+        },
+        {
+          "id": "c05_12",
+          "covers": [
+            "custform.validate"
+          ],
+          "say": "If something important is missing, the form says so in plain words, before anything is saved.",
+          "do": [
+            [
+              "tap",
+              "text",
+              "Add Customer",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              500
+            ],
+            [
+              "ring",
+              "text",
+              "Please Enter Full Name",
+              {
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c05_13",
+          "quick": true,
+          "covers": [
+            "custform.name"
+          ],
+          "say": "First, the full name.",
+          "do": [
+            [
+              "type",
+              "Enter Full Name",
+              "Olivia Tremblay"
+            ]
+          ]
+        },
+        {
+          "id": "c05_14",
+          "covers": [
+            "custform.email"
+          ],
+          "say": "Then an e-mail address, which is optional.",
+          "do": [
+            [
+              "type",
+              "Enter Email Address",
+              "olivia.tremblay@example.com"
+            ]
+          ]
+        },
+        {
+          "id": "c05_15",
+          "quick": true,
+          "covers": [
+            "custform.phone"
+          ],
+          "say": "And the phone number.",
+          "do": [
+            [
+              "type",
+              "Enter Phone No.",
+              "7805550777"
+            ]
+          ]
+        },
+        {
+          "id": "c05_16",
+          "covers": [
+            "custform.status"
+          ],
+          "say": "Choose whether the customer is active. Inactive customers stay on file, but are marked.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Active",
+                  {
+                    "grow": "tap"
+                  }
+                ],
+                [
+                  "text",
+                  "Deactive",
+                  {
+                    "grow": "tap"
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c05_17",
+          "quick": true,
+          "covers": [
+            "custform.save"
+          ],
+          "say": "One tap on Add Customer, and Olivia is in your directory.",
+          "do": [
+            [
+              "tap",
+              "text",
+              "Add Customer",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              1800
+            ]
+          ]
+        },
+        {
+          "id": "c05_18",
+          "covers": [],
+          "say": "Let's find her. Type her name, and she appears at once.",
+          "do": [
+            [
+              "type",
+              "Search name, phone or email",
+              "Olivia"
+            ],
+            [
+              "pause",
+              1500
+            ]
+          ]
+        },
+        {
+          "id": "c05_19",
+          "quick": true,
+          "covers": [],
+          "say": "Tap her row to open her profile.",
+          "do": [
+            [
+              "tap",
+              "starts",
+              "Olivia Tremblay",
+              {
+                "grow": "card"
+              }
+            ],
+            [
+              "pause",
+              1500
+            ]
+          ]
+        },
+        {
+          "id": "c05_20",
+          "covers": [
+            "custprofile.hero"
+          ],
+          "say": "The profile starts with her name, and since when she has been a customer.",
+          "do": [
+            [
+              "ring",
+              "text",
+              "Olivia Tremblay",
+              {
+                "grow": "card"
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c05_21",
+          "covers": [
+            "custprofile.contact"
+          ],
+          "say": "Her phone number and e-mail are listed here.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "starts",
+                  "Phone:",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "starts",
+                  "Email:",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "starts",
+                  "Member since:",
+                  {
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c05_22",
+          "covers": [
+            "custprofile.actions"
+          ],
+          "say": "Call, Message and Copy work straight from here.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Call",
+                  {
+                    "grow": "tap"
+                  }
+                ],
+                [
+                  "text",
+                  "Message",
+                  {
+                    "grow": "tap"
+                  }
+                ],
+                [
+                  "icon",
+                  "copy_rounded",
+                  {
+                    "grow": "tap"
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c05_23",
+          "covers": [
+            "custprofile.cards"
+          ],
+          "say": "Two cards count her total visits and her appointments. She is new, so both are zero.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Total Visits",
+                  {
+                    "grow": "card"
+                  }
+                ],
+                [
+                  "text",
+                  "Appointments",
+                  {
+                    "grow": "card"
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c05_24",
+          "covers": [
+            "custprofile.list"
+          ],
+          "say": "Below, every booking she makes will be listed here.",
+          "do": [
+            [
+              "ring",
+              "text",
+              "No appointments yet",
+              {
+                "grow": "card",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c05_25",
+          "covers": [
+            "custprofile.menu"
+          ],
+          "say": "The menu at the top right edits or deletes the customer.",
+          "do": [
+            [
+              "ring",
+              "icon",
+              "more_vert_rounded",
+              {
+                "grow": "tap"
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c04",
+      "name": "Book an appointment",
+      "start": "/app/appointment/new",
+      "ready": [
+        "hint",
+        "Enter phone number"
+      ],
+      "beats": [
+        {
+          "id": "c04_01",
+          "quick": true,
+          "covers": [],
+          "say": "Now a booking. This is the same form you get from the calendar.",
+          "do": [
+            [
+              "ring",
+              "text",
+              "Add Appointment"
+            ]
+          ]
+        },
+        {
+          "id": "c04_02",
+          "quick": true,
+          "covers": [
+            "book.phone"
+          ],
+          "say": "Start with the phone number.",
+          "do": [
+            [
+              "type",
+              "Enter phone number",
+              "7805550777"
+            ],
+            [
+              "pause",
+              1200
+            ]
+          ]
+        },
+        {
+          "id": "c04_03",
+          "quick": true,
+          "covers": [
+            "book.suggest"
+          ],
+          "say": "The app finds the customer by her number. Tap her name, and her details fill in.",
+          "do": [
+            [
+              "tap",
+              "starts",
+              "Olivia Tremblay",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ],
+            [
+              "pause",
+              800
+            ]
+          ]
+        },
+        {
+          "id": "c04_04",
+          "covers": [
+            "book.name",
+            "book.email"
+          ],
+          "say": "Her name and e-mail are filled in for you. For a new customer you would type them here.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "hint",
+                  "Enter customer name"
+                ],
+                [
+                  "hint",
+                  "Optional"
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c04_05",
+          "quick": true,
+          "covers": [
+            "book.service"
+          ],
+          "say": "Next, choose the service.",
+          "do": [
+            [
+              "tap",
+              "text",
+              "Select Service",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              900
+            ]
+          ]
+        },
+        {
+          "id": "c04_06",
+          "covers": [
+            "book.picker.search"
+          ],
+          "say": "Search to find a service quickly.",
+          "do": [
+            [
+              "type",
+              "Search",
+              "Men"
+            ],
+            [
+              "pause",
+              700
+            ]
+          ]
+        },
+        {
+          "id": "c04_07",
+          "covers": [
+            "book.picker.photo",
+            "book.picker.price"
+          ],
+          "say": "Every service has a photo, its price, and how long it takes.",
+          "do": [
+            [
+              "ring",
+              "regex",
+              "\\d+ min$",
+              {
+                "grow": "card"
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c04_08",
+          "quick": true,
+          "covers": [],
+          "say": "Tap a service to add it.",
+          "do": [
+            [
+              "tap",
+              "starts",
+              "Men",
+              {
+                "grow": "card"
+              }
+            ],
+            [
+              "pause",
+              600
+            ]
+          ]
+        },
+        {
+          "id": "c04_09",
+          "covers": [
+            "book.picker.done"
+          ],
+          "say": "Then tap Done.",
+          "do": [
+            [
+              "tap",
+              "text",
+              "Done",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              700
+            ]
+          ]
+        },
+        {
+          "id": "c04_10",
+          "covers": [
+            "book.service.card"
+          ],
+          "say": "The service appears as a card. Use plus and minus for the quantity, or the cross to remove it.",
+          "do": [
+            [
+              "ring",
+              "regex",
+              "\\d+ min$",
+              {
+                "grow": "card"
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c04_11",
+          "quick": true,
+          "covers": [
+            "book.staff",
+            "book.staff.filter"
+          ],
+          "say": "Choose the barber. The app only offers the barbers who actually do that service.",
+          "pre": [
+            [
+              "scrollTo",
+              "text",
+              "Staff"
+            ]
+          ],
+          "do": [
+            [
+              "ring",
+              "text",
+              "Staff"
+            ],
+            [
+              "tap",
+              "text",
+              "Mike",
+              {
+                "grow": "tap"
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c04_12",
+          "covers": [
+            "book.date"
+          ],
+          "say": "Pick the day. Swipe the strip sideways to look further ahead.",
+          "pre": [
+            [
+              "scrollTo",
+              "text",
+              "Date"
+            ]
+          ],
+          "do": [
+            [
+              "swipe",
+              {
+                "at": [
+                  "regex",
+                  "^\\d{1,2}$",
+                  {
+                    "in": "DateStrip"
+                  }
+                ],
+                "dx": -240,
+                "dy": 0,
+                "ms": 900
+              }
+            ],
+            [
+              "pause",
+              500
+            ],
+            [
+              "swipe",
+              {
+                "at": [
+                  "regex",
+                  "^\\d{1,2}$",
+                  {
+                    "in": "DateStrip"
+                  }
+                ],
+                "dx": 240,
+                "dy": 0,
+                "ms": 900
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c04_13",
+          "quick": true,
+          "covers": [
+            "book.slots"
+          ],
+          "say": "Only times that are really free are offered, grouped into morning, afternoon and evening. Tap one.",
+          "do": [
+            [
+              "pickSlot",
+              [
+                "{d1}",
+                "{d2}",
+                "{d3}",
+                "{d4}"
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c04_14",
+          "covers": [
+            "book.time.custom"
+          ],
+          "say": "Need a time that is not in the list? Choose any time yourself.",
+          "do": [
+            [
+              "ring",
+              "text",
+              "Choose time",
+              {
+                "grow": "tap"
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c04_15",
+          "covers": [
+            "book.notes"
+          ],
+          "say": "Add a note if the barber needs to know something.",
+          "pre": [
+            [
+              "scrollTo",
+              "text",
+              "Notes (Optional)"
+            ]
+          ],
+          "do": [
+            [
+              "ring",
+              "text",
+              "Notes (Optional)"
+            ]
+          ]
+        },
+        {
+          "id": "c04_16",
+          "covers": [
+            "book.bar"
+          ],
+          "say": "The bar at the bottom adds up the services, the time they take, and the price, as you build the booking.",
+          "do": [
+            [
+              "ring",
+              "regex",
+              "service.* min$",
+              {
+                "grow": "card"
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c04_17",
+          "quick": true,
+          "covers": [
+            "book.save"
+          ],
+          "say": "Press Review appointment for a last check of the customer, services, barber and time. Done saves it, and Edit goes back. Nothing is saved before Done.",
+          "do": [
+            [
+              "tap",
+              "text",
+              "Review appointment",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              3000
+            ],
+            [
+              "tap",
+              "text",
+              "Done",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ],
+            [
+              "pause",
+              2200
+            ]
+          ]
+        },
+        {
+          "id": "c04_18",
+          "covers": [
+            "book.edit",
+            "book.pay"
+          ],
+          "say": "Open any booking later to change it, or to take the payment when the work is done.",
+          "do": []
+        }
+      ]
+    },
+    {
+      "id": "c02",
+      "name": "Appointments",
+      "start": "/app/appointments",
+      "ready": [
+        "text",
+        "All"
+      ],
+      "beats": [
+        {
+          "id": "c02_01",
+          "quick": true,
+          "covers": [
+            "appts.title"
+          ],
+          "say": "This is the appointments list: every booking in the shop, whether it is today or months away.",
+          "do": [
+            [
+              "ring",
+              "text",
+              "Appointments"
+            ]
+          ]
+        },
+        {
+          "id": "c02_02",
+          "quick": true,
+          "covers": [
+            "appts.chips",
+            "appts.counts"
+          ],
+          "say": "These chips filter by status, pending, confirmed and more, and the number on each tells you how many there are. Swipe them sideways to see every status.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "All",
+                  {
+                    "grow": "tap"
+                  }
+                ],
+                [
+                  "text",
+                  "Pending",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Confirm",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ]
+              ]
+            ],
+            [
+              "swipe",
+              {
+                "at": [
+                  "text",
+                  "All"
+                ],
+                "dx": -280,
+                "dy": 0,
+                "ms": 900
+              }
+            ],
+            [
+              "pause",
+              400
+            ],
+            [
+              "swipe",
+              {
+                "at": [
+                  "text",
+                  "Completed",
+                  {
+                    "opt": true
+                  }
+                ],
+                "dx": 280,
+                "dy": 0,
+                "ms": 900
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c02_03",
+          "covers": [],
+          "say": "Tap a status, and the list shows only those bookings.",
+          "do": [
+            [
+              "tap",
+              "text",
+              "Pending",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              1500
+            ],
+            [
+              "tap",
+              "text",
+              "All",
+              {
+                "grow": "tap"
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c02_04",
+          "covers": [
+            "appts.group"
+          ],
+          "say": "Bookings are grouped by day, with the date as a heading.",
+          "do": [
+            [
+              "ring",
+              "regex",
+              "^[A-Z]{3}, \\d{1,2} [A-Z]{3}$",
+              {
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c02_05",
+          "quick": true,
+          "covers": [
+            "appts.row",
+            "appts.pill"
+          ],
+          "say": "Each row shows the time, the customer and their phone, the barber and the service, and a coloured status.",
+          "do": [
+            [
+              "ring",
+              "regex",
+              "^\\d{1,2}:\\d{2}$",
+              {
+                "in": "AppointmentTile",
+                "grow": "card"
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c02_05b",
+          "covers": [
+            "appts.scroll"
+          ],
+          "say": "The list keeps loading as you scroll, so it stays fast however many bookings you have.",
+          "do": [
+            [
+              "swipe",
+              {
+                "at": [
+                  0.5,
+                  0.68
+                ],
+                "dx": 0,
+                "dy": -380,
+                "ms": 900
+              }
+            ],
+            [
+              "pause",
+              500
+            ],
+            [
+              "swipe",
+              {
+                "at": [
+                  0.5,
+                  0.45
+                ],
+                "dx": 0,
+                "dy": 380,
+                "ms": 900
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c02_06",
+          "quick": true,
+          "covers": [
+            "appts.search",
+            "appts.search.type"
+          ],
+          "say": "Search finds a booking by the customer's name or phone number.",
+          "do": [
+            [
+              "tap",
+              "icon",
+              "search_rounded",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              500
+            ],
+            [
+              "type",
+              "Search",
+              "Olivia"
+            ],
+            [
+              "pause",
+              1500
+            ]
+          ]
+        },
+        {
+          "id": "c02_07",
+          "covers": [
+            "appts.empty"
+          ],
+          "say": "If nothing matches, the app says so plainly.",
+          "do": [
+            [
+              "type",
+              "Search",
+              "zzzz"
+            ],
+            [
+              "pause",
+              1200
+            ],
+            [
+              "ring",
+              "text",
+              "No bookings found",
+              {
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c02_08",
+          "covers": [],
+          "say": "Let's go back to Olivia's booking.",
+          "do": [
+            [
+              "type",
+              "Search",
+              "Olivia"
+            ],
+            [
+              "pause",
+              1400
+            ]
+          ]
+        },
+        {
+          "id": "c02_09",
+          "quick": true,
+          "covers": [
+            "appts.filter"
+          ],
+          "say": "The filter button opens more ways to narrow the list.",
+          "do": [
+            [
+              "tap",
+              "icon",
+              "tune_rounded",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              900
+            ]
+          ]
+        },
+        {
+          "id": "c02_10",
+          "covers": [
+            "appts.filter.dates"
+          ],
+          "say": "Choose a start date and an end date to see a range of days.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Start Date",
+                  {
+                    "grow": "card",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "End Date",
+                  {
+                    "grow": "card",
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c02_11",
+          "covers": [
+            "appts.filter.daytype"
+          ],
+          "say": "Day type separates morning bookings from evening ones.",
+          "do": [
+            [
+              "ring",
+              "text",
+              "Day Type",
+              {
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c02_12",
+          "covers": [
+            "appts.filter.staff"
+          ],
+          "say": "And staff name shows the bookings of just one barber.",
+          "do": [
+            [
+              "ring",
+              "text",
+              "Staff Name",
+              {
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c02_13",
+          "covers": [
+            "appts.filter.show",
+            "appts.filter.clear"
+          ],
+          "say": "Show results applies the filter, and Clear takes every filter away.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Show results",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Clear",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ]
+              ]
+            ],
+            [
+              "tap",
+              "text",
+              "Show results",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ],
+            [
+              "pause",
+              900
+            ]
+          ]
+        },
+        {
+          "id": "c02_14",
+          "quick": true,
+          "covers": [],
+          "say": "Open a booking to see everything about it.",
+          "do": [
+            [
+              "tap",
+              "regex",
+              "^\\d{1,2}:\\d{2}$",
+              {
+                "in": "AppointmentTile",
+                "grow": "card"
+              }
+            ],
+            [
+              "pause",
+              1300
+            ]
+          ]
+        },
+        {
+          "id": "c02_15",
+          "covers": [
+            "sheet.pill"
+          ],
+          "say": "At the top, a coloured label shows the status of the booking.",
+          "do": [
+            [
+              "ring",
+              "regex",
+              "^(Pending|Confirm|Confirmed|Completed|Cancelled|Reschedule|Rescheduled)$",
+              {
+                "grow": "card",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c02_16",
+          "covers": [
+            "sheet.edit",
+            "sheet.close"
+          ],
+          "say": "The pencil edits the booking, and the cross closes this panel.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "icon",
+                  "edit_rounded",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ],
+                [
+                  "icon",
+                  "close_rounded",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c02_17",
+          "quick": true,
+          "covers": [
+            "sheet.customer",
+            "sheet.call",
+            "sheet.message",
+            "sheet.copy"
+          ],
+          "say": "Below it is the customer, with Call, Message and Copy buttons for their phone number.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Call",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Message",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Copy",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c02_18",
+          "covers": [
+            "sheet.when",
+            "sheet.staff"
+          ],
+          "say": "Then the date, the time, and the barber who will do the work.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Date",
+                  {
+                    "grow": "card",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Time",
+                  {
+                    "grow": "card",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Staff",
+                  {
+                    "grow": "card",
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c02_19",
+          "covers": [
+            "sheet.services",
+            "sheet.total"
+          ],
+          "say": "The services come with their price and how long they take, and the total is at the bottom.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "regex",
+                  "· \\d+ min$",
+                  {
+                    "grow": "card",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Total",
+                  {
+                    "grow": "card",
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c02_20",
+          "covers": [
+            "sheet.facts"
+          ],
+          "say": "A few facts about the customer help you serve them well: how many visits, and how many appointments.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Visits",
+                  {
+                    "grow": "card",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Appointments",
+                  {
+                    "grow": "card",
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c02_21",
+          "covers": [
+            "sheet.complete",
+            "sheet.invoiced"
+          ],
+          "say": "Complete turns a finished booking into an invoice, and a booking that has been invoiced carries an Invoiced tag.",
+          "do": [
+            [
+              "ring",
+              "text",
+              "Complete",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c02_22",
+          "quick": true,
+          "covers": [
+            "sheet.reschedule",
+            "sheet.reschedule.strip",
+            "sheet.reschedule.times"
+          ],
+          "say": "Reschedule moves the booking: pick a new day on the strip, and only the free times are offered.",
+          "do": [
+            [
+              "tap",
+              "text",
+              "Reschedule",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ],
+            [
+              "pause",
+              1200
+            ],
+            [
+              "ring",
+              "text",
+              "Select Time",
+              {
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c02_23",
+          "covers": [],
+          "say": "I will leave it as it is. Let's open the booking again.",
+          "do": [
+            [
+              "closeSheet"
+            ],
+            [
+              "pause",
+              600
+            ],
+            [
+              "tap",
+              "regex",
+              "^\\d{1,2}:\\d{2}$",
+              {
+                "in": "AppointmentTile",
+                "grow": "card"
+              }
+            ],
+            [
+              "pause",
+              1300
+            ]
+          ]
+        },
+        {
+          "id": "c02_24",
+          "covers": [
+            "sheet.cancel",
+            "sheet.cancel.ask"
+          ],
+          "say": "Cancel asks you to confirm first, so a booking is never cancelled by accident.",
+          "do": [
+            [
+              "tap",
+              "text",
+              "Cancel",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ],
+            [
+              "pause",
+              1200
+            ],
+            [
+              "ring",
+              "text",
+              "Are you sure?",
+              {
+                "opt": true
+              }
+            ],
+            [
+              "pause",
+              700
+            ],
+            [
+              "tap",
+              "text",
+              "Cancel",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c02_25",
+          "quick": true,
+          "covers": [
+            "sheet.confirm"
+          ],
+          "say": "And Confirm confirms it. One tap, and the customer's booking is settled.",
+          "do": [
+            [
+              "ring",
+              "text",
+              "Confirm",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ],
+            [
+              "tap",
+              "text",
+              "Confirm",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ],
+            [
+              "pause",
+              1800
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c03",
+      "name": "Calendar",
+      "start": "/app/calendar",
+      "ready": [
+        "icon",
+        "groups_rounded"
+      ],
+      "beats": [
+        {
+          "id": "c03_01",
+          "quick": true,
+          "covers": [
+            "cal.title"
+          ],
+          "say": "This is the calendar. The big title is the day you are looking at, with the weekday above it.",
+          "do": [
+            [
+              "ring",
+              "text",
+              "Today",
+              {
+                "sel": "highest"
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c03_02",
+          "covers": [
+            "cal.datepicker"
+          ],
+          "say": "Tap the day to jump to any date, using a small calendar.",
+          "do": [
+            [
+              "tap",
+              "text",
+              "Today",
+              {
+                "sel": "highest",
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              1800
+            ],
+            [
+              "tap",
+              "text",
+              "Cancel",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ],
+            [
+              "pause",
+              500
+            ]
+          ]
+        },
+        {
+          "id": "c03_03",
+          "quick": true,
+          "covers": [
+            "cal.staff"
+          ],
+          "say": "The people button lets you look at one barber only, or at all of them.",
+          "do": [
+            [
+              "tap",
+              "icon",
+              "groups_rounded",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              900
+            ]
+          ]
+        },
+        {
+          "id": "c03_04",
+          "covers": [],
+          "say": "Pick All Staff, or one barber, and the calendar shows only that column.",
+          "do": [
+            [
+              "ring",
+              "text",
+              "All Staff",
+              {
+                "grow": "card",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c03_05",
+          "covers": [
+            "cal.staff.order"
+          ],
+          "say": "Below that, you can set the order of the columns. Hold the handle and drag a barber up or down, and the calendar remembers your order.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Column order",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "icon",
+                  "drag_handle_rounded",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ]
+              ]
+            ],
+            [
+              "closeSheet"
+            ]
+          ]
+        },
+        {
+          "id": "c03_06",
+          "quick": true,
+          "covers": [
+            "cal.add"
+          ],
+          "say": "The plus opens a new booking for the day you are looking at.",
+          "do": [
+            [
+              "ring",
+              "icon",
+              "add_rounded",
+              {
+                "sel": "highest",
+                "grow": "tap"
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c03_07",
+          "covers": [
+            "cal.break"
+          ],
+          "say": "The coffee cup adds a break, for lunch or an errand.",
+          "do": [
+            [
+              "tap",
+              "icon",
+              "coffee_rounded",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              900
+            ]
+          ]
+        },
+        {
+          "id": "c03_08",
+          "covers": [
+            "cal.break.sheet"
+          ],
+          "say": "Choose the barber, then either the rest of the day or how long the break lasts, and add it.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Barber",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Rest of the day",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "How long",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Add break",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ]
+              ]
+            ],
+            [
+              "closeSheet"
+            ]
+          ]
+        },
+        {
+          "id": "c03_09",
+          "quick": true,
+          "covers": [
+            "cal.strip"
+          ],
+          "say": "The strip of days moves you through the calendar. Swipe it sideways to see more days.",
+          "do": [
+            [
+              "swipe",
+              {
+                "at": [
+                  "regex",
+                  "^\\d{1,2}$",
+                  {
+                    "in": "DateStrip"
+                  }
+                ],
+                "dx": -260,
+                "dy": 0,
+                "ms": 900
+              }
+            ],
+            [
+              "pause",
+              400
+            ],
+            [
+              "swipe",
+              {
+                "at": [
+                  "regex",
+                  "^\\d{1,2}$",
+                  {
+                    "in": "DateStrip"
+                  }
+                ],
+                "dx": 260,
+                "dy": 0,
+                "ms": 900
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c03_10",
+          "covers": [
+            "cal.strip.dots"
+          ],
+          "say": "A small dot under a day means that day has bookings.",
+          "do": [
+            [
+              "ring",
+              "regex",
+              "^\\d{1,2}$",
+              {
+                "in": "DateStrip",
+                "grow": "card"
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c03_11",
+          "quick": true,
+          "covers": [
+            "cal.legend"
+          ],
+          "say": "Under it, a chip for each status shows how many bookings there are on this day.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Pending",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Confirmed",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Completed",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c03_12",
+          "covers": [
+            "cal.legend.tap"
+          ],
+          "say": "Tap a status and only those bookings stay bright, so you can find them at once. Tap again to bring everything back.",
+          "do": [
+            [
+              "tap",
+              "text",
+              "Pending",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ],
+            [
+              "pause",
+              1800
+            ],
+            [
+              "tap",
+              "text",
+              "Pending",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c03_13",
+          "covers": [
+            "cal.guide"
+          ],
+          "say": "The guide explains every colour and mark on the calendar.",
+          "do": [
+            [
+              "tap",
+              "text",
+              "Guide",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ],
+            [
+              "pause",
+              1300
+            ],
+            [
+              "ring",
+              "text",
+              "How to read the calendar",
+              {
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c03_14",
+          "covers": [],
+          "say": "Let's close it and look at the day itself.",
+          "do": [
+            [
+              "closeSheet"
+            ],
+            [
+              "pause",
+              500
+            ]
+          ]
+        },
+        {
+          "id": "c03_15",
+          "quick": true,
+          "covers": [
+            "cal.zoom"
+          ],
+          "say": "The magnifier zooms the day. Compact shows more hours at once, and roomy shows more detail.",
+          "do": [
+            [
+              "tap",
+              "icon",
+              "zoom_in_rounded",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              1100
+            ],
+            [
+              "tap",
+              "icon",
+              "zoom_in_rounded",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              1100
+            ],
+            [
+              "tap",
+              "icon",
+              "zoom_in_rounded",
+              {
+                "grow": "tap"
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c03_16",
+          "quick": true,
+          "covers": [
+            "cal.pinch",
+            "cal.hint"
+          ],
+          "say": "You can also pinch with two fingers to zoom, just like a map.",
+          "do": [
+            [
+              "pinch",
+              {
+                "at": [
+                  0.55,
+                  0.55
+                ],
+                "from": 60,
+                "to": 150,
+                "ms": 1000
+              }
+            ],
+            [
+              "pause",
+              600
+            ],
+            [
+              "pinch",
+              {
+                "at": [
+                  0.55,
+                  0.55
+                ],
+                "from": 150,
+                "to": 60,
+                "ms": 1000
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c03_17",
+          "covers": [
+            "cal.zoom.reset"
+          ],
+          "say": "Double tap the day to put the zoom back.",
+          "do": [
+            [
+              "doubleTap",
+              0.55,
+              0.6
+            ]
+          ]
+        },
+        {
+          "id": "c03_18",
+          "covers": [
+            "cal.lanes",
+            "cal.lane.head"
+          ],
+          "say": "Now the calendar itself. Each barber has their own column, with their photo, their name, and how many bookings they have.",
+          "do": [
+            [
+              "ring",
+              "regex",
+              " booked",
+              {
+                "grow": "card",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c03_19",
+          "quick": true,
+          "covers": [
+            "cal.lanes.scroll"
+          ],
+          "say": "With many barbers, swipe the calendar sideways to move between the columns.",
+          "do": [
+            [
+              "swipe",
+              {
+                "at": [
+                  0.6,
+                  0.62
+                ],
+                "dx": -300,
+                "dy": 0,
+                "ms": 1000
+              }
+            ],
+            [
+              "pause",
+              500
+            ],
+            [
+              "swipe",
+              {
+                "at": [
+                  0.4,
+                  0.62
+                ],
+                "dx": 300,
+                "dy": 0,
+                "ms": 1000
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c03_20",
+          "covers": [
+            "cal.axis"
+          ],
+          "say": "The hours run down the left side.",
+          "do": [
+            [
+              "ring",
+              "regex",
+              "^\\d{1,2} (AM|PM)$",
+              {
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c03_21",
+          "quick": true,
+          "covers": [
+            "cal.card"
+          ],
+          "say": "Bookings are colour coded cards. They show the time and the customer, and the colour tells you the status.",
+          "do": [
+            [
+              "ring",
+              "regex",
+              "^\\d{1,2}:\\d{2} (AM|PM)\\s+\\S",
+              {
+                "grow": "card",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c03_22",
+          "covers": [
+            "cal.card.tap"
+          ],
+          "say": "Tap a booking to open it, with all its actions.",
+          "do": [
+            [
+              "tap",
+              "regex",
+              "^\\d{1,2}:\\d{2} (AM|PM)\\s+\\S",
+              {
+                "grow": "card",
+                "opt": true
+              }
+            ],
+            [
+              "pause",
+              1500
+            ],
+            [
+              "closeSheet"
+            ],
+            [
+              "pause",
+              500
+            ]
+          ]
+        },
+        {
+          "id": "c03_23",
+          "covers": [
+            "cal.free"
+          ],
+          "say": "Green blocks are free time that can still be sold.",
+          "do": [
+            [
+              "ring",
+              "starts",
+              "Free ·",
+              {
+                "grow": "card",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c03_24",
+          "covers": [
+            "cal.free.tap"
+          ],
+          "say": "Tap a free block, and the booking form opens for exactly that time.",
+          "do": [
+            [
+              "ring",
+              "icon",
+              "add_circle_rounded",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c03_25",
+          "covers": [
+            "cal.unavailable"
+          ],
+          "say": "Hatched areas mean the barber is not working at that time.",
+          "do": [
+            [
+              "ring",
+              "text",
+              "Not available",
+              {
+                "grow": "card",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c03_26",
+          "covers": [
+            "cal.breakblock"
+          ],
+          "say": "Breaks are drawn too, so nobody books into one.",
+          "do": [
+            [
+              "ring",
+              "starts",
+              "Break",
+              {
+                "grow": "card",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c03_27",
+          "covers": [
+            "cal.now"
+          ],
+          "say": "The red line is the current time.",
+          "do": [
+            [
+              "ring",
+              "text",
+              "NOW",
+              {
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c03_28",
+          "covers": [
+            "cal.closed"
+          ],
+          "say": "On a day when the shop is closed, the calendar tells you, and bookings are blocked.",
+          "do": [
+            [
+              "swipe",
+              {
+                "at": [
+                  "regex",
+                  "^\\d{1,2}$",
+                  {
+                    "in": "DateStrip"
+                  }
+                ],
+                "dx": -300,
+                "dy": 0,
+                "ms": 900
+              }
+            ],
+            [
+              "tap",
+              "text",
+              "11",
+              {
+                "in": "DateStrip",
+                "grow": "tap",
+                "opt": true
+              }
+            ],
+            [
+              "pause",
+              1200
+            ],
+            [
+              "ring",
+              "text",
+              "The shop is closed on this day.",
+              {
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c03_29",
+          "quick": true,
+          "covers": [
+            "cal.landscape"
+          ],
+          "say": "The expand button turns the calendar into one wide screen. Let's look at it.",
+          "do": [
+            [
+              "tap",
+              "text",
+              "Today",
+              {
+                "sel": "highest",
+                "grow": "tap",
+                "opt": true
+              }
+            ],
+            [
+              "tap",
+              "icon",
+              "fullscreen_rounded",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              2800
+            ]
+          ]
+        },
+        {
+          "id": "c03_30",
+          "covers": [
+            "land.lanes",
+            "land.axis"
+          ],
+          "say": "The whole day on one wide screen, with a row for each barber and the time running across. Swipe it sideways to see the evening.",
+          "do": [
+            [
+              "swipe",
+              {
+                "at": [
+                  0.6,
+                  0.6
+                ],
+                "dx": -300,
+                "dy": 0,
+                "ms": 1000
+              }
+            ],
+            [
+              "pause",
+              400
+            ],
+            [
+              "swipe",
+              {
+                "at": [
+                  0.4,
+                  0.6
+                ],
+                "dx": 300,
+                "dy": 0,
+                "ms": 1000
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c03_31",
+          "covers": [
+            "land.prevnext",
+            "land.today"
+          ],
+          "say": "The arrows go to the previous or the next day, and Today brings you back.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "icon",
+                  "chevron_left_rounded",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ],
+                [
+                  "icon",
+                  "chevron_right_rounded",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Today",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c03_32",
+          "covers": [
+            "land.fit"
+          ],
+          "say": "This button switches between the whole day and more detail.",
+          "do": [
+            [
+              "ring",
+              "icon",
+              "zoom_out_map_rounded|zoom_in_map_rounded",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c03_33",
+          "covers": [
+            "land.pinch",
+            "land.add",
+            "land.legend"
+          ],
+          "say": "Pinch to zoom in on the hours, the plus adds a booking, and the coloured dots are the legend.",
+          "do": [
+            [
+              "ring",
+              "icon",
+              "add_rounded",
+              {
+                "sel": "highest",
+                "grow": "tap",
+                "opt": true
+              }
+            ],
+            [
+              "pinch",
+              {
+                "at": [
+                  0.55,
+                  0.6
+                ],
+                "from": 60,
+                "to": 160,
+                "ms": 1000
+              }
+            ],
+            [
+              "pause",
+              500
+            ],
+            [
+              "pinch",
+              {
+                "at": [
+                  0.55,
+                  0.6
+                ],
+                "from": 160,
+                "to": 60,
+                "ms": 1000
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c03_34",
+          "covers": [
+            "land.close"
+          ],
+          "say": "The cross takes you back to the normal calendar.",
+          "do": [
+            [
+              "ring",
+              "icon",
+              "close_rounded",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ],
+            [
+              "tap",
+              "icon",
+              "close_rounded",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ],
+            [
+              "pause",
+              1500
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c06",
+      "name": "Invoices and POS",
+      "start": "/app/invoices",
+      "ready": [
+        "text",
+        "View, edit, and send customer invoices"
+      ],
+      "beats": [
+        {
+          "id": "c06_01",
+          "quick": true,
+          "covers": [
+            "inv.title",
+            "inv.count"
+          ],
+          "say": "Invoices lists every sale, newest first. The small heading counts them.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Invoices",
+                  {
+                    "sel": "highest"
+                  }
+                ],
+                [
+                  "starts",
+                  "ALL INVOICES"
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c06_02",
+          "covers": [
+            "inv.search"
+          ],
+          "say": "Search by invoice number, customer name or phone.",
+          "do": [
+            [
+              "type",
+              "Search invoice, name or phone",
+              "Okafor"
+            ],
+            [
+              "pause",
+              1500
+            ],
+            [
+              "clear",
+              "Search invoice, name or phone"
+            ],
+            [
+              "pause",
+              700
+            ]
+          ]
+        },
+        {
+          "id": "c06_03",
+          "covers": [
+            "inv.row",
+            "inv.paid"
+          ],
+          "say": "Each row shows the customer, the invoice number, the date and the barber, the amount, and a Paid tag.",
+          "do": [
+            [
+              "ring",
+              "regex",
+              "^INV-",
+              {
+                "grow": "card"
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c06_04",
+          "covers": [
+            "inv.scroll"
+          ],
+          "say": "The list loads more as you scroll, however many invoices there are.",
+          "do": [
+            [
+              "swipe",
+              {
+                "at": [
+                  0.5,
+                  0.68
+                ],
+                "dx": 0,
+                "dy": -380,
+                "ms": 900
+              }
+            ],
+            [
+              "pause",
+              500
+            ],
+            [
+              "swipe",
+              {
+                "at": [
+                  0.5,
+                  0.45
+                ],
+                "dx": 0,
+                "dy": 380,
+                "ms": 900
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c06_05",
+          "quick": true,
+          "covers": [
+            "inv.add"
+          ],
+          "say": "The plus creates a new invoice. This is the point of sale.",
+          "do": [
+            [
+              "tap",
+              "icon",
+              "add_rounded",
+              {
+                "sel": "highest",
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              1200
+            ]
+          ]
+        },
+        {
+          "id": "c06_06",
+          "quick": true,
+          "covers": [
+            "invform.phone",
+            "invform.lookup"
+          ],
+          "say": "Type the phone number, and the customer's history appears: visits, last service, and total spend.",
+          "do": [
+            [
+              "type",
+              "Enter phone number",
+              "7805550777"
+            ],
+            [
+              "pause",
+              1500
+            ],
+            [
+              "ring",
+              "starts",
+              "Customer :",
+              {
+                "grow": "card",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c06_07",
+          "covers": [
+            "invform.name",
+            "invform.email",
+            "invform.guest"
+          ],
+          "say": "Name and e-mail fill in for a returning customer. Leave them empty, and the sale goes to a guest.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "hint",
+                  "Enter customer name"
+                ],
+                [
+                  "hint",
+                  "Enter email address"
+                ],
+                [
+                  "text",
+                  "Leave empty to continue as Guest.",
+                  {
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c06_08",
+          "quick": true,
+          "covers": [
+            "invform.addservice",
+            "invform.picker"
+          ],
+          "say": "Add Services opens a picker with photos, prices and a search. Tap a service, then Done.",
+          "do": [
+            [
+              "tap",
+              "text",
+              "Add Services",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              900
+            ],
+            [
+              "type",
+              "Search",
+              "Men"
+            ],
+            [
+              "pause",
+              600
+            ],
+            [
+              "tap",
+              "starts",
+              "Men",
+              {
+                "grow": "card"
+              }
+            ],
+            [
+              "pause",
+              500
+            ],
+            [
+              "tap",
+              "text",
+              "Done",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              700
+            ]
+          ]
+        },
+        {
+          "id": "c06_09",
+          "covers": [
+            "invform.line",
+            "invform.staff"
+          ],
+          "say": "Each service becomes a line with quantity buttons, and you choose which barber did the work.",
+          "do": [
+            [
+              "ring",
+              "regex",
+              " each$",
+              {
+                "grow": "card"
+              }
+            ],
+            [
+              "tap",
+              "text",
+              "Mike",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c06_10",
+          "covers": [
+            "invform.addproduct"
+          ],
+          "say": "Products work the same way. Add one, like beard oil.",
+          "do": [
+            [
+              "tap",
+              "text",
+              "Add Products",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              900
+            ],
+            [
+              "type",
+              "Search",
+              "Beard Oil"
+            ],
+            [
+              "pause",
+              600
+            ],
+            [
+              "tap",
+              "starts",
+              "Beard Oil",
+              {
+                "grow": "card",
+                "opt": true
+              }
+            ],
+            [
+              "pause",
+              500
+            ],
+            [
+              "tap",
+              "text",
+              "Done",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              700
+            ],
+            [
+              "tap",
+              "text",
+              "Mike",
+              {
+                "grow": "tap",
+                "sel": "lowest",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c06_11",
+          "covers": [
+            "invform.discount"
+          ],
+          "say": "Discounts are a percentage, one for services and one for products.",
+          "pre": [
+            [
+              "scrollTo",
+              "text",
+              "Service Discount (%)",
+              {
+                "opt": true
+              }
+            ]
+          ],
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Service Discount (%)",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Product Discount (%)",
+                  {
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c06_12",
+          "quick": true,
+          "covers": [
+            "invform.tip"
+          ],
+          "say": "Choose a tip with one tap, or type an amount.",
+          "pre": [
+            [
+              "scrollTo",
+              "text",
+              "Tip"
+            ]
+          ],
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "No tip",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "10%",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "15%",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "20%",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ]
+              ]
+            ],
+            [
+              "tap",
+              "text",
+              "15%",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c06_13",
+          "quick": true,
+          "covers": [
+            "invform.pay"
+          ],
+          "say": "Then choose how the customer pays.",
+          "pre": [
+            [
+              "scrollTo",
+              "text",
+              "Payment Method"
+            ]
+          ],
+          "do": [
+            [
+              "ring",
+              "text",
+              "Payment Method"
+            ],
+            [
+              "tap",
+              "text",
+              "Visa/Credit Card",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c06_14",
+          "covers": [
+            "invform.notes"
+          ],
+          "say": "A note can go on the invoice if you need one.",
+          "do": [
+            [
+              "ring",
+              "text",
+              "Notes (Optional)",
+              {
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c06_15",
+          "covers": [
+            "invform.totals",
+            "invform.bar"
+          ],
+          "say": "The total, the tax and the tip add up live at the bottom, as you build the invoice.",
+          "do": [
+            [
+              "ring",
+              "text",
+              "Total Amount",
+              {
+                "sel": "last",
+                "grow": "card",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c06_16",
+          "quick": true,
+          "covers": [
+            "invform.create"
+          ],
+          "say": "Press Review invoice for a last check of the customer, items, tax, tip and total. Done records the sale, and Edit goes back. Nothing is saved before Done.",
+          "do": [
+            [
+              "tap",
+              "text",
+              "Review invoice",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ],
+            [
+              "pause",
+              3000
+            ],
+            [
+              "tap",
+              "text",
+              "Done",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ],
+            [
+              "pause",
+              2500
+            ]
+          ]
+        },
+        {
+          "id": "c06_17",
+          "covers": [
+            "invform.complete",
+            "invform.edit"
+          ],
+          "say": "The same form completes a booking, filled in for you, and it opens again later if an invoice needs to be edited.",
+          "do": []
+        },
+        {
+          "id": "c06_18",
+          "covers": [],
+          "say": "Now let's open the invoice we just made.",
+          "pre": [
+            [
+              "go",
+              "/app/invoices"
+            ]
+          ],
+          "do": [
+            [
+              "tap",
+              "regex",
+              "^INV-",
+              {
+                "grow": "card"
+              }
+            ],
+            [
+              "pause",
+              1500
+            ]
+          ]
+        },
+        {
+          "id": "c06_19",
+          "quick": true,
+          "covers": [
+            "invdetail.paid",
+            "invdetail.number"
+          ],
+          "say": "At the top, the invoice number and a Paid tag.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Paid",
+                  {
+                    "grow": "card",
+                    "opt": true
+                  }
+                ],
+                [
+                  "starts",
+                  "INV-",
+                  {
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c06_20",
+          "covers": [
+            "invdetail.shop",
+            "invdetail.customer"
+          ],
+          "say": "Below, your shop's details and the customer.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Rosenthal Barbershop",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "CUSTOMER",
+                  {
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c06_21",
+          "covers": [
+            "invdetail.lines",
+            "invdetail.totals"
+          ],
+          "say": "Then the services and products with the barber for each, and the subtotal, the tax, the tip and the total.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "starts",
+                  "Total Services",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Subtotal",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Tax",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Tip",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Total Amount",
+                  {
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c06_22",
+          "covers": [
+            "invdetail.notes"
+          ],
+          "say": "Any note you wrote shows here.",
+          "do": [
+            [
+              "ring",
+              "text",
+              "NOTES",
+              {
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c06_23",
+          "quick": true,
+          "covers": [
+            "invdetail.mail",
+            "invdetail.pdf",
+            "invdetail.print",
+            "invdetail.edit"
+          ],
+          "say": "You can e-mail the invoice to the customer, download it as a PDF, print it, or edit it.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Send Invoice Mail",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Download PDF",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Print",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Edit",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c07",
+      "name": "Reports",
+      "start": "/app/reports",
+      "ready": [
+        "text",
+        "Reports"
+      ],
+      "beats": [
+        {
+          "id": "c07_01",
+          "quick": true,
+          "covers": [
+            "rep.title",
+            "rep.cards"
+          ],
+          "say": "Reports turns all your sales into numbers: total revenue, appointments, discounts given, and tips.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Total Revenue",
+                  {
+                    "grow": "card",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Total Appointment",
+                  {
+                    "grow": "card",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Discount Amount",
+                  {
+                    "grow": "card",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Total Tips",
+                  {
+                    "grow": "card",
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c07_02",
+          "covers": [
+            "rep.filter",
+            "rep.filter.sheet"
+          ],
+          "say": "The filter button picks the dates and the barber you want to look at.",
+          "do": [
+            [
+              "tap",
+              "icon",
+              "tune_rounded",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              900
+            ],
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Start Date",
+                  {
+                    "grow": "card",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "End Date",
+                  {
+                    "grow": "card",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Staff Name",
+                  {
+                    "grow": "card",
+                    "opt": true
+                  }
+                ]
+              ]
+            ],
+            [
+              "closeSheet"
+            ]
+          ]
+        },
+        {
+          "id": "c07_03",
+          "quick": true,
+          "covers": [
+            "rep.tabs"
+          ],
+          "say": "Six tabs look at the same numbers in six ways. Swipe them sideways to see them all.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Earning",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Payment Methods",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Staff",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ]
+              ]
+            ],
+            [
+              "swipe",
+              {
+                "at": [
+                  "text",
+                  "Earning"
+                ],
+                "dx": -300,
+                "dy": 0,
+                "ms": 900
+              }
+            ],
+            [
+              "pause",
+              400
+            ],
+            [
+              "swipe",
+              {
+                "at": [
+                  "text",
+                  "Invoice",
+                  {
+                    "opt": true
+                  }
+                ],
+                "dx": 300,
+                "dy": 0,
+                "ms": 900
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c07_04",
+          "covers": [
+            "rep.earning",
+            "rep.earning.cards"
+          ],
+          "say": "Earning shows what the shop earned, split into commission and tips, and then every appointment with its subtotal, discount, tip and total.",
+          "do": [
+            [
+              "tap",
+              "text",
+              "Earning",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              1000
+            ],
+            [
+              "ring",
+              "text",
+              "Total Earning",
+              {
+                "grow": "card",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c07_05",
+          "covers": [
+            "rep.payments"
+          ],
+          "say": "Payment Methods shows how your customers pay: cash, debit, or card.",
+          "do": [
+            [
+              "tap",
+              "text",
+              "Payment Methods",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              1200
+            ],
+            [
+              "ring",
+              "text",
+              "Payment Method Analytics",
+              {
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c07_06",
+          "covers": [
+            "rep.staff"
+          ],
+          "say": "Staff shows how each barber is doing, with their appointments, tips and commission.",
+          "do": [
+            [
+              "tap",
+              "text",
+              "Staff",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              1200
+            ],
+            [
+              "ring",
+              "text",
+              "Staff Performance",
+              {
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c07_07",
+          "covers": [
+            "rep.invoice"
+          ],
+          "say": "Invoice lists every invoice in the range.",
+          "do": [
+            [
+              "tap",
+              "text",
+              "Invoice",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ],
+            [
+              "pause",
+              1200
+            ]
+          ]
+        },
+        {
+          "id": "c07_08",
+          "covers": [
+            "rep.product",
+            "rep.empty"
+          ],
+          "say": "Product shows what you sold from the shelf, and if nothing was sold in the range, it says so.",
+          "do": [
+            [
+              "tap",
+              "text",
+              "Product",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ],
+            [
+              "pause",
+              1200
+            ],
+            [
+              "ring",
+              "text",
+              "Product Sell History",
+              {
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c07_09",
+          "quick": true,
+          "covers": [
+            "rep.top"
+          ],
+          "say": "Top Selling Products ranks your best sellers.",
+          "do": [
+            [
+              "tap",
+              "text",
+              "Top Selling Products",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ],
+            [
+              "pause",
+              1200
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c08",
+      "name": "Catalog",
+      "start": "/app/services",
+      "ready": [
+        "text",
+        "Manage service offerings, pricing, and duration"
+      ],
+      "beats": [
+        {
+          "id": "c08_01",
+          "quick": true,
+          "covers": [
+            "svc.title",
+            "svc.count"
+          ],
+          "say": "Your menu. Services lists everything you sell, with a count at the top.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Services",
+                  {
+                    "sel": "highest"
+                  }
+                ],
+                [
+                  "starts",
+                  "ALL SERVICES"
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c08_02",
+          "covers": [
+            "svc.search"
+          ],
+          "say": "Search by service, category or duration.",
+          "do": [
+            [
+              "type",
+              "Search service, category, duration...",
+              "fade"
+            ],
+            [
+              "pause",
+              1400
+            ],
+            [
+              "clear",
+              "Search service, category, duration..."
+            ],
+            [
+              "pause",
+              600
+            ]
+          ]
+        },
+        {
+          "id": "c08_03",
+          "quick": true,
+          "covers": [
+            "svc.row",
+            "svc.inactive"
+          ],
+          "say": "Each row has the photo, the name, the category and how long it takes, and the price. A service you have switched off shows an Inactive tag.",
+          "do": [
+            [
+              "ring",
+              "regex",
+              "· \\d+ min$",
+              {
+                "grow": "card"
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c08_04",
+          "covers": [
+            "svc.menu",
+            "svc.edit",
+            "svc.section",
+            "svc.delete"
+          ],
+          "say": "The three dots offer Edit, Website Section, and Delete.",
+          "do": [
+            [
+              "tap",
+              "icon",
+              "more_vert_rounded",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              600
+            ],
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Edit",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Website Section",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Delete",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c08_05",
+          "covers": [
+            "svc.section.sheet"
+          ],
+          "say": "Website Section chooses where the service appears on your website's menu.",
+          "do": [
+            [
+              "tap",
+              "text",
+              "Website Section",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ],
+            [
+              "pause",
+              1200
+            ],
+            [
+              "ring",
+              "text",
+              "Select Section",
+              {
+                "opt": true
+              }
+            ],
+            [
+              "closeSheet"
+            ]
+          ]
+        },
+        {
+          "id": "c08_06",
+          "covers": [
+            "svc.add"
+          ],
+          "say": "The plus adds a new service.",
+          "do": [
+            [
+              "tap",
+              "icon",
+              "add_rounded",
+              {
+                "sel": "highest",
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              1200
+            ]
+          ]
+        },
+        {
+          "id": "c08_07",
+          "quick": true,
+          "covers": [
+            "svcform.category",
+            "svcform.name",
+            "svcform.price",
+            "svcform.duration"
+          ],
+          "say": "The form asks for the category, the name, the price, and how many minutes it takes.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "starts",
+                  "Category",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "starts",
+                  "Service Name",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "starts",
+                  "Price",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "starts",
+                  "Duration",
+                  {
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c08_08",
+          "covers": [
+            "svcform.commission",
+            "svcform.active",
+            "svcform.tip"
+          ],
+          "say": "Then the commission for the barber, whether the service is active, and whether customers can tip on it.",
+          "pre": [
+            [
+              "scrollTo",
+              "starts",
+              "Commission",
+              {
+                "opt": true
+              }
+            ]
+          ],
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "starts",
+                  "Commission",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Active",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Eligible for Tip",
+                  {
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c08_09",
+          "covers": [
+            "svcform.image",
+            "svcform.desc",
+            "svcform.save"
+          ],
+          "say": "Add a photo and a description, and save. I will not save anything now.",
+          "pre": [
+            [
+              "scrollTo",
+              "starts",
+              "Service Image",
+              {
+                "opt": true
+              }
+            ]
+          ],
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "starts",
+                  "Service Image",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "starts",
+                  "Service Description",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Save",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c08_10",
+          "covers": [
+            "cat.list",
+            "cat.row"
+          ],
+          "say": "Categories group your services, each with its own picture.",
+          "pre": [
+            [
+              "go",
+              "/app/service-categories"
+            ]
+          ],
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Service Categories",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Add Ons",
+                  {
+                    "grow": "card",
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c08_11",
+          "covers": [
+            "cat.add",
+            "cat.form"
+          ],
+          "say": "Adding a category takes a name, a picture and a description.",
+          "do": [
+            [
+              "tap",
+              "icon",
+              "add_rounded",
+              {
+                "sel": "highest",
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              900
+            ],
+            [
+              "sweep",
+              [
+                [
+                  "starts",
+                  "Category Name",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Category Image",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Category Description",
+                  {
+                    "opt": true
+                  }
+                ]
+              ]
+            ],
+            [
+              "closeSheet"
+            ]
+          ]
+        },
+        {
+          "id": "c08_12",
+          "covers": [
+            "cat.menu"
+          ],
+          "say": "The three dots edit or delete a category.",
+          "do": [
+            [
+              "tap",
+              "icon",
+              "more_vert_rounded",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              600
+            ],
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Edit",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Delete",
+                  {
+                    "opt": true
+                  }
+                ]
+              ]
+            ],
+            [
+              "tapAt",
+              0.12,
+              0.9
+            ]
+          ]
+        },
+        {
+          "id": "c08_13",
+          "quick": true,
+          "covers": [
+            "prod.title",
+            "prod.search"
+          ],
+          "say": "Products are what you sell from the shelf. You can search them by name or price.",
+          "pre": [
+            [
+              "go",
+              "/app/products"
+            ]
+          ],
+          "do": [
+            [
+              "ring",
+              "text",
+              "Products",
+              {
+                "sel": "highest"
+              }
+            ],
+            [
+              "type",
+              "Search product, category or price",
+              "oil"
+            ],
+            [
+              "pause",
+              1200
+            ],
+            [
+              "clear",
+              "Search product, category or price"
+            ]
+          ]
+        },
+        {
+          "id": "c08_14",
+          "covers": [
+            "prod.row",
+            "prod.pill"
+          ],
+          "say": "Each product shows its stock, its commission, its price, and whether it is active.",
+          "do": [
+            [
+              "ring",
+              "regex",
+              "Stock \\d+",
+              {
+                "grow": "card",
+                "opt": true
+              }
+            ],
+            [
+              "ring",
+              "text",
+              "Active",
+              {
+                "grow": "card",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c08_15",
+          "covers": [
+            "prod.menu"
+          ],
+          "say": "The three dots edit or delete a product.",
+          "do": [
+            [
+              "tap",
+              "icon",
+              "more_vert_rounded",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              600
+            ],
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Edit",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Delete",
+                  {
+                    "opt": true
+                  }
+                ]
+              ]
+            ],
+            [
+              "tapAt",
+              0.12,
+              0.9
+            ]
+          ]
+        },
+        {
+          "id": "c08_16",
+          "covers": [
+            "prod.add",
+            "prod.form",
+            "prod.form.image",
+            "prod.form.status"
+          ],
+          "say": "A new product needs a name, a category, a price, the stock, the commission, a status, a picture and a description.",
+          "do": [
+            [
+              "tap",
+              "icon",
+              "add_rounded",
+              {
+                "sel": "highest",
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              1200
+            ],
+            [
+              "sweep",
+              [
+                [
+                  "starts",
+                  "Product Name",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "starts",
+                  "Category",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "starts",
+                  "Price",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "starts",
+                  "Stock",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "starts",
+                  "Commission",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "starts",
+                  "Status",
+                  {
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c08_17",
+          "quick": true,
+          "covers": [
+            "gst.title",
+            "gst.default",
+            "gst.include"
+          ],
+          "say": "GST is your tax. One rate is marked Default and is applied to every invoice, and it can be included in the price or added on top.",
+          "pre": [
+            [
+              "go",
+              "/app/gst"
+            ]
+          ],
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "starts",
+                  "TAX RATES",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Default",
+                  {
+                    "grow": "card",
+                    "opt": true
+                  }
+                ],
+                [
+                  "regex",
+                  "(Include|Exclude)$",
+                  {
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c08_18",
+          "covers": [
+            "gst.add",
+            "gst.form",
+            "gst.menu"
+          ],
+          "say": "Add a rate with a name, the percentage and the type. The three dots edit or delete one.",
+          "do": [
+            [
+              "tap",
+              "icon",
+              "add_rounded",
+              {
+                "sel": "highest",
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              900
+            ],
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "GST Name",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Total Rate",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Type",
+                  {
+                    "opt": true
+                  }
+                ]
+              ]
+            ],
+            [
+              "closeSheet"
+            ]
+          ]
+        },
+        {
+          "id": "c08_19",
+          "covers": [
+            "pay.list",
+            "pay.add",
+            "pay.form",
+            "pay.menu"
+          ],
+          "say": "Payment methods are the ways your customers can pay. Add one with a name, or edit and delete them with the three dots.",
+          "pre": [
+            [
+              "go",
+              "/app/payment-methods"
+            ]
+          ],
+          "do": [
+            [
+              "ring",
+              "starts",
+              "PAYMENT METHODS",
+              {
+                "opt": true
+              }
+            ],
+            [
+              "tap",
+              "icon",
+              "add_rounded",
+              {
+                "sel": "highest",
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              900
+            ],
+            [
+              "ring",
+              "text",
+              "Payment Method",
+              {
+                "opt": true
+              }
+            ],
+            [
+              "closeSheet"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c09",
+      "name": "Shop settings",
+      "start": "/app/settings",
+      "ready": [
+        "text",
+        "Manage business settings, payments, and account security"
+      ],
+      "beats": [
+        {
+          "id": "c09_01",
+          "quick": true,
+          "covers": [
+            "set.tabs"
+          ],
+          "say": "Settings has three tabs: general settings, contact details, and payment options.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "General Settings",
+                  {
+                    "grow": "tap"
+                  }
+                ],
+                [
+                  "text",
+                  "Contact Details",
+                  {
+                    "grow": "tap"
+                  }
+                ],
+                [
+                  "text",
+                  "Payment Options",
+                  {
+                    "grow": "tap"
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c09_02",
+          "covers": [
+            "set.general.reminder",
+            "set.general.duration",
+            "set.general.fee"
+          ],
+          "say": "General has the reminder day, the default length of a service, and an optional service fee.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Service Reminder Day",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "starts",
+                  "Service Default Duration",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Service Fee",
+                  {
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c09_03",
+          "covers": [
+            "set.general.mail",
+            "set.general.update"
+          ],
+          "say": "A switch decides whether invoices are e-mailed to customers, and Update saves the changes.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Invoice Mail Send",
+                  {
+                    "grow": "card",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Update",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c09_04",
+          "covers": [
+            "set.contact",
+            "set.contact.social",
+            "set.contact.where"
+          ],
+          "say": "Contact details are the address, phone, e-mail and website, plus your social links. They appear in the footer, the header and the booking pages of your website.",
+          "do": [
+            [
+              "tap",
+              "text",
+              "Contact Details",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              1200
+            ],
+            [
+              "sweep",
+              [
+                [
+                  "starts",
+                  "These details appear",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Social Media Links",
+                  {
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c09_05",
+          "covers": [
+            "set.payment"
+          ],
+          "say": "Payment options lists the ways customers can pay, and you can add, rename or remove them.",
+          "do": [
+            [
+              "tap",
+              "text",
+              "Payment Options",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              1200
+            ],
+            [
+              "ring",
+              "text",
+              "Custom Payment Methods",
+              {
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c09_06",
+          "quick": true,
+          "covers": [
+            "slots.days",
+            "slots.dayoff"
+          ],
+          "say": "Slots sets the opening hours for every day of the week, and a switch marks a day off.",
+          "pre": [
+            [
+              "go",
+              "/app/slots"
+            ]
+          ],
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Monday",
+                  {
+                    "grow": "card",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Day Off",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c09_07",
+          "covers": [
+            "slots.times",
+            "slots.picker",
+            "slots.update"
+          ],
+          "say": "Tap the opening or closing time to pick a new one, and Update saves the week.",
+          "do": [
+            [
+              "tap",
+              "text",
+              "Shop Open Time",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ],
+            [
+              "pause",
+              1500
+            ],
+            [
+              "tap",
+              "text",
+              "Cancel",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ],
+            [
+              "pause",
+              500
+            ],
+            [
+              "ring",
+              "text",
+              "Update",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c09_08",
+          "quick": true,
+          "covers": [
+            "clos.title",
+            "clos.row",
+            "clos.full",
+            "clos.partial"
+          ],
+          "say": "Closures are holidays and early closings. Each has a date and a reason, and it is either a full day or a partial day.",
+          "pre": [
+            [
+              "go",
+              "/app/shop-closures"
+            ]
+          ],
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "starts",
+                  "ALL CLOSURES",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Full Day",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Partial Day",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c09_09",
+          "covers": [
+            "clos.add",
+            "clos.form",
+            "clos.times",
+            "clos.menu"
+          ],
+          "say": "Add a closure with a date and a reason, and for a partial day, the start and end times. The three dots edit or delete it.",
+          "do": [
+            [
+              "tap",
+              "icon",
+              "add_rounded",
+              {
+                "sel": "highest",
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              900
+            ],
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Full Day Closure",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "starts",
+                  "Reason",
+                  {
+                    "opt": true
+                  }
+                ]
+              ]
+            ],
+            [
+              "closeSheet"
+            ]
+          ]
+        },
+        {
+          "id": "c09_10",
+          "covers": [
+            "clos.effect"
+          ],
+          "say": "On a closure day, bookings are blocked automatically, so nobody books a day you are shut.",
+          "do": []
+        }
+      ]
+    },
+    {
+      "id": "c10",
+      "name": "Website content",
+      "start": "/app/testimonials",
+      "ready": [
+        "starts",
+        "Manage homepage"
+      ],
+      "beats": [
+        {
+          "id": "c10_01",
+          "quick": true,
+          "covers": [
+            "testi.title",
+            "testi.row",
+            "testi.pill"
+          ],
+          "say": "Testimonials are the reviews shown on your website. Each has the client, their stars and their words, and an Active or Hidden tag.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Testimonials",
+                  {
+                    "sel": "highest"
+                  }
+                ],
+                [
+                  "text",
+                  "Active",
+                  {
+                    "grow": "card",
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c10_02",
+          "covers": [
+            "testi.menu"
+          ],
+          "say": "The three dots edit or delete a review.",
+          "do": [
+            [
+              "tap",
+              "icon",
+              "more_vert_rounded",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              600
+            ],
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Edit",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Delete",
+                  {
+                    "opt": true
+                  }
+                ]
+              ]
+            ],
+            [
+              "tapAt",
+              0.12,
+              0.9
+            ]
+          ]
+        },
+        {
+          "id": "c10_03",
+          "covers": [
+            "testi.add",
+            "testi.form",
+            "testi.form.show",
+            "testi.form.photo"
+          ],
+          "say": "A new review takes the client's name and title, their words, a rating, and the order it appears in. A switch shows or hides it on the website, and a photo is optional.",
+          "do": [
+            [
+              "tap",
+              "icon",
+              "add_rounded",
+              {
+                "sel": "highest",
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              1200
+            ],
+            [
+              "sweep",
+              [
+                [
+                  "starts",
+                  "Client Name",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "starts",
+                  "Review",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Rating",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Show on website",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Client Photo",
+                  {
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c10_04",
+          "quick": true,
+          "covers": [
+            "gal.title",
+            "gal.empty",
+            "gal.add",
+            "gal.form",
+            "gal.delete"
+          ],
+          "say": "The gallery holds the pictures on your website. Upload one, choose the image, and it appears on the site. Each picture can be deleted again.",
+          "pre": [
+            [
+              "go",
+              "/app/gallery"
+            ]
+          ],
+          "do": [
+            [
+              "ring",
+              "text",
+              "Gallery",
+              {
+                "sel": "highest"
+              }
+            ],
+            [
+              "ring",
+              "text",
+              "No images yet",
+              {
+                "grow": "card",
+                "opt": true
+              }
+            ],
+            [
+              "tap",
+              "icon",
+              "add_rounded",
+              {
+                "sel": "highest",
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              900
+            ],
+            [
+              "ring",
+              "text",
+              "Select Image",
+              {
+                "opt": true
+              }
+            ],
+            [
+              "closeSheet"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c11",
+      "name": "Team and roles",
+      "start": "/app/staff",
+      "ready": [
+        "text",
+        "Manage team members, roles, and commissions"
+      ],
+      "beats": [
+        {
+          "id": "c11_01",
+          "quick": true,
+          "covers": [
+            "staff.title",
+            "staff.row",
+            "staff.pill"
+          ],
+          "say": "Staff is your team. Each row has the photo, the name, the e-mail, the role and the commission, the services they offer, and an Active tag.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Staff",
+                  {
+                    "sel": "highest"
+                  }
+                ],
+                [
+                  "text",
+                  "Active",
+                  {
+                    "grow": "card",
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c11_02",
+          "covers": [
+            "staff.search"
+          ],
+          "say": "Search by name, e-mail, phone or service.",
+          "do": [
+            [
+              "type",
+              "Search name, email, phone or service",
+              "Jason"
+            ],
+            [
+              "pause",
+              1400
+            ],
+            [
+              "clear",
+              "Search name, email, phone or service"
+            ],
+            [
+              "pause",
+              600
+            ]
+          ]
+        },
+        {
+          "id": "c11_03",
+          "covers": [
+            "staff.menu",
+            "assign.list",
+            "assign.save"
+          ],
+          "say": "The three dots offer Edit, Assign Services, Change Password and Delete. Assign Services chooses what each barber can do.",
+          "do": [
+            [
+              "tap",
+              "icon",
+              "more_vert_rounded",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              600
+            ],
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Edit",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Assign Services",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Change Password",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Delete",
+                  {
+                    "opt": true
+                  }
+                ]
+              ]
+            ],
+            [
+              "tap",
+              "text",
+              "Assign Services",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ],
+            [
+              "pause",
+              1500
+            ],
+            [
+              "ring",
+              "text",
+              "Save Assignments",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ],
+            [
+              "closeSheet"
+            ]
+          ]
+        },
+        {
+          "id": "c11_04",
+          "covers": [
+            "pwd.fields",
+            "pwd.eye",
+            "pwd.update"
+          ],
+          "say": "Change Password sets a new password for a team member, typed twice, with an eye to show it.",
+          "do": [
+            [
+              "tap",
+              "icon",
+              "more_vert_rounded",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              600
+            ],
+            [
+              "tap",
+              "text",
+              "Change Password",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ],
+            [
+              "pause",
+              1200
+            ],
+            [
+              "sweep",
+              [
+                [
+                  "starts",
+                  "New Password",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "starts",
+                  "Confirm New Password",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Update Password",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ]
+              ]
+            ],
+            [
+              "closeSheet"
+            ]
+          ]
+        },
+        {
+          "id": "c11_05",
+          "quick": true,
+          "covers": [
+            "staff.add"
+          ],
+          "say": "The add button creates a team member.",
+          "do": [
+            [
+              "tap",
+              "icon",
+              "person_add_alt_1_rounded",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              1200
+            ]
+          ]
+        },
+        {
+          "id": "c11_06",
+          "covers": [
+            "staffform.photo",
+            "staffform.name",
+            "staffform.email",
+            "staffform.phone",
+            "staffform.password"
+          ],
+          "say": "A new member needs a photo, a name, an e-mail, a phone number, and a password.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Staff Profile Image",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "starts",
+                  "Staff Name",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "starts",
+                  "Email",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Phone",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "starts",
+                  "Password",
+                  {
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c11_07",
+          "covers": [
+            "staffform.barber",
+            "staffform.services",
+            "staffform.commission",
+            "staffform.status"
+          ],
+          "say": "A switch says whether they are a barber. Barbers also get their services, a commission, and a product commission, and an Active status.",
+          "pre": [
+            [
+              "scrollTo",
+              "text",
+              "Barber",
+              {
+                "opt": true
+              }
+            ]
+          ],
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Barber",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Select Service",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "starts",
+                  "Product Commission",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Active",
+                  {
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c11_08",
+          "covers": [
+            "staffprof.hero",
+            "staffprof.cards"
+          ],
+          "say": "Open a team member to see their profile, with their visits and their earnings.",
+          "pre": [
+            [
+              "go",
+              "/app/staff"
+            ]
+          ],
+          "do": [
+            [
+              "tap",
+              "text",
+              "Jason Wong",
+              {
+                "grow": "card",
+                "opt": true
+              }
+            ],
+            [
+              "pause",
+              1500
+            ],
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Total Visits",
+                  {
+                    "grow": "card",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Total Earning",
+                  {
+                    "grow": "card",
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c11_09",
+          "covers": [
+            "staffprof.tabs",
+            "staffprof.dates"
+          ],
+          "say": "Three tabs show their appointments, their services, and their earnings, and the dates narrow what you see.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Appointments",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Assign Services",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Earnings",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ]
+              ]
+            ],
+            [
+              "tap",
+              "text",
+              "Earnings",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ],
+            [
+              "pause",
+              1000
+            ],
+            [
+              "tap",
+              "text",
+              "Appointments",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ],
+            [
+              "pause",
+              600
+            ],
+            [
+              "sweep",
+              [
+                [
+                  "starts",
+                  "Start Date",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "starts",
+                  "End Date",
+                  {
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c11_10",
+          "covers": [
+            "staffprof.menu"
+          ],
+          "say": "The menu at the top right edits the member, assigns services, or changes the password.",
+          "do": [
+            [
+              "ring",
+              "icon",
+              "more_vert_rounded",
+              {
+                "grow": "tap",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c11_11",
+          "quick": true,
+          "covers": [
+            "roles.title",
+            "roles.row",
+            "roles.system"
+          ],
+          "say": "Roles decide what each person may do. A row shows how many permissions the role has and how many people use it, and System roles are protected.",
+          "pre": [
+            [
+              "go",
+              "/app/roles"
+            ]
+          ],
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Roles",
+                  {
+                    "sel": "highest"
+                  }
+                ],
+                [
+                  "starts",
+                  "42 of 42",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "System",
+                  {
+                    "grow": "card",
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c11_12",
+          "covers": [
+            "roles.search",
+            "roles.menu"
+          ],
+          "say": "Search for a role, and use the three dots to edit or delete it.",
+          "do": [
+            [
+              "type",
+              "Search role",
+              "man"
+            ],
+            [
+              "pause",
+              1200
+            ],
+            [
+              "clear",
+              "Search role"
+            ],
+            [
+              "tap",
+              "icon",
+              "more_vert_rounded",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              600
+            ],
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Edit",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Delete",
+                  {
+                    "opt": true
+                  }
+                ]
+              ]
+            ],
+            [
+              "tapAt",
+              0.12,
+              0.9
+            ]
+          ]
+        },
+        {
+          "id": "c11_13",
+          "covers": [
+            "roles.add",
+            "roleform.name"
+          ],
+          "say": "The plus creates a role. Give it a name.",
+          "do": [
+            [
+              "tap",
+              "icon",
+              "add_rounded",
+              {
+                "sel": "highest",
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              1200
+            ],
+            [
+              "ring",
+              "text",
+              "Role Name",
+              {
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c11_14",
+          "covers": [
+            "roleform.perms",
+            "roleform.admin",
+            "roleform.submit"
+          ],
+          "say": "Then tick exactly what the role may do, or choose Administrator Access for everything, and submit.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Role Permissions",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Administrator Access",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Submit",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c11_15",
+          "quick": true,
+          "covers": [
+            "roleform.live"
+          ],
+          "say": "Change a role on the website, and everyone's app follows by itself, without signing out.",
+          "do": []
+        }
+      ]
+    },
+    {
+      "id": "c12",
+      "name": "Your account and the app",
+      "start": "/app/more",
+      "ready": [
+        "icon",
+        "menu_rounded"
+      ],
+      "beats": [
+        {
+          "id": "c12_01",
+          "quick": true,
+          "covers": [
+            "more.card",
+            "more.groups"
+          ],
+          "say": "More is the menu for everything else. At the top is you, with your name and your role, and below it, your work, your catalog, your shop, and your team.",
+          "pre": [
+            [
+              "scroll",
+              -100000,
+              500
+            ]
+          ],
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Work",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Catalog",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Shop",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Team",
+                  {
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c12_32",
+          "covers": [
+            "more.revenue",
+            "more.revenue.eye"
+          ],
+          "say": "Under your name sits the money card: shop revenue, or your own earnings for a barber. It stays hidden behind dots. Tap the eye to show it, and it hides again after a minute.",
+          "pre": [
+            [
+              "scroll",
+              -100000,
+              500
+            ]
+          ],
+          "do": [
+            [
+              "ring",
+              "regex",
+              "^(TOTAL REVENUE|MY EARNINGS)$",
+              {
+                "grow": "card"
+              }
+            ],
+            [
+              "tap",
+              "label",
+              "Show amount",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              2200
+            ],
+            [
+              "tap",
+              "label",
+              "Hide amount",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              800
+            ]
+          ]
+        },
+        {
+          "id": "c12_02",
+          "quick": true,
+          "covers": [
+            "more.appearance"
+          ],
+          "say": "Appearance switches between dark, light and automatic. Watch the whole app change.",
+          "pre": [
+            [
+              "scrollTo",
+              "text",
+              "Appearance"
+            ]
+          ],
+          "do": [
+            [
+              "tap",
+              "text",
+              "Dark",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              2000
+            ],
+            [
+              "tap",
+              "text",
+              "Light",
+              {
+                "grow": "tap"
+              }
+            ],
+            [
+              "pause",
+              1000
+            ]
+          ]
+        },
+        {
+          "id": "c12_03",
+          "covers": [
+            "more.haptics"
+          ],
+          "say": "Haptic feedback gives a small vibration when you tap, and you can turn it off.",
+          "do": [
+            [
+              "ring",
+              "text",
+              "Haptic feedback",
+              {
+                "grow": "card",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c12_04",
+          "covers": [
+            "more.about"
+          ],
+          "say": "About shows the version of the app.",
+          "do": [
+            [
+              "ring",
+              "text",
+              "About",
+              {
+                "grow": "card",
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c12_05",
+          "quick": true,
+          "covers": [
+            "more.security",
+            "more.lockafter"
+          ],
+          "say": "Security locks the app with your fingerprint, and you choose how soon it locks again, from immediately to fifteen minutes.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Fingerprint unlock",
+                  {
+                    "grow": "card",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Lock after",
+                  {
+                    "grow": "card",
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c12_06",
+          "covers": [
+            "more.signout",
+            "more.signoutall"
+          ],
+          "say": "Sign out ends your session on this phone, and Sign out of all devices ends it everywhere. Both ask first.",
+          "pre": [
+            [
+              "scrollTo",
+              "text",
+              "Sign out"
+            ]
+          ],
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Sign out",
+                  {
+                    "grow": "card",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Sign out of all devices",
+                  {
+                    "grow": "card",
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c12_07",
+          "covers": [
+            "prof.hero",
+            "prof.stats"
+          ],
+          "say": "Your profile has your picture and your name, with your numbers.",
+          "pre": [
+            [
+              "go",
+              "/app/profile"
+            ]
+          ],
+          "do": [
+            [
+              "ring",
+              "text",
+              "My Profile",
+              {
+                "opt": true
+              }
+            ]
+          ]
+        },
+        {
+          "id": "c12_08",
+          "covers": [
+            "prof.edit",
+            "prof.fields",
+            "prof.photo",
+            "prof.save",
+            "prof.assigned"
+          ],
+          "say": "Edit your name, e-mail and phone, change your photo, and save. Your role is shown, and your assigned services are listed.",
+          "do": [
+            [
+              "sweep",
+              [
+                [
+                  "text",
+                  "Edit Profile",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "starts",
+                  "Name",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Profile Photo",
+                  {
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Save Changes",
+                  {
+                    "grow": "tap",
+                    "opt": true
+                  }
+                ],
+                [
+                  "text",
+                  "Assigned Services",
+                  {
+                    "opt": true
+                  }
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "c12_09",
+          "quick": true,
+          "covers": [],
+          "say": "That is the whole app. Faster bookings, no double booking, invoices in a minute, and the numbers you need whenever you want them.",
+          "pre": [
+            [
+              "go",
+              "/app/home"
+            ]
+          ],
+          "do": []
+        },
+        {
+          "id": "c12_10",
+          "quick": true,
+          "covers": [],
+          "say": "It works for the owner and for every barber, and each person sees only what you allow. It mirrors your website admin panel, so there is nothing new to learn. Thank you for watching.",
+          "do": []
+        }
+      ]
+    }
+  ]
+}

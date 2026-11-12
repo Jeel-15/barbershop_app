@@ -10,6 +10,7 @@ import 'package:barbershop_app/features/staff/presentation/widgets/change_passwo
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:barbershop_app/features/auth/domain/perm.dart';
 
 /// The web's Staff page ("Manage team members, roles, and commissions"): the
 /// team with search, Add, and per row View / Edit / Delete / Change Password
@@ -109,7 +110,7 @@ class _StaffPageState extends ConsumerState<StaffPage> {
                       style: AppType.heading.copyWith(color: t.text),
                     ),
                   ),
-                  if (user.can('Staff-Add'))
+                  if (user.can(Perm.staffAdd))
                     HeaderIconButton(
                       icon: Icons.person_add_alt_1_rounded,
                       label: 'Add',
@@ -153,8 +154,8 @@ class _StaffPageState extends ConsumerState<StaffPage> {
                     state: value,
                     controller: _scroll,
                     searching: query.trim().isNotEmpty,
-                    canEdit: user.can('Staff-Edit'),
-                    canDelete: user.can('Staff-Delete'),
+                    canEdit: user.can(Perm.staffEdit),
+                    canDelete: user.can(Perm.staffDelete),
                     onOpen: (m) => context.push('/app/staff/${m.id}'),
                     onEdit: _edit,
                     onDelete: _delete,

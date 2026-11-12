@@ -8,6 +8,7 @@ import 'package:barbershop_app/features/catalog/presentation/widgets/admin_widge
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:barbershop_app/features/auth/domain/perm.dart';
 
 /// The web's Products page ("Manage retail products, pricing, and inventory").
 class ProductsPage extends ConsumerWidget {
@@ -58,13 +59,13 @@ class ProductsPage extends ConsumerWidget {
     final t = context.tokens;
     final user = ref.watch(currentUserProvider);
     final query = ref.watch(productQueryProvider);
-    final canEdit = user.can('Product-Edit');
-    final canDelete = user.can('Product-Delete');
+    final canEdit = user.can(Perm.productEdit);
+    final canDelete = user.can(Perm.productDelete);
     return AdminListShell(
       title: 'Products',
       subtitle: 'Manage retail products, pricing, and inventory',
       addLabel: 'Add Product',
-      onAdd: user.can('Product-Add') ? () => _form(context, ref) : null,
+      onAdd: user.can(Perm.productAdd) ? () => _form(context, ref) : null,
       searchHint: 'Search product, category or price',
       query: query,
       onSearch: (q) => ref.read(productQueryProvider.notifier).set(q),

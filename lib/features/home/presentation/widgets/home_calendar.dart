@@ -8,11 +8,11 @@ import 'package:flutter/material.dart';
 /// Home's "Staff Calendar" block: the shop floor right now, in plain words.
 ///
 /// Three numbers (with a client / free / not in), the time and the shop hours,
-/// then one card per barber who works today. A card says what the barber is
-/// doing, then lists their day as a strip of cards in time order: bookings,
-/// breaks and free time, with a red NOW marker between what is over and what is
-/// next. Everything can be used right here: a booking opens its details and
-/// actions, a free time starts a new booking at that time.
+/// then one calm row per barber who works today: who, what they do now, and
+/// their day as one thin bar. Tap a row for that day in a sheet (bookings,
+/// breaks and free time in order, a red NOW line); a booking opens its details,
+/// a free time starts a booking at that time, and the green plus on a free
+/// barber books them right now.
 class StaffCalendarCard extends StatelessWidget {
   const StaffCalendarCard({
     super.key,
@@ -87,7 +87,8 @@ class StaffCalendarCard extends StatelessWidget {
   }
 }
 
-/// The barbers who work today, the first three open and the rest one tap away.
+/// The barbers who work today, four open and the rest one tap away. Each is one
+/// calm row; the day of a barber opens in a sheet when the row is tapped.
 class _Lanes extends StatefulWidget {
   const _Lanes({
     required this.rows,
@@ -106,8 +107,31 @@ class _Lanes extends StatefulWidget {
 }
 
 class _LanesState extends State<_Lanes> {
-  static const _limit = 3;
+  static const _limit = 4;
   bool _all = false;
+
+  /// Bookings start on the quarter hour.
+  static int _roundUp(int m) => (m + 14) ~/ 15 * 15;
+
+  void _openDay(_Row row) {
+    showAppSheet<void>(
+      context,
+      title: row.lane.name,
+      builder: (sheet) => _DayList(
+        row: row,
+        nowMin: widget.nowMin,
+        // The booking or the form opens on top of the page, so the sheet goes first.
+        onBooking: (e) {
+          Navigator.of(sheet).pop();
+          widget.onBooking(e);
+        },
+        onFree: (lane, minute) {
+          Navigator.of(sheet).pop();
+          widget.onFree(lane, minute);
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,20 +141,12 @@ class _LanesState extends State<_Lanes> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         for (final r in shown) ...[
-          const SizedBox(height: AppSpace.md),
-          Container(
-            padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
-            decoration: BoxDecoration(
-              color: t.border.withValues(alpha: 0.18),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: t.border.withValues(alpha: 0.7)),
-            ),
-            child: _LaneCard(
-              row: r,
-              nowMin: widget.nowMin,
-              onBooking: widget.onBooking,
-              onFree: widget.onFree,
-            ),
+          const SizedBox(height: AppSpace.sm + 2),
+          _LaneRow(
+            row: r,
+            nowMin: widget.nowMin,
+            onOpen: () => _openDay(r),
+            onBook: () => widget.onFree(r.lane, _roundUp(widget.nowMin)),
           ),
         ],
         if (widget.rows.length > _limit)
@@ -156,6 +172,9 @@ class _LanesState extends State<_Lanes> {
     );
   }
 }
+
+/// How wide a booking, break or free card is when they sit side by side.
+const _cardWidth = 148.0;
 
 /// "10:15 – 11:00 AM" (one AM/PM when both are the same), "11:30 AM – 1:00 PM".
 String _range(int start, int end) {
@@ -299,7 +318,7 @@ class _Counters extends StatelessWidget {
       label: '$n $label',
       excludeSemantics: true,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
         decoration: BoxDecoration(
           color: n == 0
               ? t.border.withValues(alpha: 0.3)
@@ -309,52 +328,421 @@ class _Counters extends StatelessWidget {
             color: n == 0 ? t.border : color.withValues(alpha: 0.4),
           ),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 8,
-              height: 8,
-              decoration: BoxDecoration(
-                color: n == 0 ? t.textMuted : color,
-                shape: BoxShape.circle,
+        // Shrinks a little instead of wrapping, so the three stay on one line.
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 7,
+                height: 7,
+                decoration: BoxDecoration(
+                  color: n == 0 ? t.textMuted : color,
+                  shape: BoxShape.circle,
+                ),
               ),
-            ),
-            const SizedBox(width: 6),
-            Text(
-              '$n',
-              style: AppType.title.copyWith(
-                color: n == 0 ? t.textMuted : t.text,
-                fontSize: 16,
+              const SizedBox(width: 5),
+              Text(
+                '$n',
+                style: AppType.title.copyWith(
+                  color: n == 0 ? t.textMuted : t.text,
+                  fontSize: 15,
+                ),
               ),
-            ),
-            const SizedBox(width: 5),
-            Text(
-              label,
-              style: AppType.caption.copyWith(
-                color: t.textSecondary,
-                fontSize: 12.5,
+              const SizedBox(width: 4),
+              Text(
+                label,
+                style: AppType.caption.copyWith(
+                  color: t.textSecondary,
+                  fontSize: 12,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
-    return Wrap(
-      spacing: 6,
-      runSpacing: 6,
+    return Row(
       children: [
-        chip(busy, 'with client', t.danger),
-        chip(free, 'free now', t.success),
-        chip(gone, 'not in', t.textMuted),
+        Expanded(child: chip(busy, 'with client', t.danger)),
+        const SizedBox(width: 5),
+        Expanded(child: chip(free, 'free now', t.success)),
+        const SizedBox(width: 5),
+        Expanded(child: chip(gone, 'not in', t.textMuted)),
       ],
     );
   }
 }
 
-/// One barber: who they are and what they do now, then their day as cards.
-class _LaneCard extends StatelessWidget {
-  const _LaneCard({
+/// One barber as one row: who they are, what they do now, and their day as a
+/// thin bar (green = free, coloured = booked, a red tick = now). Tap the row for
+/// the whole day; the green plus books a free barber right now.
+class _LaneRow extends StatelessWidget {
+  const _LaneRow({
+    required this.row,
+    required this.nowMin,
+    required this.onOpen,
+    required this.onBook,
+  });
+
+  final _Row row;
+  final int nowMin;
+  final VoidCallback onOpen;
+  final VoidCallback onBook;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final now = row.now;
+    final color = _presenceColor(t, now.presence);
+    final (String words, IconData icon) = _presenceWords(now);
+    final String? when = _presenceWhen(now);
+    final booked = row.bookings.length;
+    final canBook = now.presence == Presence.free;
+
+    return Semantics(
+      button: true,
+      label:
+          '${row.lane.name}. $words${when == null ? '' : ', $when'}. $booked booked.${now.noHours ? ' No working hours set for today.' : ''} Opens the day.',
+      excludeSemantics: true,
+      child: Pressable(
+        onTap: onOpen,
+        scale: 0.985,
+        minSize: 0,
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(12, 12, 8, 10),
+          decoration: BoxDecoration(
+            color: t.border.withValues(alpha: 0.18),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: t.border.withValues(alpha: 0.7)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      AppAvatar(
+                        name: row.lane.name,
+                        imageUrl: row.lane.photoUrl,
+                        size: 38,
+                      ),
+                      Positioned(
+                        right: -2,
+                        bottom: -2,
+                        child: Container(
+                          width: 13,
+                          height: 13,
+                          decoration: BoxDecoration(
+                            color: color,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: t.surface, width: 2),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          row.lane.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppType.bodyStrong.copyWith(
+                            color: t.text,
+                            fontSize: 15,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Icon(icon, size: 13, color: color),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                now.noHours ? '$words · no hours' : words,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: AppType.label.copyWith(
+                                  color: now.presence == Presence.free
+                                      ? t.success
+                                      : t.textSecondary,
+                                  fontSize: 12.5,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      if (when != null)
+                        Text(
+                          when,
+                          style: AppType.label.copyWith(
+                            color: t.text,
+                            fontSize: 12.5,
+                          ),
+                        ),
+                      Text(
+                        booked == 0
+                            ? 'No bookings'
+                            : '$booked ${booked == 1 ? 'booking' : 'bookings'}',
+                        style: AppType.caption.copyWith(
+                          color: t.textMuted,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (canBook)
+                    Semantics(
+                      button: true,
+                      label: 'Book ${row.lane.name} now',
+                      excludeSemantics: true,
+                      child: Pressable(
+                        onTap: onBook,
+                        scale: 0.92,
+                        minSize: 0,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 8),
+                          child: Container(
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              color: t.success,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.add_rounded,
+                              size: 20,
+                              color: t.bg,
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                  else
+                    Padding(
+                      padding: const EdgeInsets.only(left: 2),
+                      child: Icon(
+                        Icons.chevron_right_rounded,
+                        size: 22,
+                        color: t.textMuted,
+                      ),
+                    ),
+                ],
+              ),
+              _DayBar(row: row, nowMin: nowMin),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+(String, IconData) _presenceWords(LaneNow now) => switch (now.presence) {
+  Presence.busy => (
+    'With ${now.who ?? 'a customer'}',
+    Icons.content_cut_rounded,
+  ),
+  Presence.onBreak => ('On a break', Icons.coffee_rounded),
+  Presence.free => ('Free now', Icons.check_circle_rounded),
+  Presence.later => ('Not in yet', Icons.schedule_rounded),
+  Presence.done => ('Done for today', Icons.task_alt_rounded),
+  Presence.off => (now.offReason ?? 'Away', Icons.bedtime_rounded),
+};
+
+String? _presenceWhen(LaneNow now) => switch (now.presence) {
+  Presence.busy || Presence.onBreak =>
+    now.freeAt == null ? null : 'Free at ${clockLabel(now.freeAt!)}',
+  Presence.free => now.until == null ? null : 'until ${clockLabel(now.until!)}',
+  Presence.later => now.until == null ? null : 'from ${clockLabel(now.until!)}',
+  _ => null,
+};
+
+/// The barber's whole day on one thin line: working time in soft green, each
+/// booking in its status colour, breaks grey, a red tick where "now" is, and the
+/// first and last hour under it. Nothing to read, everything to see.
+class _DayBar extends StatelessWidget {
+  const _DayBar({required this.row, required this.nowMin});
+
+  final _Row row;
+  final int nowMin;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final spans = <int>[
+      for (final w in row.line.working) ...[w.$1, w.$2],
+      for (final e in row.events) ...[e.startMin, e.endMin],
+    ];
+    if (spans.isEmpty) return const SizedBox.shrink();
+    var start = spans.reduce((a, b) => a < b ? a : b);
+    var end = spans.reduce((a, b) => a > b ? a : b);
+    if (end - start < 60) end = start + 60;
+    // Whole hours at both ends, so the two labels read cleanly.
+    start = start ~/ 60 * 60;
+    end = (end + 59) ~/ 60 * 60;
+
+    final segments = <_Seg>[
+      for (final w in row.line.working)
+        _Seg(w.$1, w.$2, t.success.withValues(alpha: t.isDark ? 0.3 : 0.28)),
+      for (final e in row.events)
+        _Seg(
+          e.startMin,
+          e.endMin <= e.startMin ? e.startMin + 15 : e.endMin,
+          e.isBreak
+              ? t.textMuted.withValues(alpha: 0.55)
+              : t
+                    .statusColor(e.status)
+                    .withValues(
+                      alpha: (e.endMin <= nowMin && !e.isBreak) ? 0.5 : 1,
+                    ),
+        ),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 10, right: 4),
+      child: Column(
+        children: [
+          SizedBox(
+            height: 10,
+            width: double.infinity,
+            child: CustomPaint(
+              painter: _DayBarPainter(
+                start: start,
+                end: end,
+                segments: segments,
+                nowMin: nowMin,
+                track: t.border.withValues(alpha: 0.6),
+                nowColor: t.danger,
+              ),
+            ),
+          ),
+          const SizedBox(height: 3),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                clockLabel(start),
+                style: AppType.caption.copyWith(
+                  color: t.textMuted,
+                  fontSize: 10.5,
+                ),
+              ),
+              Text(
+                clockLabel(end),
+                style: AppType.caption.copyWith(
+                  color: t.textMuted,
+                  fontSize: 10.5,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Seg {
+  const _Seg(this.start, this.end, this.color);
+
+  final int start;
+  final int end;
+  final Color color;
+}
+
+class _DayBarPainter extends CustomPainter {
+  _DayBarPainter({
+    required this.start,
+    required this.end,
+    required this.segments,
+    required this.nowMin,
+    required this.track,
+    required this.nowColor,
+  });
+
+  final int start;
+  final int end;
+  final List<_Seg> segments;
+  final int nowMin;
+  final Color track;
+  final Color nowColor;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final span = (end - start).toDouble();
+    double x(int m) => ((m - start) / span).clamp(0.0, 1.0) * size.width;
+
+    final bar = RRect.fromRectAndRadius(
+      Offset.zero & size,
+      Radius.circular(size.height / 2),
+    );
+    canvas.save();
+    canvas.clipRRect(bar);
+    canvas.drawRect(Offset.zero & size, Paint()..color = track);
+    for (final s in segments) {
+      final a = x(s.start);
+      final b = x(s.end);
+      if (b - a < 1) continue;
+      canvas.drawRect(
+        Rect.fromLTRB(a, 0, b, size.height),
+        Paint()..color = s.color,
+      );
+    }
+    canvas.restore();
+
+    if (nowMin >= start && nowMin <= end) {
+      final nx = x(nowMin);
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(nx - 1.25, -2, 2.5, size.height + 4),
+          const Radius.circular(2),
+        ),
+        Paint()..color = nowColor,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(_DayBarPainter old) =>
+      old.start != start ||
+      old.end != end ||
+      old.nowMin != nowMin ||
+      old.track != track ||
+      old.nowColor != nowColor ||
+      old.segments.length != segments.length ||
+      !_sameSegs(old.segments, segments);
+
+  static bool _sameSegs(List<_Seg> a, List<_Seg> b) {
+    for (var i = 0; i < a.length; i++) {
+      if (a[i].start != b[i].start ||
+          a[i].end != b[i].end ||
+          a[i].color != b[i].color) {
+        return false;
+      }
+    }
+    return true;
+  }
+}
+
+/// A barber's day in a sheet: bookings, breaks and free time in order, with a
+/// red line where now is. A booking opens its details, a free time starts a
+/// booking at that time.
+class _DayList extends StatelessWidget {
+  const _DayList({
     required this.row,
     required this.nowMin,
     required this.onBooking,
@@ -366,131 +754,134 @@ class _LaneCard extends StatelessWidget {
   final void Function(CalendarEvent event) onBooking;
   final void Function(CalendarLane lane, int minute) onFree;
 
+  /// Bookings start on the quarter hour.
+  static int _roundUp(int m) => (m + 14) ~/ 15 * 15;
+
+  /// Cards in time order (free time that is already over is left out).
+  List<_Item> _items() {
+    return <_Item>[
+      for (final e in row.events)
+        _Item(
+          e.isBreak ? _Kind.breakTime : _Kind.booking,
+          e.startMin,
+          e.endMin <= e.startMin ? e.startMin + 15 : e.endMin,
+          event: e,
+        ),
+      for (final (s, e) in row.line.free)
+        if (e > nowMin && e - (s < nowMin ? nowMin : s) >= 15)
+          _Item(_Kind.free, s < nowMin ? nowMin : s, e),
+    ]..sort((a, b) => a.start.compareTo(b.start));
+  }
+
+  bool _live(_Item i) => nowMin >= i.start && nowMin < i.end;
+
+  Widget _card(_Item i) {
+    final live = _live(i);
+    final over = i.end <= nowMin;
+    return switch (i.kind) {
+      _Kind.booking => _BookingCard(
+        event: i.event!,
+        live: live,
+        over: over,
+        width: double.infinity,
+        onTap: () => onBooking(i.event!),
+      ),
+      _Kind.breakTime => _BreakCard(
+        item: i,
+        live: live,
+        over: over,
+        width: double.infinity,
+      ),
+      _Kind.free => _FreeCard(
+        item: i,
+        live: live,
+        width: double.infinity,
+        onTap: () => onFree(row.lane, _roundUp(i.start)),
+      ),
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
     final now = row.now;
-    final color = _presenceColor(t, now.presence);
+    final (String words, IconData icon) = _presenceWords(now);
+    final when = _presenceWhen(now);
+    final items = _items();
+    final anyLive = items.any(_live);
+    final markerAt = anyLive ? -1 : items.indexWhere((i) => i.start > nowMin);
 
-    final (String words, IconData icon) = switch (now.presence) {
-      Presence.busy => (
-        'With ${now.who ?? 'a customer'}',
-        Icons.content_cut_rounded,
-      ),
-      Presence.onBreak => ('On a break', Icons.coffee_rounded),
-      Presence.free => ('Free now', Icons.check_circle_rounded),
-      Presence.later => ('Not in yet', Icons.schedule_rounded),
-      Presence.done => ('Done for today', Icons.task_alt_rounded),
-      Presence.off => (now.offReason ?? 'Away', Icons.bedtime_rounded),
-    };
-    final String? when = switch (now.presence) {
-      Presence.busy || Presence.onBreak =>
-        now.freeAt == null ? null : 'Free at ${clockLabel(now.freeAt!)}',
-      Presence.free =>
-        now.until == null ? null : 'until ${clockLabel(now.until!)}',
-      Presence.later =>
-        now.until == null ? null : 'from ${clockLabel(now.until!)}',
-      _ => null,
-    };
-    final booked = row.bookings.length;
+    final children = <Widget>[];
+    for (var i = 0; i < items.length; i++) {
+      if (i == markerAt) children.add(_NowLine(nowMin: nowMin));
+      children.add(
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: _card(items[i]),
+        ),
+      );
+    }
+    if (!anyLive && markerAt == -1 && items.isNotEmpty) {
+      children.add(_NowLine(nowMin: nowMin));
+    }
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Semantics(
-          label:
-              '${row.lane.name}. $words${when == null ? '' : ', $when'}. $booked booked.${now.noHours ? ' No working hours set for today.' : ''}',
-          excludeSemantics: true,
-          child: Row(
-            children: [
-              Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  AppAvatar(
-                    name: row.lane.name,
-                    imageUrl: row.lane.photoUrl,
-                    size: 34,
-                  ),
-                  Positioned(
-                    right: -2,
-                    bottom: -2,
-                    child: Container(
-                      width: 12,
-                      height: 12,
-                      decoration: BoxDecoration(
-                        color: color,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: t.surface, width: 2),
-                      ),
-                    ),
-                  ),
-                ],
+        Row(
+          children: [
+            Icon(icon, size: 15, color: _presenceColor(t, now.presence)),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text(
+                when == null ? words : '$words · $when',
+                style: AppType.label.copyWith(color: t.text, fontSize: 13.5),
               ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      row.lane.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppType.bodyStrong.copyWith(
-                        color: t.text,
-                        fontSize: 14.5,
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        Icon(icon, size: 12, color: color),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            now.noHours ? '$words · no hours' : words,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: AppType.label.copyWith(
-                              color: now.presence == Presence.free
-                                  ? t.success
-                                  : t.textSecondary,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  if (when != null)
-                    Text(
-                      when,
-                      style: AppType.label.copyWith(
-                        color: t.text,
-                        fontSize: 12.5,
-                      ),
-                    ),
-                  Text(
-                    booked == 0
-                        ? 'No bookings'
-                        : '$booked ${booked == 1 ? 'booking' : 'bookings'}',
-                    style: AppType.caption.copyWith(
-                      color: t.textMuted,
-                      fontSize: 11,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
-        const SizedBox(height: 10),
-        _Strip(row: row, nowMin: nowMin, onBooking: onBooking, onFree: onFree),
+        const SizedBox(height: AppSpace.md),
+        if (items.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: AppSpace.lg),
+            child: Text(
+              'Nothing booked today.',
+              textAlign: TextAlign.center,
+              style: AppType.body.copyWith(color: t.textSecondary),
+            ),
+          )
+        else
+          ...children,
       ],
+    );
+  }
+}
+
+/// A red line across the list where "now" falls.
+class _NowLine extends StatelessWidget {
+  const _NowLine({required this.nowMin});
+
+  final int nowMin;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          Text(
+            'NOW ${clockLabel(nowMin)}',
+            style: AppType.caption.copyWith(
+              color: t.danger,
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(child: Container(height: 2, color: t.danger)),
+        ],
+      ),
     );
   }
 }
@@ -506,190 +897,16 @@ class _Item {
   final CalendarEvent? event;
 }
 
-/// The barber's day as cards in time order, a NOW marker where we are.
-class _Strip extends StatefulWidget {
-  const _Strip({
-    required this.row,
-    required this.nowMin,
-    required this.onBooking,
-    required this.onFree,
-  });
-
-  final _Row row;
-  final int nowMin;
-  final void Function(CalendarEvent event) onBooking;
-  final void Function(CalendarLane lane, int minute) onFree;
-
-  static const double cardWidth = 148;
-  static const double gap = 8;
-  static const double markerWidth = 56;
-
-  @override
-  State<_Strip> createState() => _StripState();
-}
-
-class _StripState extends State<_Strip> {
-  final _scroll = ScrollController();
-
-  /// Cards in time order (free time that is already over is left out).
-  List<_Item> _items() {
-    final now = widget.nowMin;
-    return <_Item>[
-      for (final e in widget.row.events)
-        _Item(
-          e.isBreak ? _Kind.breakTime : _Kind.booking,
-          e.startMin,
-          e.endMin <= e.startMin ? e.startMin + 15 : e.endMin,
-          event: e,
-        ),
-      for (final (s, e) in widget.row.line.free)
-        if (e > now && e - (s < now ? now : s) >= 15)
-          _Item(_Kind.free, s < now ? now : s, e),
-    ]..sort((a, b) => a.start.compareTo(b.start));
-  }
-
-  bool _live(_Item i) => widget.nowMin >= i.start && widget.nowMin < i.end;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // Bring "what is next" into view: the NOW card, or the first one not over.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || !_scroll.hasClients) return;
-      final items = _items();
-      final firstOpen = items.indexWhere((i) => i.end > widget.nowMin);
-      var offset = 0.0;
-      if (firstOpen < 0) {
-        offset = _scroll.position.maxScrollExtent;
-      } else {
-        for (var i = 0; i < firstOpen; i++) {
-          offset += _widthOf(items[i]) + _Strip.gap;
-        }
-      }
-      _scroll.jumpTo(offset.clamp(0.0, _scroll.position.maxScrollExtent));
-    });
-  }
-
-  @override
-  void dispose() {
-    _scroll.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final items = _items();
-    final height = MediaQuery.textScalerOf(context).scale(34) + 18;
-    final anyLive = items.any(_live);
-    // Where the NOW marker goes: before the first card that has not started.
-    final markerAt = anyLive
-        ? -1
-        : items.indexWhere((i) => i.start > widget.nowMin);
-
-    final children = <Widget>[];
-    void gap() => children.add(const SizedBox(width: _Strip.gap));
-    for (var i = 0; i < items.length; i++) {
-      if (i == markerAt) {
-        children.add(_NowMarker(nowMin: widget.nowMin));
-        gap();
-      }
-      children.add(_card(items[i]));
-      gap();
-    }
-    if (!anyLive && markerAt == -1) {
-      // Everything is over: the marker closes the day.
-      children.add(_NowMarker(nowMin: widget.nowMin));
-    }
-
-    return SizedBox(
-      height: height,
-      child: ListView(
-        controller: _scroll,
-        scrollDirection: Axis.horizontal,
-        children: children,
-      ),
-    );
-  }
-
-  Widget _card(_Item i) {
-    final lane = widget.row.lane;
-    final live = _live(i);
-    final over = i.end <= widget.nowMin;
-    return switch (i.kind) {
-      _Kind.booking => _BookingCard(
-        event: i.event!,
-        live: live,
-        over: over,
-        onTap: () => widget.onBooking(i.event!),
-      ),
-      _Kind.breakTime => _BreakCard(item: i, live: live, over: over),
-      _Kind.free => _FreeCard(
-        item: i,
-        live: live,
-        onTap: () => widget.onFree(lane, _roundUp(i.start)),
-      ),
-    };
-  }
-
-  double _widthOf(_Item i) =>
-      i.kind == _Kind.breakTime ? _Strip.cardWidth * 0.85 : _Strip.cardWidth;
-
-  /// Bookings start on the quarter hour.
-  int _roundUp(int m) => (m + 14) ~/ 15 * 15;
-}
-
-class _NowMarker extends StatelessWidget {
-  const _NowMarker({required this.nowMin});
-
-  final int nowMin;
-
-  @override
-  Widget build(BuildContext context) {
-    final t = context.tokens;
-    return SizedBox(
-      width: _Strip.markerWidth,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 3,
-            height: 14,
-            decoration: BoxDecoration(
-              color: t.danger,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(height: 3),
-          Text(
-            'NOW',
-            style: AppType.caption.copyWith(
-              color: t.danger,
-              fontSize: 11,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          Text(
-            clockLabel(nowMin),
-            maxLines: 1,
-            style: AppType.caption.copyWith(
-              color: t.textSecondary,
-              fontSize: 10,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _BookingCard extends StatelessWidget {
   const _BookingCard({
     required this.event,
     required this.live,
     required this.over,
     required this.onTap,
+    this.width = _cardWidth,
   });
 
+  final double width;
   final CalendarEvent event;
   final bool live;
   final bool over;
@@ -715,7 +932,7 @@ class _BookingCard extends StatelessWidget {
           scale: 0.97,
           minSize: 0,
           child: Container(
-            width: _Strip.cardWidth,
+            width: width,
             clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(
               color: Color.alphaBlend(
@@ -795,8 +1012,10 @@ class _BreakCard extends StatelessWidget {
     required this.item,
     required this.live,
     required this.over,
+    this.width = _cardWidth * 0.85,
   });
 
+  final double width;
   final _Item item;
   final bool live;
   final bool over;
@@ -807,7 +1026,7 @@ class _BreakCard extends StatelessWidget {
     return Opacity(
       opacity: over ? 0.55 : 1,
       child: Container(
-        width: _Strip.cardWidth * 0.85,
+        width: width,
         padding: const EdgeInsets.fromLTRB(9, 4, 6, 4),
         decoration: BoxDecoration(
           color: t.border.withValues(alpha: 0.4),
@@ -857,8 +1076,10 @@ class _FreeCard extends StatelessWidget {
     required this.item,
     required this.live,
     required this.onTap,
+    this.width = _cardWidth,
   });
 
+  final double width;
   final _Item item;
   final bool live;
   final VoidCallback onTap;
@@ -876,7 +1097,7 @@ class _FreeCard extends StatelessWidget {
         scale: 0.97,
         minSize: 0,
         child: Container(
-          width: _Strip.cardWidth,
+          width: width,
           padding: const EdgeInsets.fromLTRB(9, 4, 6, 4),
           decoration: BoxDecoration(
             color: t.success.withValues(alpha: t.isDark ? 0.12 : 0.1),

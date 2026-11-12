@@ -11,6 +11,7 @@ import 'package:barbershop_app/features/staff/presentation/widgets/change_passwo
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:barbershop_app/features/auth/domain/perm.dart';
 
 enum _Tab { appointments, services, earnings }
 
@@ -81,7 +82,11 @@ class _StaffProfilePageState extends ConsumerState<StaffProfilePage> {
     final user = ref.watch(currentUserProvider);
     final async = ref.watch(staffProfileProvider(_id));
     final p = async.value;
-    final canEdit = user.can('Staff-Edit');
+    final canEdit = user.can(Perm.staffEdit);
+    // Access can change while this page is open: never stay on a tab that is gone.
+    if (_tab == _Tab.services && !user.canSeeStaffServices) {
+      _tab = _Tab.appointments;
+    }
 
     return Scaffold(
       body: SafeArea(
@@ -203,10 +208,12 @@ class _StaffProfilePageState extends ConsumerState<StaffProfilePage> {
                       padding: EdgeInsets.zero,
                       selected: _tab,
                       onChanged: (v) => setState(() => _tab = v),
-                      options: const [
-                        ChipOption(_Tab.appointments, 'Appointments'),
-                        ChipOption(_Tab.services, 'Assign Services'),
-                        ChipOption(_Tab.earnings, 'Earnings'),
+                      options: [
+                        const ChipOption(_Tab.appointments, 'Appointments'),
+                        // The server lists a member's services only to Staff-Add/Edit/Delete.
+                        if (user.canSeeStaffServices)
+                          const ChipOption(_Tab.services, 'Assign Services'),
+                        const ChipOption(_Tab.earnings, 'Earnings'),
                       ],
                     ),
                     const SizedBox(height: AppSpace.md),

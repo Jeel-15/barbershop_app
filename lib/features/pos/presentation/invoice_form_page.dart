@@ -90,6 +90,145 @@ class _InvoiceFormPageState extends ConsumerState<InvoiceFormPage> {
     context.pop();
   }
 
+  /// "Check before you save": what is about to be saved, in words, with
+  /// anything unusual called out. Edit goes back to the form untouched; Done
+  /// saves (the save itself is [_submit]).
+  Future<void> _review() async {
+    FocusScope.of(context).unfocus();
+    // The state as it is now, not as it was when the button was last built.
+    final s = ref.read(invoiceFormProvider(_target));
+    final d = s.draft;
+    String? problem;
+    if (d.lines.isEmpty) {
+      problem = 'Please select at least one service or product.';
+    } else if (!d.allHaveStaff) {
+      problem = 'Select Staff Members';
+    } else if (s.totals == null) {
+      problem = s.previewing
+          ? 'The total is still being worked out. One moment.'
+          : 'The total could not be worked out. Check the items and try again.';
+    }
+    if (problem != null) {
+      showToast(context, problem, kind: ToastKind.error);
+      return;
+    }
+    final ok = await showReviewSheet(
+      context,
+      title: 'Check the invoice',
+      intro: widget.invoiceId != null
+          ? 'You are changing invoice No ${s.invoice?.row.number ?? ''}.'
+          : 'Make sure everything is right. Done saves it.',
+      sections: _reviewSections(s),
+      warnings: _reviewWarnings(s),
+      total: ReviewRow('Total Amount', s.totals!.finalTotal.format()),
+    );
+    // Closing the sheet hands focus back to the last field and opens the
+    // keyboard; the form should look as it did.
+    if (mounted) FocusScope.of(context).unfocus();
+    if (ok && mounted) await _submit();
+  }
+
+  List<ReviewSection> _reviewSections(InvoiceFormState s) {
+    final d = s.draft;
+    final totals = s.totals!;
+    final staff = {
+      for (final x in s.catalog?.staff ?? const <StaffOption>[]) x.id: x.name,
+    };
+    final appt = widget.appointmentId != null ? s.appointment?.row : null;
+    final name = appt?.customerName ?? d.customerName.trim();
+    final phone = (appt?.customerPhone ?? d.customerPhone).trim();
+    final email = d.customerEmail.trim();
+
+    ReviewRow line(InvoiceLine l) => ReviewRow(
+      l.qty > 1 ? '${l.name} x ${l.qty}' : l.name,
+      Money(l.price.cents * l.qty).format(),
+      note: l.staffId == null ? null : 'with ${staff[l.staffId] ?? 'staff'}',
+    );
+    String pct(double v) =>
+        v == v.roundToDouble() ? v.toStringAsFixed(0) : v.toStringAsFixed(2);
+
+    final services = [
+      for (final l in d.lines)
+        if (l.type == LineType.service) l,
+    ];
+    final products = [
+      for (final l in d.lines)
+        if (l.type == LineType.product) l,
+    ];
+    final taxLabel = s.catalog?.taxLabel ?? '';
+    return [
+      ReviewSection('Customer', [
+        ReviewRow(name.isEmpty ? 'Walk-in (no name)' : name, ''),
+        if (phone.isNotEmpty) ReviewRow('Phone', phone),
+        if (email.isNotEmpty) ReviewRow('Email', email),
+      ], icon: Icons.person_rounded),
+      if (services.isNotEmpty)
+        ReviewSection('Services', [
+          for (final l in services) line(l),
+        ], icon: Icons.content_cut_rounded),
+      if (products.isNotEmpty)
+        ReviewSection('Products', [
+          for (final l in products) line(l),
+        ], icon: Icons.inventory_2_rounded),
+      ReviewSection('Amounts', [
+        if (services.isNotEmpty)
+          ReviewRow('Services', totals.serviceTotal.format()),
+        if (!totals.serviceDiscountAmount.isZero)
+          ReviewRow(
+            'Service discount (${pct(totals.serviceDiscountPercent)}%)',
+            '-${totals.serviceDiscountAmount.format()}',
+            color: context.tokens.success,
+          ),
+        if (products.isNotEmpty)
+          ReviewRow('Products', totals.productTotal.format()),
+        if (!totals.productDiscountAmount.isZero)
+          ReviewRow(
+            'Product discount (${pct(totals.productDiscountPercent)}%)',
+            '-${totals.productDiscountAmount.format()}',
+            color: context.tokens.success,
+          ),
+        ReviewRow('Subtotal', totals.subtotal.format()),
+        if (taxLabel.isNotEmpty) ReviewRow(taxLabel, totals.tax.format()),
+        ReviewRow('Tip', totals.tip.format()),
+      ], icon: Icons.receipt_long_rounded),
+      ReviewSection('Payment', [
+        ReviewRow('Payment method', d.paymentMethod),
+        if (d.notes.trim().isNotEmpty) ReviewRow('Notes', d.notes.trim()),
+      ], icon: Icons.payments_rounded),
+    ];
+  }
+
+  /// Things that are allowed but worth a second look.
+  List<String> _reviewWarnings(InvoiceFormState s) {
+    final d = s.draft;
+    final totals = s.totals!;
+    final out = <String>[];
+    if (totals.finalTotal.isZero) out.add('The total is \$0.00.');
+    final guest =
+        widget.appointmentId == null &&
+        d.customerName.trim().isEmpty &&
+        d.customerPhone.trim().isEmpty;
+    if (guest) {
+      out.add('No customer name or phone: this is saved as a walk-in guest.');
+    }
+    final bigDiscount = totals.serviceDiscountPercent >= 25
+        ? totals.serviceDiscountPercent
+        : totals.productDiscountPercent >= 25
+        ? totals.productDiscountPercent
+        : null;
+    if (bigDiscount != null) {
+      out.add(
+        'Large discount: ${bigDiscount.toStringAsFixed(0)}%. Is that right?',
+      );
+    }
+    if (totals.subtotal.cents > 0 &&
+        totals.tip.cents * 100 > totals.subtotal.cents * 40) {
+      final pct = (totals.tip.cents * 100 / totals.subtotal.cents).round();
+      out.add('The tip is $pct% of the bill. Is that right?');
+    }
+    return out;
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
@@ -193,11 +332,11 @@ class _InvoiceFormPageState extends ConsumerState<InvoiceFormPage> {
               _TotalBar(
                 s: s,
                 label: editing
-                    ? 'Update'
+                    ? 'Review changes'
                     : completing
-                    ? 'Complete'
-                    : 'Create Invoice',
-                onPressed: s.submitting ? null : _submit,
+                    ? 'Review & complete'
+                    : 'Review invoice',
+                onPressed: s.submitting ? null : _review,
               ),
           ],
         ),
@@ -844,7 +983,7 @@ class _TotalBar extends StatelessWidget {
           Expanded(
             child: AppButton(
               label: label,
-              icon: Icons.check_rounded,
+              icon: Icons.fact_check_rounded,
               loading: s.submitting,
               onPressed: onPressed,
             ),

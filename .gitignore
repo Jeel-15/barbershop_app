@@ -68,3 +68,15 @@ android/app/.cxx/
 **/hs_err_pid*.log
 **/replay_pid*.log
 .claude/scheduled_tasks.lock
+
+# Demo tour: database snapshots and node modules
+tool/demo/snapshots/
+tool/demo/node_modules/
+
+tool/demo/runs/
+tool/demo/last_build.txt
+
+# Release signing (never commit)
+android/key.properties
+*.jks
+*.keystore

@@ -1,9 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Fingerprint / screen-lock unlock (the session token is kept behind it). -->
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <!-- DEV ONLY: lets the app talk plain http to the PC on the local network.
-         The production build must remove usesCleartextTraffic (see docs/APP_PLAN.md, Phase 12). -->
+         Switched off automatically when built with FLAVOR=prod (see build.gradle.kts). -->
     <application
-        android:usesCleartextTraffic="true"
+        android:usesCleartextTraffic="${usesCleartext}"
+        android:allowBackup="false"
         android:label="Rosenthal"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">

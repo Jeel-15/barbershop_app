@@ -28,7 +28,14 @@ class _RoleFormPageState extends ConsumerState<RoleFormPage> {
   bool _busy = false;
   String? _nameError;
 
+  /// True once the person changed something: leaving then asks first.
+  bool _dirty = false;
+
   bool get _editing => widget.roleId != null;
+
+  void _touch() {
+    if (!_dirty && mounted) setState(() => _dirty = true);
+  }
 
   @override
   void dispose() {
@@ -47,6 +54,7 @@ class _RoleFormPageState extends ConsumerState<RoleFormPage> {
         _picked = {...r.permissionIds};
       }
     }
+    _name.addListener(_touch);
   }
 
   Future<void> _save() async {
@@ -80,95 +88,44 @@ class _RoleFormPageState extends ConsumerState<RoleFormPage> {
 
   @override
   Widget build(BuildContext context) {
-    final t = context.tokens;
     final async = ref.watch(rolesProvider);
     final data = async.value;
     if (data != null) _fill(data);
+    final ready = data != null && !(_editing && _role == null);
 
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpace.page,
-                AppSpace.sm,
-                AppSpace.page,
-                AppSpace.sm,
-              ),
-              child: Row(
-                children: [
-                  RoundBackButton(
-                    onPressed: () => context.canPop()
-                        ? context.pop()
-                        : context.go('/app/roles'),
-                  ),
-                  const SizedBox(width: AppSpace.md),
-                  Expanded(
-                    child: Text(
-                      _editing ? 'Edit Role' : 'Add New Role',
-                      style: AppType.heading.copyWith(color: t.text),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: data == null
-                  ? (async.hasError
-                        ? ErrorState(
-                            message: async.error is Failure
-                                ? (async.error! as Failure).userMessage
-                                : 'Could not open the form.',
-                            onRetry: () => ref.invalidate(rolesProvider),
-                          )
-                        : const Padding(
-                            padding: EdgeInsets.all(AppSpace.page),
-                            child: SkeletonRows(count: 5),
-                          ))
-                  : _editing && _role == null
-                  ? const QuietState(
-                      title: 'Role not found',
-                      message: 'It may have been deleted.',
-                    )
-                  : _body(context, data),
-            ),
-            if (data != null && !(_editing && _role == null))
-              Container(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpace.page,
-                  AppSpace.md,
-                  AppSpace.page,
-                  AppSpace.md,
-                ),
-                decoration: BoxDecoration(
-                  color: t.surface,
-                  border: Border(top: BorderSide(color: t.border)),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: AppButton(
-                        label: 'Cancel',
-                        variant: AppButtonVariant.secondary,
-                        onPressed: () => context.pop(),
-                      ),
-                    ),
-                    const SizedBox(width: AppSpace.sm + 2),
-                    Expanded(
-                      flex: 2,
-                      child: AppButton(
-                        label: 'Submit',
-                        loading: _busy,
-                        onPressed: _save,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-          ],
-        ),
-      ),
+    return FormPageFrame(
+      title: _editing ? 'Edit Role' : 'Add New Role',
+      dirty: _dirty,
+      onClose: () =>
+          context.canPop() ? context.pop() : context.go('/app/roles'),
+      bottom: ready
+          ? FormActionBar(
+              label: 'Submit',
+              loading: _busy,
+              onPressed: _save,
+              secondaryLabel: 'Cancel',
+              onSecondary: () =>
+                  context.canPop() ? context.pop() : context.go('/app/roles'),
+            )
+          : null,
+      child: data == null
+          ? (async.hasError
+                ? ErrorState(
+                    message: async.error is Failure
+                        ? (async.error! as Failure).userMessage
+                        : 'Could not open the form.',
+                    onRetry: () => ref.invalidate(rolesProvider),
+                  )
+                : const Padding(
+                    padding: EdgeInsets.all(AppSpace.page),
+                    child: SkeletonRows(count: 5),
+                  ))
+          : _editing && _role == null
+          ? const QuietState(
+              title: 'Role not found',
+              message: 'It may have been deleted.',
+            )
+          : _body(context, data),
     );
   }
 
@@ -176,6 +133,7 @@ class _RoleFormPageState extends ConsumerState<RoleFormPage> {
     final t = context.tokens;
     final all = data.allPermissionIds;
     final allOn = all.isNotEmpty && all.every(_picked.contains);
+    const gap = SizedBox(height: AppSpace.md);
     return ListView(
       keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       padding: const EdgeInsets.fromLTRB(
@@ -185,54 +143,64 @@ class _RoleFormPageState extends ConsumerState<RoleFormPage> {
         AppSpace.xl,
       ),
       children: [
-        AppTextField(
-          label: 'Role Name',
-          hint: 'Enter a role name',
-          controller: _name,
-          errorText: _nameError,
-          textCapitalization: TextCapitalization.words,
-          autofocus: !_editing,
-        ),
-        if (_role?.locked ?? false)
-          Padding(
-            padding: const EdgeInsets.only(top: 6),
-            child: Text(
-              'A system role: its name cannot be changed.',
-              style: AppType.caption.copyWith(color: t.textMuted),
+        FormSection(
+          title: 'Role',
+          icon: Icons.admin_panel_settings_rounded,
+          children: [
+            AppTextField(
+              label: 'Role Name',
+              hint: 'Enter a role name',
+              controller: _name,
+              errorText: _nameError,
+              textCapitalization: TextCapitalization.words,
+              autofocus: !_editing,
+              helperText: (_role?.locked ?? false)
+                  ? 'A system role: its name cannot be changed.'
+                  : null,
             ),
-          ),
-        const SizedBox(height: AppSpace.xl),
-        Text(
-          'Role Permissions',
-          style: AppType.subheading.copyWith(color: t.text),
+          ],
         ),
-        const SizedBox(height: AppSpace.sm + 2),
+        gap,
         SwitchRow(
           label: 'Administrator Access',
           hint: 'Allows a full access to the system. Select All',
           value: allOn,
           onChanged: (v) => setState(() {
             _picked = v ? {...all} : <int>{};
+            _dirty = true;
           }),
         ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(4, AppSpace.lg, 0, AppSpace.sm),
+          child: Text(
+            'Role Permissions',
+            style: AppType.subheading.copyWith(color: t.text),
+          ),
+        ),
         for (final g in data.groups) ...[
-          const SizedBox(height: AppSpace.lg),
-          Text(g.name, style: AppType.bodyStrong.copyWith(color: t.text)),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
+          FormSection(
+            title: g.name,
+            subtitle:
+                '${g.permissions.where((p) => _picked.contains(p.id)).length} of ${g.permissions.length} allowed',
             children: [
-              for (final p in g.permissions)
-                AppChoiceChip(
-                  label: p.label,
-                  selected: _picked.contains(p.id),
-                  onTap: () => setState(() {
-                    if (!_picked.add(p.id)) _picked.remove(p.id);
-                  }),
-                ),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final p in g.permissions)
+                    AppChoiceChip(
+                      label: p.label,
+                      selected: _picked.contains(p.id),
+                      onTap: () => setState(() {
+                        if (!_picked.add(p.id)) _picked.remove(p.id);
+                        _dirty = true;
+                      }),
+                    ),
+                ],
+              ),
             ],
           ),
+          gap,
         ],
       ],
     );

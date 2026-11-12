@@ -1,4 +1,5 @@
 import 'package:barbershop_app/features/auth/domain/auth_user.dart';
+import 'package:barbershop_app/features/auth/domain/perm.dart';
 
 /// The four fixed branches of the shell, in route order. Which of them show
 /// in the bar is decided from the server's `modules` flags, not from roles.
@@ -18,13 +19,32 @@ extension AppTabVisibility on AuthUser {
 
   /// Staff see their own space; the owner sees the whole menu.
   String get moreLabel => isStaff ? 'Me' : 'More';
-
-  /// Centre action of the bar.
-  bool get canSell => modules.invoiceWrite;
 }
+
+/// Form pages by list path. The module flag is true for any of Add / Edit /
+/// Delete, so a form needs its own permission: `new` the Add one, `edit/:id`
+/// the Edit one (the server asks for exactly these when the form is saved).
+const _formRoutes = <String, ({String add, String edit})>{
+  '/app/services': (add: Perm.serviceAdd, edit: Perm.serviceEdit),
+  '/app/products': (add: Perm.productAdd, edit: Perm.productEdit),
+  '/app/testimonials': (add: Perm.testimonialAdd, edit: Perm.testimonialEdit),
+  '/app/roles': (add: Perm.roleAdd, edit: Perm.roleEdit),
+  '/app/staff': (add: Perm.staffAdd, edit: Perm.staffEdit),
+  '/app/invoice': (add: Perm.posInvoiceAdd, edit: Perm.posInvoiceEdit),
+};
 
 /// Permission guard for the router: may this user open this location?
 bool allowedFor(AuthUser user, String location) {
+  // Completing a booking makes its invoice: the same permission as a new one.
+  if (location.startsWith('/app/invoice/complete/')) {
+    return user.canCreateInvoice;
+  }
+  for (final entry in _formRoutes.entries) {
+    if (location == '${entry.key}/new') return user.can(entry.value.add);
+    if (location.startsWith('${entry.key}/edit/')) {
+      return user.can(entry.value.edit);
+    }
+  }
   if (location.startsWith('/app/appointments')) {
     return user.modules.appointments;
   }

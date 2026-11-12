@@ -67,6 +67,12 @@ Risk: none. Do first.
 
 ## Phase B - Live permissions (no logout needed)
 
+**STATUS 2026-10-29: IMPLEMENTED** (server header + `permissions_version`, `ApiClient` interceptor, `SessionController.syncPermissions`,
+resume listener in `app.dart`, "access updated" note in `AppShell`). Tests: `test/core/permissions_header_test.dart` (7),
+`test/features/auth/live_permissions_test.dart` (15), one widget test in `auth_flow_test.dart`. Deviations from the text
+below: the refresh call is `/bootstrap` (not `/auth/me`); the version is read from `user.permissions_version`
+(login also returns it, but the app gets it through the bootstrap that follows). Server notes: `WEB_DEV_FIXES.md` Q65.
+
 ### B0. Decision record (blunt)
 * Use the existing `/bootstrap` as the refresh call. It already returns user, permissions and modules and drives the whole
   UI. `/auth/me` returns only `user` and would need a server change. Plan text in the request says `/auth/me`; our

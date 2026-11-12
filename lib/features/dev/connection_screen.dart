@@ -26,6 +26,10 @@ class _Result {
 }
 
 class _ConnectionScreenState extends ConsumerState<ConnectionScreen> {
+  static const _localUsb = 'http://localhost:8081${ApiBaseUrl.defaultPath}';
+
+  final _addressCtl = TextEditingController();
+  String? _addressError;
   _Result? _result;
   bool _busy = false;
 
@@ -33,6 +37,32 @@ class _ConnectionScreenState extends ConsumerState<ConnectionScreen> {
   void initState() {
     super.initState();
     _test();
+  }
+
+  @override
+  void dispose() {
+    _addressCtl.dispose();
+    super.dispose();
+  }
+
+  /// Points the app at [url] (already a full address), signs out of the old
+  /// server and tests the new one.
+  Future<void> _switchTo(String? url) async {
+    setState(() => _busy = true);
+    await ref.read(apiBaseUrlProvider.notifier).use(url);
+    if (!mounted) return;
+    _addressCtl.clear();
+    setState(() => _addressError = null);
+    await _test();
+  }
+
+  Future<void> _saveTyped() async {
+    final url = ApiBaseUrl.normalize(_addressCtl.text);
+    if (url == null) {
+      setState(() => _addressError = 'That is not a web address.');
+      return;
+    }
+    await _switchTo(url);
   }
 
   Future<void> _test() async {
@@ -139,10 +169,64 @@ class _ConnectionScreenState extends ConsumerState<ConnectionScreen> {
           AppListGroup(
             title: 'This build',
             children: [
-              row('API address', Env.apiBaseUrl),
+              row('API address', ref.watch(apiBaseUrlProvider)),
+              row('Build default', Env.apiBaseUrl),
               row('Flavor', Env.flavor.name),
             ],
           ),
+          if (!Env.isProd) ...[
+            AppListGroup(
+              title: 'Switch server (signs you out)',
+              children: [
+                AppListRow(
+                  title: 'Local PC (USB cable)',
+                  subtitle: _localUsb,
+                  onTap: _busy ? null : () => _switchTo(_localUsb),
+                ),
+                AppListRow(
+                  title: 'Build default',
+                  subtitle: Env.apiBaseUrl,
+                  onTap: _busy ? null : () => _switchTo(null),
+                ),
+                for (final url in ref.watch(appPrefsProvider).recentServers)
+                  AppListRow(
+                    title: 'Recent',
+                    subtitle: url,
+                    onTap: _busy ? null : () => _switchTo(url),
+                  ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpace.page,
+                AppSpace.md,
+                AppSpace.page,
+                AppSpace.sm,
+              ),
+              child: AppTextField(
+                label: 'New address',
+                hint: 'abcd-1234.ngrok-free.app',
+                helperText:
+                    'Paste the tunnel or live address. The path '
+                    '${ApiBaseUrl.defaultPath} is added if you give only the host.',
+                controller: _addressCtl,
+                errorText: _addressError,
+                keyboardType: TextInputType.url,
+                textInputAction: TextInputAction.done,
+                onSubmitted: (_) => _saveTyped(),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpace.page),
+              child: AppButton(
+                label: 'Use this address',
+                icon: Icons.link_rounded,
+                loading: _busy,
+                onPressed: _saveTyped,
+              ),
+            ),
+            const SizedBox(height: AppSpace.lg),
+          ],
           AppListGroup(
             title: 'Server',
             children: [

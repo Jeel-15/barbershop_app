@@ -1,4 +1,3 @@
-import 'package:barbershop_app/core/utils/money.dart';
 import 'package:barbershop_app/core/utils/shop_time.dart';
 import 'package:barbershop_app/design_system/design_system.dart';
 import 'package:barbershop_app/features/appointments/domain/appointment.dart';
@@ -45,11 +44,12 @@ class HomeHeader extends StatelessWidget {
   }
 }
 
-/// The money and the counts in one card. Admin: shop revenue, then Upcoming /
-/// Customers / Completed. Staff: own earnings (commission and tips), then the
-/// five booking counts. The counts open Bookings with that filter.
-class HomeSummaryCard extends StatelessWidget {
-  const HomeSummaryCard({
+/// The booking counts as small chips in one row that slides sideways. No money
+/// here (that is the card on More). Admin: Upcoming / Customers / Completed,
+/// like the web's cards. Staff: Upcoming / Completed / Confirmed / Scheduled /
+/// Cancelled. A chip with a list behind it opens Bookings with that filter.
+class HomeCountChips extends StatelessWidget {
+  const HomeCountChips({
     super.key,
     required this.summary,
     required this.onCount,
@@ -63,11 +63,10 @@ class HomeSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
-    final admin = summary.isAdmin;
 
     // Upcoming = booked for a later day (the web's definition).
     final tomorrow = ShopTime.today().add(const Duration(days: 1));
-    final upcoming = _Count(
+    final upcoming = _Chip(
       icon: Icons.event_available_rounded,
       label: 'Upcoming',
       value: summary.upcoming,
@@ -81,7 +80,7 @@ class HomeSummaryCard extends StatelessWidget {
               ),
             ),
     );
-    _Count byStatus(String label, int value, AppointmentStatus s) => _Count(
+    _Chip byStatus(String label, int value, AppointmentStatus s) => _Chip(
       icon: s.icon,
       label: label,
       value: value,
@@ -90,10 +89,10 @@ class HomeSummaryCard extends StatelessWidget {
           ? null
           : () => onCount!(AppointmentFilter(status: s)),
     );
-    final counts = admin
+    final chips = summary.isAdmin
         ? [
             upcoming,
-            _Count(
+            _Chip(
               icon: Icons.people_alt_rounded,
               label: 'Customers',
               value: summary.customers,
@@ -129,143 +128,22 @@ class HomeSummaryCard extends StatelessWidget {
             ),
           ];
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(AppRadius.xl),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(AppRadius.xl),
-          border: Border.all(color: t.accent.withValues(alpha: 0.35)),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: t.isDark
-                ? const [Color(0xFF2E2014), Color(0xFF1A120C)]
-                : const [Color(0xFFFFF4DC), Color(0xFFF1DFB8)],
-          ),
-        ),
-        child: Stack(
-          children: [
-            if (t.isDark)
-              const Positioned.fill(
-                child: IgnorePointer(child: GoldDust(count: 16, opacity: 0.5)),
-              ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpace.xl,
-                AppSpace.lg + 4,
-                AppSpace.xl,
-                AppSpace.lg,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'TOTAL REVENUE',
-                    style: AppType.overline.copyWith(color: t.accentText),
-                  ),
-                  const SizedBox(height: 2),
-                  CountUpText(
-                    value: summary.revenue.cents.toDouble(),
-                    builder: (v) => Money(v.round()).format(),
-                    duration: const Duration(milliseconds: 1100),
-                    style:
-                        AppText.display(
-                          38,
-                          color: t.text,
-                          height: 1.05,
-                          weight: FontWeight.w700,
-                        ).copyWith(
-                          fontFeatures: const [FontFeature.liningFigures()],
-                        ),
-                  ),
-                  Text(
-                    admin
-                        ? 'All appointments, without tax and tips'
-                        : 'Your tips plus your commission',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppType.caption.copyWith(color: t.textSecondary),
-                  ),
-                  if (!admin) ...[
-                    const SizedBox(height: AppSpace.sm),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _Cell(
-                            'Commission',
-                            summary.commission.format(hideZeroCents: true),
-                          ),
-                        ),
-                        Container(
-                          width: 1,
-                          height: 28,
-                          margin: const EdgeInsets.symmetric(horizontal: 12),
-                          color: t.accent.withValues(alpha: 0.25),
-                        ),
-                        Expanded(
-                          child: _Cell(
-                            'Tips Received',
-                            summary.tips.format(hideZeroCents: true),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                  const SizedBox(height: AppSpace.lg),
-                  Divider(height: 1, color: t.accent.withValues(alpha: 0.25)),
-                  const SizedBox(height: AppSpace.md),
-                  // Up to three counts share the row; more (staff) slide sideways.
-                  if (counts.length <= 3)
-                    Row(children: [for (final c in counts) Expanded(child: c)])
-                  else
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          for (var i = 0; i < counts.length; i++) ...[
-                            if (i > 0) const SizedBox(width: AppSpace.xl),
-                            counts[i],
-                          ],
-                        ],
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ],
-        ),
+    return SizedBox(
+      height: 48,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: AppSpace.page),
+        itemCount: chips.length,
+        separatorBuilder: (_, _) => const SizedBox(width: AppSpace.sm),
+        itemBuilder: (_, i) => StaggerIn(index: i, child: chips[i]),
       ),
     );
   }
 }
 
-class _Cell extends StatelessWidget {
-  const _Cell(this.label, this.value);
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    final t = context.tokens;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          value,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: AppType.heading.copyWith(color: t.text),
-        ),
-        Text(label, style: AppType.caption.copyWith(color: t.textSecondary)),
-      ],
-    );
-  }
-}
-
-/// A count over its name, with the status colour: "11 / Customers".
-class _Count extends StatelessWidget {
-  const _Count({
+/// "● 11  Customers": the status colour, the count, its name.
+class _Chip extends StatelessWidget {
+  const _Chip({
     required this.icon,
     required this.label,
     required this.value,
@@ -288,31 +166,41 @@ class _Count extends StatelessWidget {
       excludeSemantics: true,
       child: Pressable(
         onTap: onTap,
+        scale: 0.96,
         minSize: 0,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          decoration: BoxDecoration(
+            color: t.surface,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: t.border),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Row(
-                children: [
-                  Icon(icon, size: 16, color: color),
-                  const SizedBox(width: 6),
-                  CountUpText(
-                    value: value.toDouble(),
-                    builder: (v) => '${v.round()}',
-                    duration: const Duration(milliseconds: 800),
-                    style: AppType.title.copyWith(color: t.text, fontSize: 19),
-                  ),
-                ],
+              Container(
+                width: 26,
+                height: 26,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.16),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, size: 15, color: color),
               ),
+              const SizedBox(width: 8),
+              CountUpText(
+                value: value.toDouble(),
+                builder: (v) => '${v.round()}',
+                duration: const Duration(milliseconds: 700),
+                style: AppType.title.copyWith(color: t.text, fontSize: 17),
+              ),
+              const SizedBox(width: 6),
               Text(
                 label,
                 maxLines: 1,
-                overflow: TextOverflow.ellipsis,
                 style: AppType.caption.copyWith(
                   color: t.textSecondary,
-                  fontSize: 12,
+                  fontSize: 12.5,
                 ),
               ),
             ],

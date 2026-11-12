@@ -431,8 +431,11 @@ class _TopBar extends StatelessWidget {
         ),
         const SizedBox(width: 11),
         GestureDetector(
-          // Review tools (design gallery, connection test): not in production.
-          onLongPress: Env.isProd ? null : () => context.push('/dev/gallery'),
+          // Review tools (connection test and server switch, design gallery):
+          // not in production.
+          onLongPress: Env.isProd
+              ? null
+              : () => context.push('/dev/connection'),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,

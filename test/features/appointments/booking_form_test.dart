@@ -64,6 +64,18 @@ Future<FakeAppointmentsRepo> _open(
 }
 
 /// Opens the picker, taps a service, closes it.
+/// The save button now says "Review ...": it opens the check sheet, and Done in
+/// the sheet is what saves.
+Future<void> _reviewAndSave(
+  WidgetTester tester, {
+  String button = 'Review appointment',
+}) async {
+  await tester.tap(find.widgetWithText(AppButton, button));
+  await _settle(tester);
+  await tester.tap(find.widgetWithText(AppButton, 'Done'));
+  await _settle(tester);
+}
+
 Future<void> _pick(WidgetTester tester, String service, {int times = 1}) async {
   await tester.tap(find.text('Select Service').last);
   await _settle(tester);
@@ -96,7 +108,7 @@ void main() {
       expect(find.text('Select Time'), findsOneWidget);
       expect(find.text('Choose time'), findsOneWidget);
       expect(find.widgetWithText(AppButton, 'Select Service'), findsOneWidget);
-      expect(find.text('Save Appointment'), findsOneWidget);
+      expect(find.text('Review appointment'), findsOneWidget);
     });
 
     testWidgets(
@@ -143,8 +155,7 @@ void main() {
           .setCustomTime(10, 40);
       await _settle(tester);
       expect(find.text('Time: 10:40 AM'), findsOneWidget);
-      await tester.tap(find.widgetWithText(AppButton, 'Save Appointment'));
-      await _settle(tester);
+      await _reviewAndSave(tester);
       expect(repo.created.single.toJson()['time'], '10:40');
     });
 
@@ -179,8 +190,7 @@ void main() {
       await _settle(tester);
       await tester.tap(find.text('01:30 PM'));
       await tester.pump();
-      await tester.tap(find.widgetWithText(AppButton, 'Save Appointment'));
-      await _settle(tester);
+      await _reviewAndSave(tester);
 
       expect(repo.created, hasLength(1));
       final b = repo.created.single;
@@ -197,9 +207,49 @@ void main() {
       expect(find.text('BACK'), findsOneWidget);
     });
 
+    testWidgets('Review shows what will be saved; Edit keeps the form, Done '
+        'saves', (tester) async {
+      final repo = await _open(tester, const BookingTarget());
+      await tester.enterText(
+        find.widgetWithText(AppTextField, 'Full Name'),
+        'Ravi Shah',
+      );
+      await tester.enterText(
+        find.widgetWithText(AppTextField, 'Phone'),
+        '7805559999',
+      );
+      await _pick(tester, "Men's cut", times: 2);
+      await tester.tap(find.text('Mutaz'));
+      await _settle(tester);
+      await tester.tap(find.text('01:30 PM'));
+      await tester.pump();
+
+      await tester.tap(find.widgetWithText(AppButton, 'Review appointment'));
+      await _settle(tester);
+      expect(find.text('Check the booking'), findsOneWidget);
+      expect(find.text('Ravi Shah'), findsWidgets);
+      expect(find.text('7805559999'), findsWidgets);
+      expect(find.text("Men's cut x 2"), findsOneWidget);
+      expect(find.text('Mutaz'), findsWidgets);
+      expect(find.text('01:30 PM'), findsWidgets);
+      // Nothing is saved yet.
+      expect(repo.created, isEmpty);
+
+      // Edit: back to the form, everything still filled in.
+      await tester.tap(find.widgetWithText(AppButton, 'Edit'));
+      await _settle(tester);
+      expect(find.text('Check the booking'), findsNothing);
+      expect(repo.created, isEmpty);
+      expect(find.text('Ravi Shah'), findsOneWidget);
+
+      // Review again, then Done.
+      await _reviewAndSave(tester);
+      expect(repo.created, hasLength(1));
+    });
+
     testWidgets('missing pieces are named, nothing is sent', (tester) async {
       final repo = await _open(tester, const BookingTarget());
-      await tester.tap(find.widgetWithText(AppButton, 'Save Appointment'));
+      await tester.tap(find.widgetWithText(AppButton, 'Review appointment'));
       await _settle(tester);
       expect(find.text('Full Name is required.'), findsOneWidget);
       await tester.pump(const Duration(seconds: 6));
@@ -211,7 +261,7 @@ void main() {
         'Ravi',
       );
       await tester.enterText(find.widgetWithText(AppTextField, 'Phone'), '780');
-      await tester.tap(find.widgetWithText(AppButton, 'Save Appointment'));
+      await tester.tap(find.widgetWithText(AppButton, 'Review appointment'));
       await _settle(tester);
       expect(find.text('Please select at least one service.'), findsOneWidget);
       expect(repo.created, isEmpty);
@@ -250,8 +300,7 @@ void main() {
       // The booking's own 10:00 AM is offered even though the finder calls it taken.
       expect(find.text('10:00 AM'), findsOneWidget);
 
-      await tester.tap(find.widgetWithText(AppButton, 'Update'));
-      await _settle(tester);
+      await _reviewAndSave(tester, button: 'Review changes');
       expect(repo.updated, hasLength(1));
       final (id, b) = repo.updated.single;
       expect(id, 4);

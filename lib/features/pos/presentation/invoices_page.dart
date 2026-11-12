@@ -7,6 +7,7 @@ import 'package:barbershop_app/features/pos/domain/invoice.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:barbershop_app/features/auth/domain/perm.dart';
 
 /// The web's Invoices page ("View, edit, and send customer invoices"): the
 /// newest first, search, Add Invoice. Staff only see what the server allows.
@@ -69,7 +70,7 @@ class _InvoicesPageState extends ConsumerState<InvoicesPage> {
                       style: AppType.heading.copyWith(color: t.text),
                     ),
                   ),
-                  if (user.can('Pos_invoice-Add'))
+                  if (user.can(Perm.posInvoiceAdd))
                     HeaderIconButton(
                       icon: Icons.add_rounded,
                       label: 'Add Invoice',

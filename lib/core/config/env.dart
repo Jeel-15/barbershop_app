@@ -4,13 +4,18 @@
 ///   flutter run --dart-define=API_BASE_URL=http://192.168.1.20/rosen_barber/public/api/v1
 ///
 /// On an Android emulator the PC is `10.0.2.2`; on a real phone use the PC's
-/// Wi-Fi address, or `adb reverse tcp:80 tcp:80` and keep `localhost`.
+/// Wi-Fi address, or `adb reverse tcp:8081 tcp:80` and keep `localhost:8081`
+/// (Android does not let adb listen on port 80, "Permission denied").
+///
+/// With no `API_BASE_URL` given (a plain Run from the IDE) the app talks to that
+/// local test server, so it just works with the USB cable and `adb reverse`.
+/// Live and production builds always pass their own address.
 enum Flavor { dev, staging, prod }
 
 class Env {
   static const apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://localhost/rosen_barber/public/api/v1',
+    defaultValue: 'http://localhost:8081/rosen_barber/public/api/v1',
   );
 
   static const _flavorName = String.fromEnvironment(

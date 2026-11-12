@@ -9,6 +9,7 @@ import 'package:barbershop_app/features/content/data/content_repository.dart';
 import 'package:barbershop_app/features/content/domain/content_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:barbershop_app/features/auth/domain/perm.dart';
 
 /// The web's Gallery ("Manage website gallery images"): the pictures in a
 /// grid, Add Image (Upload Gallery Image) and Delete.
@@ -52,7 +53,7 @@ class _GalleryPageState extends ConsumerState<GalleryPage> {
 
   Future<void> _open(GalleryPicture p) async {
     final user = ref.read(currentUserProvider);
-    final canDelete = user.can('Gallery-Delete');
+    final canDelete = user.can(Perm.galleryDelete);
     final remove = await showAppSheet<bool>(
       context,
       builder: (ctx) => Column(
@@ -198,7 +199,7 @@ class _GalleryPageState extends ConsumerState<GalleryPage> {
       title: 'Gallery',
       subtitle: 'Manage website gallery images',
       addLabel: 'Add Image',
-      onAdd: user.can('Gallery-Add') ? _add : null,
+      onAdd: user.can(Perm.galleryAdd) ? _add : null,
       body: AppRefresh(
         onRefresh: () => ref.read(galleryProvider.notifier).refresh(),
         child: body,

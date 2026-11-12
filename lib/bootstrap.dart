@@ -56,6 +56,17 @@ Future<void> bootstrap() async {
           (ref) =>
               () => ref.read(sessionControllerProvider.notifier).expire(),
         ),
+        // An admin changed this user's access on the web: follow, quietly.
+        permissionsVersionHandlerProvider.overrideWith(
+          (ref) =>
+              (version) => ref
+                  .read(sessionControllerProvider.notifier)
+                  .onServerPermissionsVersion(version),
+        ),
+        forbiddenHandlerProvider.overrideWith(
+          (ref) =>
+              () => ref.read(sessionControllerProvider.notifier).onForbidden(),
+        ),
       ],
       child: const BarbershopApp(),
     ),

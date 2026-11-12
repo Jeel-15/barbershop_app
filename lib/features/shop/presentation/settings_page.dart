@@ -126,7 +126,6 @@ class _FormFrame extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final t = context.tokens;
     return Column(
       children: [
         Expanded(
@@ -141,24 +140,7 @@ class _FormFrame extends StatelessWidget {
             children: children,
           ),
         ),
-        Container(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpace.page,
-            AppSpace.md,
-            AppSpace.page,
-            AppSpace.md,
-          ),
-          decoration: BoxDecoration(
-            color: t.surface,
-            border: Border(top: BorderSide(color: t.border)),
-          ),
-          child: AppButton(
-            label: label,
-            icon: Icons.check_rounded,
-            loading: busy,
-            onPressed: onSave,
-          ),
-        ),
+        FormActionBar(label: label, loading: busy, onPressed: onSave),
       ],
     );
   }
@@ -250,64 +232,56 @@ class _GeneralState extends ConsumerState<_General> {
 
   @override
   Widget build(BuildContext context) {
-    final t = context.tokens;
     return _FormFrame(
       label: 'Update',
       busy: _busy,
       onSave: _save,
       children: [
-        Text(
-          'General Business Settings',
-          style: AppType.subheading.copyWith(color: t.text),
-        ),
-        const SizedBox(height: AppSpace.lg),
-        AppTextField(
-          label: 'Service Reminder Day',
-          hint: 'Enter Day',
-          controller: _reminder,
-          errorText: _errors['reminder'],
-          keyboardType: TextInputType.number,
-        ),
-        const SizedBox(height: AppSpace.lg),
-        AppTextField(
-          label: 'Service Default Duration (Minutes)',
-          hint: 'Enter Duration',
-          controller: _duration,
-          errorText: _errors['duration'],
-          keyboardType: TextInputType.number,
-        ),
-        const SizedBox(height: AppSpace.lg),
-        AppTextField(
-          label: 'Service Fee',
-          hint: 'Enter Service Fee',
-          controller: _fee,
-          errorText: _errors['fee'],
-          helperText:
-              'Deducted per service before staff commission (not shown on invoice).',
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-        ),
-        const SizedBox(height: AppSpace.lg),
-        Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpace.md,
-            vertical: AppSpace.sm,
-          ),
-          decoration: BoxDecoration(
-            color: t.surface,
-            borderRadius: AppRadius.card,
-            border: Border.all(color: t.border),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  'Invoice Mail Send',
-                  style: AppType.bodyStrong.copyWith(color: t.text),
+        FormSection(
+          title: 'General Business Settings',
+          icon: Icons.tune_rounded,
+          children: [
+            FormRow(
+              children: [
+                AppTextField(
+                  label: 'Service Reminder Day',
+                  hint: 'Enter Day',
+                  suffixText: 'days',
+                  controller: _reminder,
+                  errorText: _errors['reminder'],
+                  keyboardType: TextInputType.number,
+                  textInputAction: TextInputAction.next,
                 ),
+                AppTextField(
+                  label: 'Service Default Duration (Minutes)',
+                  hint: 'Enter Duration',
+                  suffixText: 'min',
+                  controller: _duration,
+                  errorText: _errors['duration'],
+                  keyboardType: TextInputType.number,
+                  textInputAction: TextInputAction.next,
+                ),
+              ],
+            ),
+            AppTextField(
+              label: 'Service Fee',
+              hint: 'Enter Service Fee',
+              prefixText: '\$ ',
+              controller: _fee,
+              errorText: _errors['fee'],
+              helperText:
+                  'Deducted per service before staff commission (not shown on invoice).',
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
               ),
-              Switch(value: _mail, onChanged: (v) => setState(() => _mail = v)),
-            ],
-          ),
+            ),
+            SwitchTile(
+              label: 'Invoice Mail Send',
+              hint: 'Email the invoice to the customer after a sale.',
+              value: _mail,
+              onChanged: (v) => setState(() => _mail = v),
+            ),
+          ],
         ),
       ],
     );
@@ -400,62 +374,59 @@ class _ContactState extends ConsumerState<_Contact> {
     String? hint,
     TextInputType? type,
     int lines = 1,
-  }) => Padding(
-    padding: const EdgeInsets.only(bottom: AppSpace.lg),
-    child: AppTextField(
-      label: label,
-      hint: hint,
-      controller: _c[key],
-      errorText: _errors[key],
-      keyboardType: type,
-      maxLines: lines,
-    ),
+  }) => AppTextField(
+    label: label,
+    hint: hint,
+    controller: _c[key],
+    errorText: _errors[key],
+    keyboardType: type,
+    maxLines: lines,
+    clearable: lines == 1,
   );
 
   @override
   Widget build(BuildContext context) {
-    final t = context.tokens;
     return _FormFrame(
       label: 'Update Contact Details',
       busy: _busy,
       onSave: _save,
       children: [
-        Text(
-          'Contact Details',
-          style: AppType.subheading.copyWith(color: t.text),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          'These details appear in the website footer, contact page, header, and booking pages.',
-          style: AppType.caption.copyWith(color: t.textSecondary),
-        ),
-        const SizedBox(height: AppSpace.lg),
-        _field('footer_about', 'Footer About Text', lines: 3),
-        _field('contact_address', 'Address *', lines: 2),
-        _field('contact_phone', 'Phone *', type: TextInputType.phone),
-        _field('whatsapp', 'WhatsApp Number', type: TextInputType.phone),
-        _field(
-          'contact_email',
-          'Info Email *',
-          type: TextInputType.emailAddress,
-        ),
-        _field(
-          'support_email',
-          'Support Email',
-          type: TextInputType.emailAddress,
-        ),
-        _field('website_url', 'Website URL', type: TextInputType.url),
-        Text(
-          'Social Media Links',
-          style: AppType.subheading.copyWith(color: t.text),
+        FormSection(
+          title: 'Contact Details',
+          subtitle:
+              'These details appear in the website footer, contact page, header, and booking pages.',
+          icon: Icons.contact_phone_rounded,
+          children: [
+            _field('footer_about', 'Footer About Text', lines: 3),
+            _field('contact_address', 'Address *', lines: 2),
+            _field('contact_phone', 'Phone *', type: TextInputType.phone),
+            _field('whatsapp', 'WhatsApp Number', type: TextInputType.phone),
+            _field(
+              'contact_email',
+              'Info Email *',
+              type: TextInputType.emailAddress,
+            ),
+            _field(
+              'support_email',
+              'Support Email',
+              type: TextInputType.emailAddress,
+            ),
+            _field('website_url', 'Website URL', type: TextInputType.url),
+          ],
         ),
         const SizedBox(height: AppSpace.md),
-        _field('facebook_url', 'Facebook', type: TextInputType.url),
-        _field('instagram_url', 'Instagram', type: TextInputType.url),
-        _field('tiktok_url', 'TikTok', type: TextInputType.url),
-        _field('youtube_url', 'YouTube', type: TextInputType.url),
-        _field('twitter_url', 'Twitter / X', type: TextInputType.url),
-        _field('linkedin_url', 'LinkedIn', type: TextInputType.url),
+        FormSection(
+          title: 'Social Media Links',
+          icon: Icons.share_rounded,
+          children: [
+            _field('facebook_url', 'Facebook', type: TextInputType.url),
+            _field('instagram_url', 'Instagram', type: TextInputType.url),
+            _field('tiktok_url', 'TikTok', type: TextInputType.url),
+            _field('youtube_url', 'YouTube', type: TextInputType.url),
+            _field('twitter_url', 'Twitter / X', type: TextInputType.url),
+            _field('linkedin_url', 'LinkedIn', type: TextInputType.url),
+          ],
+        ),
       ],
     );
   }

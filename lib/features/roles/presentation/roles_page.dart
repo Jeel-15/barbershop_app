@@ -7,6 +7,7 @@ import 'package:barbershop_app/features/roles/domain/role_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:barbershop_app/features/auth/domain/perm.dart';
 
 /// The web's Roles page ("Manage user roles and permissions").
 class RolesPage extends ConsumerStatefulWidget {
@@ -121,12 +122,12 @@ class _RolesPageState extends ConsumerState<RolesPage> {
                   '${r.usersCount} ${r.usersCount == 1 ? 'user' : 'users'}',
                 ],
                 menu: [
-                  if (user.can('Role-Edit')) ('edit', 'Edit', false),
-                  if (user.can('Role-Delete') && !r.locked)
+                  if (user.can(Perm.roleEdit)) ('edit', 'Edit', false),
+                  if (user.can(Perm.roleDelete) && !r.locked)
                     ('delete', 'Delete', true),
                 ],
                 onMenu: (v) => v == 'edit' ? _form(r) : _delete(r),
-                onTap: user.can('Role-Edit') ? () => _form(r) : null,
+                onTap: user.can(Perm.roleEdit) ? () => _form(r) : null,
               ),
             ),
         ],
@@ -137,7 +138,7 @@ class _RolesPageState extends ConsumerState<RolesPage> {
       title: 'Roles',
       subtitle: 'Manage user roles and permissions',
       addLabel: 'Add New Role',
-      onAdd: user.can('Role-Add') ? () => _form() : null,
+      onAdd: user.can(Perm.roleAdd) ? () => _form() : null,
       searchHint: 'Search role',
       query: _q,
       onSearch: (q) => setState(() => _q = q),

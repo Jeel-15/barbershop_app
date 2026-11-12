@@ -156,7 +156,8 @@ class _InvoiceDetailPageState extends ConsumerState<InvoiceDetailPage> {
             if (inv != null)
               _Actions(
                 busy: _busy,
-                canEdit: user.can('Pos_invoice-Edit'),
+                canEdit: user.canEditInvoice,
+                canMail: user.canMailInvoice,
                 onMail: () => _mail(inv),
                 onPdf: () => _run(() => shareInvoicePdf(inv, shop)),
                 onPrint: () => _run(() => printInvoice(inv, shop)),
@@ -173,6 +174,7 @@ class _Actions extends StatelessWidget {
   const _Actions({
     required this.busy,
     required this.canEdit,
+    required this.canMail,
     required this.onMail,
     required this.onPdf,
     required this.onPrint,
@@ -181,6 +183,9 @@ class _Actions extends StatelessWidget {
 
   final bool busy;
   final bool canEdit;
+
+  /// Viewing an invoice is not enough to mail it (the server asks for Add or Edit).
+  final bool canMail;
   final VoidCallback onMail;
   final VoidCallback onPdf;
   final VoidCallback onPrint;
@@ -203,13 +208,15 @@ class _Actions extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          AppButton(
-            label: 'Send Invoice Mail',
-            icon: Icons.mail_outline_rounded,
-            loading: busy,
-            onPressed: busy ? null : onMail,
-          ),
-          const SizedBox(height: AppSpace.sm),
+          if (canMail) ...[
+            AppButton(
+              label: 'Send Invoice Mail',
+              icon: Icons.mail_outline_rounded,
+              loading: busy,
+              onPressed: busy ? null : onMail,
+            ),
+            const SizedBox(height: AppSpace.sm),
+          ],
           Row(
             children: [
               Expanded(

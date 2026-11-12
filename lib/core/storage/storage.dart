@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:barbershop_app/core/security/biometric_vault.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,6 +10,26 @@ abstract interface class TokenStore {
   Future<String?> read();
   Future<void> write(String token);
   Future<void> clear();
+}
+
+/// A [TokenStore] whose token can be locked behind the phone's fingerprint /
+/// screen lock (the "biometric vault"). While protected, the token is not on
+/// disk in the open: it is decrypted only after the person proves who they
+/// are, then kept in memory so the network layer never opens a prompt.
+abstract interface class ProtectableTokenStore implements TokenStore {
+  /// True when the token lives in the vault (feature on).
+  bool get isProtected;
+
+  /// Opens the phone's prompt and returns the token (also keeps it in memory).
+  /// Throws [VaultException]. Null: the vault is empty.
+  Future<String?> unlock();
+
+  /// Moves the signed-in token into the vault (opens the prompt once).
+  /// Throws [VaultException]; on failure the token stays where it was.
+  Future<void> protect();
+
+  /// Moves the token back to the normal secure storage (no prompt).
+  Future<void> unprotect();
 }
 
 class SecureTokenStore implements TokenStore {
@@ -29,17 +50,143 @@ class SecureTokenStore implements TokenStore {
   Future<void> clear() => _storage.delete(key: _key);
 }
 
-class MemoryTokenStore implements TokenStore {
+/// The real store: the normal secure storage while the feature is off, the
+/// biometric vault while it is on. [read] is answered from memory once the
+/// token is known, so only [unlock] and [protect] ever open a prompt.
+class ProtectedTokenStore implements ProtectableTokenStore {
+  ProtectedTokenStore({
+    required this._plain,
+    required this._vault,
+    required this._readProtected,
+    required this._writeProtected,
+  });
+
+  final TokenStore _plain;
+  final BiometricVault _vault;
+  final bool Function() _readProtected;
+  final Future<void> Function(bool) _writeProtected;
+
+  String? _cache;
+
+  @override
+  bool get isProtected => _readProtected();
+
+  @override
+  Future<String?> read() async {
+    final cached = _cache;
+    if (cached != null) return cached;
+    // Protected and not unlocked yet: no token, and certainly no prompt.
+    if (isProtected) return null;
+    return _cache = await _plain.read();
+  }
+
+  @override
+  Future<void> write(String token) async {
+    _cache = token;
+    // A new sign-in always starts unprotected (sign-out cleared the vault).
+    await _plain.write(token);
+  }
+
+  @override
+  Future<void> clear() async {
+    _cache = null;
+    await _plain.clear();
+    await _vault.delete();
+    await _writeProtected(false);
+  }
+
+  @override
+  Future<String?> unlock() async {
+    final token = await _vault.read();
+    _cache = token;
+    return token;
+  }
+
+  @override
+  Future<void> protect() async {
+    final token = _cache ?? await _plain.read();
+    if (token == null || token.isEmpty) {
+      throw StateError('Nothing to protect: not signed in.');
+    }
+    // Vault first (this opens the prompt and proves it works), flag next,
+    // the open copy last: a failure at any step leaves a usable session.
+    await _vault.save(token);
+    await _writeProtected(true);
+    await _plain.clear();
+    _cache = token;
+  }
+
+  @override
+  Future<void> unprotect() async {
+    final token = _cache;
+    if (token == null) {
+      throw StateError('Unlock first: the token is not in memory.');
+    }
+    await _plain.write(token);
+    await _writeProtected(false);
+    await _vault.delete();
+  }
+}
+
+/// In-memory store for tests (and previews). Behaves like [ProtectedTokenStore]
+/// with a scripted vault: set [unlockError] to make `unlock` / `protect` fail.
+class MemoryTokenStore implements ProtectableTokenStore {
   String? _token;
+  bool _protected = false;
+
+  /// False after [lockForColdStart] until `unlock` succeeds (like the real store: no
+  /// token, and no prompt, while locked).
+  bool _unlocked = true;
+
+  /// Thrown by `unlock` and `protect` when set (a cancelled prompt, an
+  /// invalidated key...).
+  VaultException? unlockError;
+
+  /// How many prompts were opened (tests).
+  int prompts = 0;
 
   @override
-  Future<String?> read() async => _token;
+  bool get isProtected => _protected;
 
   @override
-  Future<void> write(String token) async => _token = token;
+  Future<String?> read() async => _unlocked ? _token : null;
 
   @override
-  Future<void> clear() async => _token = null;
+  Future<void> write(String token) async {
+    _token = token;
+    _unlocked = true;
+  }
+
+  @override
+  Future<void> clear() async {
+    _token = null;
+    _protected = false;
+    _unlocked = true;
+  }
+
+  @override
+  Future<String?> unlock() async {
+    prompts++;
+    if (unlockError != null) throw unlockError!;
+    _unlocked = true;
+    return _token;
+  }
+
+  @override
+  Future<void> protect() async {
+    prompts++;
+    if (unlockError != null) throw unlockError!;
+    _protected = true;
+  }
+
+  @override
+  Future<void> unprotect() async => _protected = false;
+
+  /// Starts a "launch" in which the saved session is locked behind the vault.
+  void lockForColdStart() {
+    _protected = true;
+    _unlocked = false;
+  }
 }
 
 /// Small non-secret preferences (appearance, last e-mail used...).
@@ -60,6 +207,20 @@ class AppPrefs {
   String? get lastEmail => _prefs.getString('last_email');
   Future<void> setLastEmail(String email) =>
       _prefs.setString('last_email', email);
+
+  /// Test builds only: the API address chosen in the app (null = the build's own).
+  String? get serverUrl => _prefs.getString('server_url');
+  Future<void> setServerUrl(String? url) => url == null
+      ? _prefs.remove('server_url')
+      : _prefs.setString('server_url', url);
+
+  /// The last few addresses used, newest first, for one-tap switching.
+  List<String> get recentServers =>
+      _prefs.getStringList('server_recent') ?? const <String>[];
+  Future<void> rememberServer(String url) => _prefs.setStringList(
+    'server_recent',
+    [url, ...recentServers.where((u) => u != url)].take(4).toList(),
+  );
 
   bool get hapticsOn => _prefs.getBool('haptics') ?? true;
   Future<void> setHaptics(bool on) => _prefs.setBool('haptics', on);
@@ -85,6 +246,23 @@ class AppPrefs {
   Future<void> setLandscapeHourWidth(double? px) => px == null
       ? _prefs.remove('landscape_hour_width')
       : _prefs.setDouble('landscape_hour_width', px);
+
+  /// The session is locked behind the fingerprint / screen lock (the biometric vault).
+  /// Only a flag: the token itself is in the vault, and a wrong flag can never
+  /// open anything (the vault would simply be empty or unreadable).
+  bool get biometricEnabled => _prefs.getBool('biometric_enabled') ?? false;
+  Future<void> setBiometricEnabled(bool on) =>
+      _prefs.setBool('biometric_enabled', on);
+
+  /// Seconds away (or idle) before the app locks; 0 = every time it is left.
+  int get lockTimeoutSeconds => _prefs.getInt('lock_timeout_seconds') ?? 300;
+  Future<void> setLockTimeoutSeconds(int s) =>
+      _prefs.setInt('lock_timeout_seconds', s);
+
+  /// How many times the "turn on fingerprint unlock" offer was answered "Not now".
+  int get biometricOfferDeclines => _prefs.getInt('biometric_declines') ?? 0;
+  Future<void> setBiometricOfferDeclines(int n) =>
+      _prefs.setInt('biometric_declines', n);
 
   /// The one-time "pinch to zoom" tip has been shown (or used).
   bool get calendarZoomHintSeen =>

@@ -88,16 +88,20 @@ class AppButton extends StatelessWidget {
                   Icon(icon, size: 19, color: fg),
                   const SizedBox(width: 8),
                 ],
+                // A label that is a little too long shrinks to fit instead of being
+                // cut ("Yes, confi...").
                 Flexible(
-                  child: Text(
-                    label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppText.ui(
-                      compact ? 14 : 16,
-                      weight: FontWeight.w800,
-                      color: fg,
-                      letterSpacing: 0.2,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      label,
+                      maxLines: 1,
+                      style: AppText.ui(
+                        compact ? 14 : 16,
+                        weight: FontWeight.w800,
+                        color: fg,
+                        letterSpacing: 0.2,
+                      ),
                     ),
                   ),
                 ),

@@ -5,6 +5,7 @@ import 'package:barbershop_app/features/catalog/domain/catalog_models.dart';
 import 'package:barbershop_app/features/catalog/presentation/widgets/admin_widgets.dart';
 import 'package:barbershop_app/features/catalog/presentation/widgets/image_pick.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' show ScrollCacheExtent;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -39,6 +40,23 @@ class _ServiceFormPageState extends ConsumerState<ServiceFormPage> {
   bool _busy = false;
   final _errors = <String, String>{};
 
+  /// True once the person changed something: leaving then asks first.
+  bool _dirty = false;
+  bool _listening = false;
+
+  /// One key per field that can show an error, to scroll to the first one.
+  final _keys = {
+    for (final k in [
+      'image',
+      'category',
+      'name',
+      'price',
+      'duration',
+      'commission',
+    ])
+      k: GlobalKey(),
+  };
+
   bool get _editing => widget.editId != null || widget.service != null;
 
   @override
@@ -53,6 +71,10 @@ class _ServiceFormPageState extends ConsumerState<ServiceFormPage> {
       c.dispose();
     }
     super.dispose();
+  }
+
+  void _touch() {
+    if (!_dirty && mounted) setState(() => _dirty = true);
   }
 
   Future<void> _load() async {
@@ -77,6 +99,12 @@ class _ServiceFormPageState extends ConsumerState<ServiceFormPage> {
         _active = s.active;
         _tip = s.eligibleForTip;
       }
+      if (!_listening) {
+        _listening = true;
+        for (final c in [_name, _price, _duration, _commission, _description]) {
+          c.addListener(_touch);
+        }
+      }
       if (mounted) setState(() => _loading = false);
     } catch (e) {
       if (mounted) {
@@ -98,33 +126,48 @@ class _ServiceFormPageState extends ConsumerState<ServiceFormPage> {
       if (r.path != null) {
         _image = r.path;
         _errors.remove('image');
+        _dirty = true;
       }
       if (r.error != null) _errors['image'] = r.error!;
     });
   }
 
+  static String? _nameError(String v) =>
+      v.trim().isEmpty ? 'Please enter service name' : null;
+
+  static String? _priceError(String v) {
+    if (v.trim().isEmpty) return 'Please enter price';
+    final n = double.tryParse(v.trim());
+    return n == null || n < 0 ? 'Price must be a number, 0 or more' : null;
+  }
+
+  static String? _durationError(String v) {
+    if (v.trim().isEmpty) return 'Please enter duration';
+    final n = int.tryParse(v.trim());
+    return n == null || n < 1
+        ? 'Duration must be a whole number, 1 or more'
+        : null;
+  }
+
+  static String? _commissionError(String v) {
+    if (v.trim().isEmpty) return null;
+    final n = double.tryParse(v.trim());
+    return n == null || n < 0 || n > 100
+        ? 'Commission must be between 0 and 100'
+        : null;
+  }
+
   bool _validate() {
     final e = <String, String>{};
     if (_categoryId == null) e['category'] = 'Please select a category';
-    if (_name.text.trim().isEmpty) e['name'] = 'Please enter service name';
-    final price = double.tryParse(_price.text.trim());
-    if (_price.text.trim().isEmpty) {
-      e['price'] = 'Please enter price';
-    } else if (price == null || price < 0) {
-      e['price'] = 'Price must be a number, 0 or more';
-    }
-    final dur = int.tryParse(_duration.text.trim());
-    if (_duration.text.trim().isEmpty) {
-      e['duration'] = 'Please enter duration';
-    } else if (dur == null || dur < 1) {
-      e['duration'] = 'Duration must be a whole number, 1 or more';
-    }
-    if (_commission.text.trim().isNotEmpty) {
-      final c = double.tryParse(_commission.text.trim());
-      if (c == null || c < 0 || c > 100) {
-        e['commission'] = 'Commission must be between 0 and 100';
-      }
-    }
+    final name = _nameError(_name.text);
+    if (name != null) e['name'] = name;
+    final price = _priceError(_price.text);
+    if (price != null) e['price'] = price;
+    final dur = _durationError(_duration.text);
+    if (dur != null) e['duration'] = dur;
+    final com = _commissionError(_commission.text);
+    if (com != null) e['commission'] = com;
     if (!_editing && _image == null) {
       e['image'] = 'Please upload a service image';
     }
@@ -136,8 +179,24 @@ class _ServiceFormPageState extends ConsumerState<ServiceFormPage> {
     return e.isEmpty;
   }
 
+  /// Brings the first field with an error into view, top to bottom.
+  void _showFirstError() => scrollToFirstError([
+    for (final k in [
+      'image',
+      'category',
+      'name',
+      'price',
+      'duration',
+      'commission',
+    ])
+      if (_errors[k] != null) _keys[k],
+  ]);
+
   Future<void> _save() async {
-    if (!_validate()) return;
+    if (!_validate()) {
+      _showFirstError();
+      return;
+    }
     FocusScope.of(context).unfocus();
     setState(() => _busy = true);
     final input = ServiceInput(
@@ -176,6 +235,8 @@ class _ServiceFormPageState extends ConsumerState<ServiceFormPage> {
       });
       if (f.fieldErrors.isEmpty) {
         showToast(context, f.userMessage, kind: ToastKind.error);
+      } else {
+        _showFirstError();
       }
     } on Failure catch (f) {
       if (!mounted) return;
@@ -186,90 +247,53 @@ class _ServiceFormPageState extends ConsumerState<ServiceFormPage> {
 
   @override
   Widget build(BuildContext context) {
-    final t = context.tokens;
     final cats = ref.watch(categoriesProvider).value;
     final ready = !_loading && _loadError == null && cats != null;
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpace.page,
-                AppSpace.sm,
-                AppSpace.page,
-                AppSpace.sm,
-              ),
-              child: Row(
-                children: [
-                  RoundBackButton(
-                    onPressed: () => context.canPop()
-                        ? context.pop()
-                        : context.go('/app/services'),
-                  ),
-                  const SizedBox(width: AppSpace.md),
-                  Expanded(
-                    child: Text(
-                      _editing ? 'Update Service' : 'Add Service',
-                      style: AppType.heading.copyWith(color: t.text),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: _loadError != null
-                  ? ErrorState(
-                      message: _loadError is Failure
-                          ? (_loadError! as Failure).userMessage
-                          : 'Could not open the form.',
-                      onRetry: _load,
-                    )
-                  : !ready
-                  ? const Padding(
-                      padding: EdgeInsets.all(AppSpace.page),
-                      child: SkeletonLoader(
-                        child: Column(
-                          children: [
-                            SkeletonBox(height: 80, radius: 16),
-                            SizedBox(height: AppSpace.md),
-                            SkeletonBox(height: 80, radius: 16),
-                            SizedBox(height: AppSpace.md),
-                            SkeletonBox(height: 150, radius: 16),
-                          ],
-                        ),
-                      ),
-                    )
-                  : _body(context, cats),
-            ),
-            if (ready)
-              Container(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpace.page,
-                  AppSpace.md,
-                  AppSpace.page,
-                  AppSpace.md,
-                ),
-                decoration: BoxDecoration(
-                  color: t.surface,
-                  border: Border(top: BorderSide(color: t.border)),
-                ),
-                child: AppButton(
-                  label: _editing ? 'Update' : 'Save',
-                  loading: _busy,
-                  onPressed: _save,
+    return FormPageFrame(
+      title: _editing ? 'Update Service' : 'Add Service',
+      dirty: _dirty,
+      onClose: () =>
+          context.canPop() ? context.pop() : context.go('/app/services'),
+      bottom: ready
+          ? FormActionBar(
+              label: _editing ? 'Update' : 'Save',
+              loading: _busy,
+              onPressed: _save,
+            )
+          : null,
+      child: _loadError != null
+          ? ErrorState(
+              message: _loadError is Failure
+                  ? (_loadError! as Failure).userMessage
+                  : 'Could not open the form.',
+              onRetry: _load,
+            )
+          : !ready
+          ? const Padding(
+              padding: EdgeInsets.all(AppSpace.page),
+              child: SkeletonLoader(
+                child: Column(
+                  children: [
+                    SkeletonBox(height: 150, radius: 16),
+                    SizedBox(height: AppSpace.md),
+                    SkeletonBox(height: 220, radius: 16),
+                    SizedBox(height: AppSpace.md),
+                    SkeletonBox(height: 150, radius: 16),
+                  ],
                 ),
               ),
-          ],
-        ),
-      ),
+            )
+          : _body(context, cats),
     );
   }
 
   Widget _body(BuildContext context, List<AdminCategory> cats) {
     final t = context.tokens;
     const decimal = TextInputType.numberWithOptions(decimal: true);
+    const gap = SizedBox(height: AppSpace.md);
     return ListView(
+      // Every section is built, so a field with an error can be scrolled to.
+      scrollCacheExtent: const ScrollCacheExtent.pixels(4000),
       keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       padding: const EdgeInsets.fromLTRB(
         AppSpace.page,
@@ -278,79 +302,140 @@ class _ServiceFormPageState extends ConsumerState<ServiceFormPage> {
         AppSpace.xl,
       ),
       children: [
-        Text(
-          'Category *',
-          style: AppType.label.copyWith(color: t.textSecondary),
+        FormSection(
+          title: 'Photo',
+          icon: Icons.photo_camera_rounded,
+          children: [
+            ImagePickField(
+              key: _keys['image'],
+              compact: true,
+              label: _editing ? 'Service Image' : 'Service Image *',
+              pickedPath: _image,
+              savedUrl: _existing?.imageUrl,
+              error: _errors['image'],
+              onPick: _pick,
+            ),
+          ],
         ),
-        const SizedBox(height: 8),
-        CategoryChips(
-          names: {for (final c in cats) c.id: c.name},
-          selected: _categoryId,
-          error: _errors['category'],
-          onSelected: (id) => setState(() {
-            _categoryId = id;
-            _errors.remove('category');
-          }),
+        gap,
+        FormSection(
+          title: 'Basics',
+          icon: Icons.content_cut_rounded,
+          children: [
+            Column(
+              key: _keys['category'],
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const FieldLabel('Category *'),
+                const SizedBox(height: 8),
+                CategoryChips(
+                  names: {for (final c in cats) c.id: c.name},
+                  selected: _categoryId,
+                  error: _errors['category'],
+                  onSelected: (id) => setState(() {
+                    _categoryId = id;
+                    _errors.remove('category');
+                    _dirty = true;
+                  }),
+                ),
+              ],
+            ),
+            AppTextField(
+              key: _keys['name'],
+              label: 'Service Name *',
+              hint: 'Enter Service Name',
+              controller: _name,
+              errorText: _errors['name'],
+              validator: _nameError,
+              textCapitalization: TextCapitalization.words,
+              textInputAction: TextInputAction.next,
+              clearable: true,
+            ),
+          ],
         ),
-        const SizedBox(height: AppSpace.lg),
-        AppTextField(
-          label: 'Service Name *',
-          hint: 'Enter Service Name',
-          controller: _name,
-          errorText: _errors['name'],
-          textCapitalization: TextCapitalization.words,
-          textInputAction: TextInputAction.next,
+        gap,
+        FormSection(
+          title: 'Price and time',
+          icon: Icons.payments_rounded,
+          children: [
+            FormRow(
+              children: [
+                AppTextField(
+                  key: _keys['price'],
+                  label: 'Price (\$) *',
+                  hint: '0.00',
+                  prefixText: '\$ ',
+                  controller: _price,
+                  errorText: _errors['price'],
+                  validator: _priceError,
+                  keyboardType: decimal,
+                  textInputAction: TextInputAction.next,
+                ),
+                AppTextField(
+                  key: _keys['duration'],
+                  label: 'Duration (Minutes) *',
+                  hint: '30',
+                  suffixText: 'min',
+                  controller: _duration,
+                  errorText: _errors['duration'],
+                  validator: _durationError,
+                  keyboardType: TextInputType.number,
+                  textInputAction: TextInputAction.next,
+                ),
+              ],
+            ),
+            AppTextField(
+              key: _keys['commission'],
+              label: 'Commission (%)',
+              hint: 'Enter Commission',
+              suffixText: '%',
+              helperText: 'The share the barber earns on this service.',
+              controller: _commission,
+              errorText: _errors['commission'],
+              validator: _commissionError,
+              keyboardType: decimal,
+            ),
+          ],
         ),
-        const SizedBox(height: AppSpace.lg),
-        AppTextField(
-          label: 'Price (\$) *',
-          hint: 'Enter Price',
-          controller: _price,
-          errorText: _errors['price'],
-          keyboardType: decimal,
+        gap,
+        FormSection(
+          title: 'Options',
+          icon: Icons.tune_rounded,
+          children: [
+            SwitchTile(
+              label: 'Active',
+              hint: 'Shown when booking and in the POS.',
+              value: _active,
+              onChanged: (v) => setState(() {
+                _active = v;
+                _dirty = true;
+              }),
+            ),
+            Divider(height: 1, color: t.border),
+            SwitchTile(
+              label: 'Eligible for Tip',
+              hint: 'Customers can leave a tip on this service.',
+              value: _tip,
+              onChanged: (v) => setState(() {
+                _tip = v;
+                _dirty = true;
+              }),
+            ),
+          ],
         ),
-        const SizedBox(height: AppSpace.lg),
-        AppTextField(
-          label: 'Duration (Minutes) *',
-          hint: 'Enter Duration (Minutes)',
-          controller: _duration,
-          errorText: _errors['duration'],
-          keyboardType: TextInputType.number,
-        ),
-        const SizedBox(height: AppSpace.lg),
-        AppTextField(
-          label: 'Commission (%)',
-          hint: 'Enter Commission',
-          controller: _commission,
-          errorText: _errors['commission'],
-          keyboardType: decimal,
-        ),
-        const SizedBox(height: AppSpace.lg),
-        SwitchRow(
-          label: 'Active',
-          value: _active,
-          onChanged: (v) => setState(() => _active = v),
-        ),
-        const SizedBox(height: AppSpace.sm + 2),
-        SwitchRow(
-          label: 'Eligible for Tip',
-          value: _tip,
-          onChanged: (v) => setState(() => _tip = v),
-        ),
-        const SizedBox(height: AppSpace.lg),
-        ImagePickField(
-          label: _editing ? 'Service Image' : 'Service Image *',
-          pickedPath: _image,
-          savedUrl: _existing?.imageUrl,
-          error: _errors['image'],
-          onPick: _pick,
-        ),
-        const SizedBox(height: AppSpace.lg),
-        AppTextField(
-          label: 'Service Description',
-          hint: 'Describe the service',
-          controller: _description,
-          maxLines: 4,
+        gap,
+        FormSection(
+          title: 'Description',
+          icon: Icons.notes_rounded,
+          children: [
+            AppTextField(
+              label: 'Service Description',
+              hint: 'Describe the service',
+              controller: _description,
+              maxLines: 4,
+              textCapitalization: TextCapitalization.sentences,
+            ),
+          ],
         ),
       ],
     );

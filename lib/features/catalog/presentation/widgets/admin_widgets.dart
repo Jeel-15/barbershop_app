@@ -309,17 +309,20 @@ class AdminTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
+                // A long name keeps its words (up to two lines); the status pill drops
+                // below it instead of squeezing the name into "Aftersh...".
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 6,
+                  runSpacing: 2,
                   children: [
-                    Flexible(
-                      child: Text(
-                        title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppType.bodyStrong.copyWith(color: t.text),
-                      ),
+                    Text(
+                      title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppType.bodyStrong.copyWith(color: t.text),
                     ),
-                    if (badge != null) ...[const SizedBox(width: 6), badge!],
+                    ?badge,
                   ],
                 ),
                 for (final l in lines)
@@ -375,15 +378,30 @@ class _Thumb extends StatelessWidget {
     final t = context.tokens;
     final box = BorderRadius.circular(12);
     if ((url ?? '').isNotEmpty) {
-      return ClipRRect(
-        borderRadius: box,
-        child: Image.network(
-          url!,
-          width: 52,
-          height: 52,
-          fit: BoxFit.cover,
-          errorBuilder: (_, _, _) => _fallback(t, box),
-        ),
+      // The tile stays underneath while the picture loads (and for good if it
+      // fails), so a slow or missing photo never leaves a hole in the row.
+      return Stack(
+        children: [
+          _fallback(t, box),
+          ClipRRect(
+            borderRadius: box,
+            child: Image.network(
+              url!,
+              width: 52,
+              height: 52,
+              fit: BoxFit.cover,
+              cacheWidth: 156,
+              errorBuilder: (_, _, _) => const SizedBox(width: 52, height: 52),
+              frameBuilder: (context, image, frame, sync) => sync
+                  ? image
+                  : AnimatedOpacity(
+                      opacity: frame == null ? 0 : 1,
+                      duration: const Duration(milliseconds: 220),
+                      child: image,
+                    ),
+            ),
+          ),
+        ],
       );
     }
     return _fallback(t, box);
@@ -401,7 +419,9 @@ class _Thumb extends StatelessWidget {
 }
 
 /// The picture field of a form: shows the saved picture or the picked one,
-/// opens the gallery on tap and shows the error in words.
+/// opens the gallery on tap and shows the error in words. [compact] is a square
+/// tile with the words beside it (a form that has more to fill in); the default
+/// is the wide picture.
 class ImagePickField extends StatelessWidget {
   const ImagePickField({
     super.key,
@@ -410,6 +430,7 @@ class ImagePickField extends StatelessWidget {
     this.pickedPath,
     this.savedUrl,
     this.error,
+    this.compact = false,
   });
 
   final String label;
@@ -417,15 +438,137 @@ class ImagePickField extends StatelessWidget {
   final String? pickedPath;
   final String? savedUrl;
   final String? error;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
     final has = pickedPath != null || (savedUrl ?? '').isNotEmpty;
+    return compact ? _compact(t, has) : _wide(t, has);
+  }
+
+  Widget _picture(AppTokens t, {required Widget empty}) => pickedPath != null
+      ? Image.file(File(pickedPath!), fit: BoxFit.cover)
+      : (savedUrl ?? '').isNotEmpty
+      ? Image.network(
+          savedUrl!,
+          fit: BoxFit.cover,
+          errorBuilder: (_, _, _) => empty,
+        )
+      : empty;
+
+  Widget _compact(AppTokens t, bool has) {
+    final edge = error == null ? t.border : t.danger;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: AppType.label.copyWith(color: t.textSecondary)),
+        FieldLabel(label, color: error == null ? null : t.danger),
+        const SizedBox(height: 8),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Semantics(
+              button: true,
+              label: has ? 'Change photo' : 'Choose photo',
+              child: Pressable(
+                onTap: onPick,
+                minSize: 0,
+                child: SizedBox(
+                  width: 104,
+                  height: 104,
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: has
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(18),
+                                child: _picture(t, empty: const SizedBox()),
+                              )
+                            : CustomPaint(
+                                painter: _DashedBorder(color: edge, radius: 18),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: t.accent.withValues(alpha: 0.07),
+                                    borderRadius: BorderRadius.circular(18),
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.add_photo_alternate_rounded,
+                                        size: 30,
+                                        color: t.accentText,
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        'Choose photo',
+                                        style: AppType.caption.copyWith(
+                                          color: t.accentText,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                      ),
+                      if (has)
+                        Positioned(
+                          right: 6,
+                          bottom: 6,
+                          child: Container(
+                            width: 28,
+                            height: 28,
+                            decoration: BoxDecoration(
+                              color: t.surface,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: t.border),
+                            ),
+                            child: Icon(
+                              Icons.edit_rounded,
+                              size: 15,
+                              color: t.accentText,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: AppSpace.lg),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    error ??
+                        (has
+                            ? 'Tap the photo to change it.'
+                            : 'A clear photo.'),
+                    style: AppType.label.copyWith(
+                      color: error == null ? t.text : t.danger,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'JPG, PNG or GIF. Max 2MB.',
+                    style: AppType.caption.copyWith(color: t.textMuted),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _wide(AppTokens t, bool has) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        FieldLabel(label),
         const SizedBox(height: 8),
         Pressable(
           onTap: onPick,
@@ -439,15 +582,7 @@ class ImagePickField extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: error == null ? t.border : t.danger),
             ),
-            child: pickedPath != null
-                ? Image.file(File(pickedPath!), fit: BoxFit.cover)
-                : (savedUrl ?? '').isNotEmpty
-                ? Image.network(
-                    savedUrl!,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, _, _) => _empty(t),
-                  )
-                : _empty(t),
+            child: _picture(t, empty: _empty(t)),
           ),
         ),
         const SizedBox(height: 6),
@@ -472,6 +607,40 @@ class ImagePickField extends StatelessWidget {
       ),
     ],
   );
+}
+
+/// A dashed rounded outline: "put something here".
+class _DashedBorder extends CustomPainter {
+  _DashedBorder({required this.color, required this.radius});
+
+  final Color color;
+  final double radius;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.6;
+    final path = Path()
+      ..addRRect(
+        RRect.fromRectAndRadius(
+          Offset.zero & size,
+          Radius.circular(radius),
+        ).deflate(0.8),
+      );
+    for (final m in path.computeMetrics()) {
+      var d = 0.0;
+      while (d < m.length) {
+        canvas.drawPath(m.extractPath(d, d + 7), paint);
+        d += 12;
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_DashedBorder old) =>
+      old.color != color || old.radius != radius;
 }
 
 /// A labelled switch row (Active, Eligible for Tip, Default...).

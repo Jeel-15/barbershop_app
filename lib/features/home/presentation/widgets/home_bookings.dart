@@ -145,113 +145,16 @@ class NextUpCard extends StatelessWidget {
   }
 }
 
-/// One booking in two lines: time, status colour, customer and what is booked.
-/// The full tile (phone, every line) is the Bookings tab; Home only has to be
-/// read at a glance.
-class CompactAppointmentTile extends StatelessWidget {
-  const CompactAppointmentTile({
-    super.key,
-    required this.row,
-    required this.onTap,
-    this.showDate = false,
-  });
-
-  final AppointmentRow row;
-  final VoidCallback onTap;
-  final bool showDate;
-
-  @override
-  Widget build(BuildContext context) {
-    final t = context.tokens;
-    final color = t.statusColor(row.status);
-    final dimmed = !row.isOpen;
-    final parts = row.startLabel.replaceFirst(RegExp(r'^0'), '').split(' ');
-    final what = row.lines.isEmpty
-        ? row.servicesText
-        : '${row.lines.first}${row.lines.length > 1 ? '  +${row.lines.length - 1}' : ''}';
-    return Pressable(
-      onTap: onTap,
-      scale: 0.99,
-      minSize: 0,
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpace.md,
-          vertical: 13,
-        ),
-        decoration: BoxDecoration(
-          color: t.surface,
-          borderRadius: BorderRadius.circular(AppRadius.md),
-          border: Border.all(color: t.border),
-        ),
-        child: IntrinsicHeight(
-          child: Row(
-            children: [
-              SizedBox(
-                width: 58,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      parts.first,
-                      style: AppType.title.copyWith(
-                        color: dimmed ? t.textMuted : t.text,
-                        fontSize: 16,
-                      ),
-                    ),
-                    Text(
-                      showDate
-                          ? ShopTime.relativeDay(ShopTime.parseDate(row.date))
-                          : (parts.length > 1 ? parts.last : ''),
-                      maxLines: 1,
-                      style: AppType.caption.copyWith(
-                        color: showDate ? t.accentText : t.textMuted,
-                        fontSize: 10.5,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                width: 3,
-                margin: const EdgeInsets.symmetric(horizontal: AppSpace.sm),
-                decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      row.customerName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppType.bodyStrong.copyWith(
-                        color: dimmed ? t.textSecondary : t.text,
-                        fontSize: 14.5,
-                      ),
-                    ),
-                    if (what.isNotEmpty)
-                      Text(
-                        what,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppType.caption.copyWith(
-                          color: t.textMuted,
-                          fontSize: 11.5,
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: AppSpace.sm),
-              AppointmentStatusPill(row.status, compact: true),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+/// True when this booking is on now or starts within [within] (default 2 hours):
+/// the only time Home spends a whole card on "next up".
+bool startsSoon(
+  AppointmentRow a, {
+  Duration within = const Duration(hours: 2),
+}) {
+  final now = ShopTime.now();
+  final cur = now.hour * 60 + now.minute;
+  final s = ShopTime.minutes(a.start);
+  final e = ShopTime.minutes(a.end);
+  if (cur >= e) return false;
+  return s - cur <= within.inMinutes;
 }

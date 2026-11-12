@@ -39,14 +39,14 @@ green = the phone reaches the API, database and schema are fine; red tells you w
    New-NetFirewallRule -DisplayName "Laragon Apache 80" -Direction Inbound -Protocol TCP -LocalPort 80 -Action Allow -Profile Private
    ```
 3. Open `http://192.168.0.194/rosen_barber/public/api/v1/health` in the phone's browser: you should see `{"status":1,...}`.
-4. USB alternative (Android): `adb reverse tcp:80 tcp:80`, then build with `API_BASE_URL=http://localhost/rosen_barber/public/api/v1`.
+4. USB alternative (Android): `adb reverse tcp:8081 tcp:80` (Android refuses port 80: "Permission denied"), and the app uses `http://localhost:8081/rosen_barber/public/api/v1` (now also its default when no `API_BASE_URL` is given). In VS Code pick the launch entry "Barbershop (phone on USB, local server)".
 5. Away from home: a tunnel (ngrok is already on this PC): `ngrok http 80`, then use the https address it prints.
 
 ## Build flavors
 
 | `--dart-define` | Meaning |
 |---|---|
-| `API_BASE_URL=...` | where the API lives (defaults to `http://localhost/rosen_barber/public/api/v1`) |
+| `API_BASE_URL=...` | where the API lives (defaults to `http://localhost:8081/rosen_barber/public/api/v1`) |
 | `FLAVOR=dev` (default) / `staging` / `prod` | `prod` hides the review tools (gallery, connection test) and must also turn off cleartext http (Phase 12) |
 
 ## One command before every hand-over

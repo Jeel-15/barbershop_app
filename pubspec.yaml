@@ -51,6 +51,9 @@ dependencies:
   printing: ^5.15.1
   image_picker: ^1.2.4
   custom_refresh_indicator: ^4.0.2
+  local_auth: ^3.0.2
+  audioplayers: ^6.8.1
+  wakelock_plus: ^1.8.2
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -77,6 +80,8 @@ flutter:
   assets:
     - assets/images/
     - assets/video/
+    - assets/demo/
+    - assets/demo/audio/
 
   # Fonts are bundled: no runtime download, no layout shift, works offline.
   fonts:

@@ -7,8 +7,10 @@ import 'package:barbershop_app/features/content/application/content_controllers.
 import 'package:barbershop_app/features/content/data/content_repository.dart';
 import 'package:barbershop_app/features/content/domain/content_models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' show ScrollCacheExtent;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:barbershop_app/features/auth/domain/perm.dart';
 
 /// The web's Testimonials page ("Manage homepage "What Clients Say" reviews").
 class TestimonialsPage extends ConsumerWidget {
@@ -61,13 +63,13 @@ class TestimonialsPage extends ConsumerWidget {
     final t = context.tokens;
     final user = ref.watch(currentUserProvider);
     final query = ref.watch(testimonialQueryProvider);
-    final canEdit = user.can('Testimonial-Edit');
-    final canDelete = user.can('Testimonial-Delete');
+    final canEdit = user.can(Perm.testimonialEdit);
+    final canDelete = user.can(Perm.testimonialDelete);
     return AdminListShell(
       title: 'Testimonials',
       subtitle: 'Manage homepage “What Clients Say” reviews',
       addLabel: 'Add Testimonial',
-      onAdd: user.can('Testimonial-Add') ? () => _form(context, ref) : null,
+      onAdd: user.can(Perm.testimonialAdd) ? () => _form(context, ref) : null,
       searchHint: 'Search name, title or review',
       query: query,
       onSearch: (q) => ref.read(testimonialQueryProvider.notifier).set(q),
@@ -135,7 +137,25 @@ class _TestimonialFormPageState extends ConsumerState<TestimonialFormPage> {
   bool _busy = false;
   final _errors = <String, String>{};
 
+  /// True once the person changed something: leaving then asks first.
+  bool _dirty = false;
+  final _keys = {
+    for (final k in ['name', 'review', 'order']) k: GlobalKey(),
+  };
+
   bool get _editing => widget.testimonial != null;
+
+  void _touch() {
+    if (!_dirty && mounted) setState(() => _dirty = true);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    for (final c in [_name, _role, _review, _order]) {
+      c.addListener(_touch);
+    }
+  }
 
   @override
   void dispose() {
@@ -156,25 +176,37 @@ class _TestimonialFormPageState extends ConsumerState<TestimonialFormPage> {
       if (r.path != null) {
         _image = r.path;
         _errors.remove('image');
+        _dirty = true;
       }
       if (r.error != null) _errors['image'] = r.error!;
     });
   }
 
+  static String? _nameError(String v) =>
+      v.trim().isEmpty ? 'The client name field is required.' : null;
+
+  static String? _reviewError(String v) {
+    if (v.trim().isEmpty) return 'The review field is required.';
+    return v.trim().length > 2000
+        ? 'The review must not be greater than 2000 characters.'
+        : null;
+  }
+
+  static String? _orderError(String v) {
+    final o = v.trim();
+    return o.isNotEmpty && (int.tryParse(o) == null || int.parse(o) < 0)
+        ? 'The display order must be a whole number, 0 or more.'
+        : null;
+  }
+
   bool _validate() {
     final e = <String, String>{};
-    if (_name.text.trim().isEmpty) {
-      e['name'] = 'The client name field is required.';
-    }
-    if (_review.text.trim().isEmpty) {
-      e['review'] = 'The review field is required.';
-    } else if (_review.text.trim().length > 2000) {
-      e['review'] = 'The review must not be greater than 2000 characters.';
-    }
-    final o = _order.text.trim();
-    if (o.isNotEmpty && (int.tryParse(o) == null || int.parse(o) < 0)) {
-      e['order'] = 'The display order must be a whole number, 0 or more.';
-    }
+    final name = _nameError(_name.text);
+    if (name != null) e['name'] = name;
+    final review = _reviewError(_review.text);
+    if (review != null) e['review'] = review;
+    final order = _orderError(_order.text);
+    if (order != null) e['order'] = order;
     setState(() {
       _errors
         ..removeWhere((k, _) => k == 'name' || k == 'review' || k == 'order')
@@ -184,7 +216,13 @@ class _TestimonialFormPageState extends ConsumerState<TestimonialFormPage> {
   }
 
   Future<void> _save() async {
-    if (!_validate()) return;
+    if (!_validate()) {
+      scrollToFirstError([
+        for (final k in ['name', 'review', 'order'])
+          if (_errors[k] != null) _keys[k],
+      ]);
+      return;
+    }
     FocusScope.of(context).unfocus();
     setState(() => _busy = true);
     final input = TestimonialInput(
@@ -228,75 +266,78 @@ class _TestimonialFormPageState extends ConsumerState<TestimonialFormPage> {
 
   @override
   Widget build(BuildContext context) {
-    final t = context.tokens;
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpace.page,
-                AppSpace.sm,
-                AppSpace.page,
-                AppSpace.sm,
+    const gap = SizedBox(height: AppSpace.md);
+    return FormPageFrame(
+      title: _editing ? 'Update Testimonial' : 'Add Testimonial',
+      dirty: _dirty,
+      onClose: () =>
+          context.canPop() ? context.pop() : context.go('/app/testimonials'),
+      bottom: FormActionBar(label: 'Save', loading: _busy, onPressed: _save),
+      child: ListView(
+        // Every section is built, so a field with an error can be scrolled to.
+        scrollCacheExtent: const ScrollCacheExtent.pixels(4000),
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+        padding: const EdgeInsets.fromLTRB(
+          AppSpace.page,
+          AppSpace.sm,
+          AppSpace.page,
+          AppSpace.xl,
+        ),
+        children: [
+          FormSection(
+            title: 'Client',
+            icon: Icons.person_rounded,
+            children: [
+              ImagePickField(
+                compact: true,
+                label: 'Client Photo',
+                pickedPath: _image,
+                savedUrl: widget.testimonial?.imageUrl,
+                error: _errors['image'],
+                onPick: _pick,
               ),
-              child: Row(
-                children: [
-                  RoundBackButton(
-                    onPressed: () => context.canPop()
-                        ? context.pop()
-                        : context.go('/app/testimonials'),
-                  ),
-                  const SizedBox(width: AppSpace.md),
-                  Expanded(
-                    child: Text(
-                      _editing ? 'Update Testimonial' : 'Add Testimonial',
-                      style: AppType.heading.copyWith(color: t.text),
-                    ),
-                  ),
-                ],
+              AppTextField(
+                key: _keys['name'],
+                label: 'Client Name *',
+                hint: 'Enter client name',
+                controller: _name,
+                errorText: _errors['name'],
+                validator: _nameError,
+                textCapitalization: TextCapitalization.words,
+                textInputAction: TextInputAction.next,
+                clearable: true,
               ),
-            ),
-            Expanded(
-              child: ListView(
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.onDrag,
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpace.page,
-                  AppSpace.sm,
-                  AppSpace.page,
-                  AppSpace.xl,
-                ),
+              AppTextField(
+                label: 'Client Title',
+                hint: 'Regular Client',
+                controller: _role,
+                textCapitalization: TextCapitalization.words,
+                textInputAction: TextInputAction.next,
+                clearable: true,
+              ),
+            ],
+          ),
+          gap,
+          FormSection(
+            title: 'Review',
+            icon: Icons.format_quote_rounded,
+            children: [
+              AppTextField(
+                key: _keys['review'],
+                label: 'Review *',
+                hint: 'What the client said',
+                controller: _review,
+                errorText: _errors['review'],
+                validator: _reviewError,
+                maxLines: 5,
+                maxLength: 2000,
+                showCounter: true,
+                textCapitalization: TextCapitalization.sentences,
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  AppTextField(
-                    label: 'Client Name *',
-                    hint: 'Enter client name',
-                    controller: _name,
-                    errorText: _errors['name'],
-                    textCapitalization: TextCapitalization.words,
-                    textInputAction: TextInputAction.next,
-                  ),
-                  const SizedBox(height: AppSpace.lg),
-                  AppTextField(
-                    label: 'Client Title',
-                    hint: 'Regular Client',
-                    controller: _role,
-                    textInputAction: TextInputAction.next,
-                  ),
-                  const SizedBox(height: AppSpace.lg),
-                  AppTextField(
-                    label: 'Review *',
-                    hint: 'What the client said',
-                    controller: _review,
-                    errorText: _errors['review'],
-                    maxLines: 5,
-                    maxLength: 2000,
-                  ),
-                  const SizedBox(height: AppSpace.lg),
-                  Text(
-                    'Rating',
-                    style: AppType.label.copyWith(color: t.textSecondary),
-                  ),
+                  const FieldLabel('Rating'),
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
@@ -306,49 +347,44 @@ class _TestimonialFormPageState extends ConsumerState<TestimonialFormPage> {
                         AppChoiceChip(
                           label: r == 1 ? '1 Star' : '$r Stars',
                           selected: _rating == r,
-                          onTap: () => setState(() => _rating = r),
+                          onTap: () => setState(() {
+                            _rating = r;
+                            _dirty = true;
+                          }),
                         ),
                     ],
                   ),
-                  const SizedBox(height: AppSpace.lg),
-                  AppTextField(
-                    label: 'Display Order',
-                    controller: _order,
-                    errorText: _errors['order'],
-                    keyboardType: TextInputType.number,
-                  ),
-                  const SizedBox(height: AppSpace.lg),
-                  SwitchRow(
-                    label: 'Show on website',
-                    value: _active,
-                    onChanged: (v) => setState(() => _active = v),
-                  ),
-                  const SizedBox(height: AppSpace.lg),
-                  ImagePickField(
-                    label: 'Client Photo',
-                    pickedPath: _image,
-                    savedUrl: widget.testimonial?.imageUrl,
-                    error: _errors['image'],
-                    onPick: _pick,
-                  ),
                 ],
               ),
-            ),
-            Container(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpace.page,
-                AppSpace.md,
-                AppSpace.page,
-                AppSpace.md,
+            ],
+          ),
+          gap,
+          FormSection(
+            title: 'On the website',
+            icon: Icons.language_rounded,
+            children: [
+              SwitchTile(
+                label: 'Show on website',
+                hint: 'Off keeps it hidden from visitors.',
+                value: _active,
+                onChanged: (v) => setState(() {
+                  _active = v;
+                  _dirty = true;
+                }),
               ),
-              decoration: BoxDecoration(
-                color: t.surface,
-                border: Border(top: BorderSide(color: t.border)),
+              AppTextField(
+                key: _keys['order'],
+                label: 'Display Order',
+                hint: '0',
+                helperText: 'Smaller numbers come first.',
+                controller: _order,
+                errorText: _errors['order'],
+                validator: _orderError,
+                keyboardType: TextInputType.number,
               ),
-              child: AppButton(label: 'Save', loading: _busy, onPressed: _save),
-            ),
-          ],
-        ),
+            ],
+          ),
+        ],
       ),
     );
   }

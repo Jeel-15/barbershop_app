@@ -5,6 +5,7 @@ import 'package:barbershop_app/core/utils/app_version.dart';
 import 'package:barbershop_app/features/auth/application/session_controller.dart';
 import 'package:barbershop_app/features/auth/data/auth_repository.dart';
 import 'package:barbershop_app/features/auth/domain/bootstrap.dart';
+import 'package:barbershop_app/features/auth/domain/perm.dart';
 import 'package:barbershop_app/features/calendar/application/calendar_controller.dart';
 import 'package:barbershop_app/features/calendar/domain/calendar_models.dart';
 import 'package:barbershop_app/features/home/application/home_controller.dart';
@@ -21,7 +22,8 @@ Map<String, dynamic> bootstrapJson({
   String role = 'Admin',
   bool isStaff = false,
   Map<String, bool>? modules,
-  List<String> permissions = const ['appointments.view'],
+  // The admin of the real shop holds every permission (Super-admin).
+  List<String> permissions = Perm.all,
   String minVersion = '1.0.0',
   String latestVersion = '1.0.0',
 }) {
@@ -94,6 +96,8 @@ Bootstrap staffBootstrap() => Bootstrap.fromJson(
     name: 'API Staff',
     role: 'Staff',
     isStaff: true,
+    // What the shop's Staff role holds: bookings and its own numbers, no selling.
+    permissions: const [Perm.appointmentView, Perm.reportView],
     modules: {
       'invoice_write': false,
       'calendar': false,
@@ -196,6 +200,7 @@ class AuthHarness {
     String? savedToken,
     AppVersion version = const AppVersion(1, 0, 0),
     Map<String, Object> prefs = const {},
+    List<Override> extra = const [],
   }) async {
     SharedPreferences.setMockInitialValues(prefs);
     final sp = await SharedPreferences.getInstance();
@@ -208,6 +213,7 @@ class AuthHarness {
         tokenStoreProvider.overrideWithValue(tokens),
         authRepositoryProvider.overrideWithValue(fake),
         appVersionProvider.overrideWithValue(version),
+        ...extra,
       ],
     );
     return AuthHarness._(container, fake, tokens);

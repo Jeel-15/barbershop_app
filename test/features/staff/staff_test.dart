@@ -4,6 +4,7 @@ import 'package:barbershop_app/core/errors/failure.dart';
 import 'package:barbershop_app/core/utils/shop_time.dart';
 import 'package:barbershop_app/design_system/design_system.dart';
 import 'package:barbershop_app/features/auth/application/current_user.dart';
+import 'package:barbershop_app/features/auth/domain/bootstrap.dart';
 import 'package:barbershop_app/features/me/presentation/profile_page.dart';
 import 'package:barbershop_app/features/staff/data/staff_repository.dart';
 import 'package:barbershop_app/features/staff/domain/staff_models.dart';
@@ -32,12 +33,15 @@ Future<FakeStaffRepo> _open(
   WidgetTester tester, {
   String start = '/app/staff',
   List<String> perms = _all,
+  bool staffModule = true,
 }) async {
   tester.view.physicalSize = const Size(390 * 3, 2400 * 3);
   tester.view.devicePixelRatio = 3;
   addTearDown(tester.view.reset);
   final repo = FakeStaffRepo();
-  final boot = adminBootstrapWith(perms);
+  final boot = Bootstrap.fromJson(
+    bootstrapJson(permissions: perms, modules: {'staff': staffModule}),
+  );
   final router = GoRouter(
     routes: [
       GoRoute(path: '/', builder: (_, _) => const Text('BACK')),
@@ -342,6 +346,21 @@ void main() {
   });
 
   group('Staff Profile', () {
+    testWidgets(
+      'a member with no Staff permission has no Assign Services tab',
+      (tester) async {
+        // The server lists a member's services only to Staff-Add/Edit/Delete.
+        await _open(
+          tester,
+          start: '/app/staff/42',
+          perms: const [],
+          staffModule: false,
+        );
+        expect(find.text('Earnings'), findsOneWidget);
+        expect(find.text('Assign Services'), findsNothing);
+      },
+    );
+
     testWidgets('the web cards and the three tabs', (tester) async {
       await _open(tester, start: '/app/staff/42');
       expect(find.text('Staff Profile'), findsOneWidget);

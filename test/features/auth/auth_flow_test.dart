@@ -2,6 +2,7 @@ import 'package:barbershop_app/core/errors/failure.dart';
 import 'package:barbershop_app/core/router/app_router.dart';
 import 'package:barbershop_app/design_system/design_system.dart';
 import 'package:barbershop_app/features/auth/application/session_controller.dart';
+import 'package:barbershop_app/features/auth/domain/bootstrap.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -160,6 +161,36 @@ void main() {
       final h = await AuthHarness.create(repo: repo, savedToken: 'dead');
       await _launch(tester, h, go: '/sign-in');
       expect(find.textContaining('session has ended'), findsOneWidget);
+    });
+  });
+
+  group('an administrator changes the access while the app is open', () {
+    testWidgets('the screen they are on closes, the menu follows, a note says '
+        'why', (tester) async {
+      final sem = tester.ensureSemantics();
+      final h = await AuthHarness.create(savedToken: 'saved');
+      final (container, router) = await _launch(tester, h, go: '/app/calendar');
+      await _pumpFor(tester, const Duration(seconds: 1));
+      String where() => router.routerDelegate.currentConfiguration.uri.path;
+      expect(where(), '/app/calendar');
+      expect(find.bySemanticsLabel('Calendar'), findsWidgets);
+
+      // On the web the admin removes this user's calendar access.
+      h.repo.bootstrapResult = Bootstrap.fromJson(
+        bootstrapJson(modules: {'calendar': false}),
+      );
+      await container
+          .read(sessionControllerProvider.notifier)
+          .syncPermissions(minGap: Duration.zero);
+      await _pumpFor(tester, const Duration(seconds: 1));
+
+      expect(where(), '/app/home');
+      expect(find.bySemanticsLabel('Calendar'), findsNothing);
+      expect(
+        find.text('Your access was updated by an administrator.'),
+        findsOneWidget,
+      );
+      sem.dispose();
     });
   });
 

@@ -3,9 +3,11 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  audioplayers_windows
   connectivity_plus
   file_selector_windows
   flutter_secure_storage_windows
+  local_auth_windows
   printing
   url_launcher_windows
 )

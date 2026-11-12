@@ -6,6 +6,7 @@ import 'package:barbershop_app/design_system/design_system.dart';
 import 'package:barbershop_app/features/appointments/data/appointments_repository.dart';
 import 'package:barbershop_app/features/auth/application/current_user.dart';
 import 'package:barbershop_app/features/auth/domain/bootstrap.dart';
+import 'package:barbershop_app/features/auth/domain/perm.dart';
 import 'package:barbershop_app/features/calendar/application/calendar_controller.dart';
 import 'package:barbershop_app/features/home/application/home_controller.dart';
 import 'package:barbershop_app/features/pos/data/invoices_repository.dart';
@@ -29,6 +30,15 @@ import '../../helpers/invoice_fixtures.dart';
 import '../../helpers/load_fonts.dart';
 import '../../helpers/pos_fixtures.dart';
 
+/// The save button now says "Review ...": it opens the check sheet, and Done in
+/// the sheet is what saves.
+Future<void> _reviewAndSubmit(WidgetTester tester, String button) async {
+  await tester.tap(find.widgetWithText(AppButton, button));
+  await _settle(tester);
+  await tester.tap(find.widgetWithText(AppButton, 'Done'));
+  await _settle(tester);
+}
+
 Future<void> _settle(WidgetTester tester) async {
   for (var i = 0; i < 12; i++) {
     await tester.pump(const Duration(milliseconds: 100));
@@ -40,17 +50,21 @@ Future<({FakeInvoicesRepo inv, FakePosRepo pos})> _open(
   WidgetTester tester, {
   required String start,
   bool guest = false,
+  List<String> perms = const [
+    Perm.posInvoiceAdd,
+    Perm.posInvoiceEdit,
+    Perm.posInvoiceShowAll,
+  ],
+  Map<String, bool>? modules,
 }) async {
   tester.view.physicalSize = const Size(390 * 3, 2400 * 3);
   tester.view.devicePixelRatio = 3;
   addTearDown(tester.view.reset);
   final inv = FakeInvoicesRepo(guest: guest);
   final pos = FakePosRepo();
-  final boot = adminBootstrapWith(const [
-    'Pos_invoice-Add',
-    'Pos_invoice-Edit',
-    'Pos_invoice-Show_All',
-  ]);
+  final boot = Bootstrap.fromJson(
+    bootstrapJson(permissions: perms, modules: modules),
+  );
   final router = GoRouter(
     routes: [
       GoRoute(path: '/', builder: (_, _) => const Text('BACK')),
@@ -231,6 +245,47 @@ void main() {
     });
   });
 
+  group('Invoice actions follow the permissions', () {
+    testWidgets('view only: PDF and Print, no Mail, no Edit', (tester) async {
+      await _open(
+        tester,
+        start: '/app/invoice/5',
+        perms: const [Perm.posInvoiceShowAll],
+        modules: {'invoice_write': false},
+      );
+      expect(find.widgetWithText(AppButton, 'Download PDF'), findsOneWidget);
+      expect(find.widgetWithText(AppButton, 'Print'), findsOneWidget);
+      expect(find.widgetWithText(AppButton, 'Send Invoice Mail'), findsNothing);
+      expect(find.widgetWithText(AppButton, 'Edit'), findsNothing);
+    });
+
+    testWidgets('edit only: Mail and Edit', (tester) async {
+      await _open(
+        tester,
+        start: '/app/invoice/5',
+        perms: const [Perm.posInvoiceEdit],
+      );
+      expect(
+        find.widgetWithText(AppButton, 'Send Invoice Mail'),
+        findsOneWidget,
+      );
+      expect(find.widgetWithText(AppButton, 'Edit'), findsOneWidget);
+    });
+
+    testWidgets('add only: Mail, but no Edit', (tester) async {
+      await _open(
+        tester,
+        start: '/app/invoice/5',
+        perms: const [Perm.posInvoiceAdd],
+      );
+      expect(
+        find.widgetWithText(AppButton, 'Send Invoice Mail'),
+        findsOneWidget,
+      );
+      expect(find.widgetWithText(AppButton, 'Edit'), findsNothing);
+    });
+  });
+
   group('Edit Invoice', () {
     testWidgets('opens with the saved invoice and says Update', (tester) async {
       await _open(tester, start: '/app/invoice/edit/5');
@@ -239,13 +294,12 @@ void main() {
       expect(find.text("Men's cut"), findsWidgets);
       expect(find.text('Hair oil'), findsWidgets);
       expect(find.text('Sam Patel'), findsWidgets);
-      expect(find.widgetWithText(AppButton, 'Update'), findsOneWidget);
+      expect(find.widgetWithText(AppButton, 'Review changes'), findsOneWidget);
     });
 
     testWidgets('Update sends the edited cart to the invoice', (tester) async {
       final r = await _open(tester, start: '/app/invoice/edit/5');
-      await tester.tap(find.widgetWithText(AppButton, 'Update'));
-      await _settle(tester);
+      await _reviewAndSubmit(tester, 'Review changes');
       expect(r.pos.calls, contains('update:5'));
       final d = r.pos.drafts.single;
       expect(d.lines.length, 3);

@@ -49,6 +49,13 @@ class _Taps {
   final frees = <(CalendarLane, int)>[];
 }
 
+/// A sheet rises and falls; give it time.
+Future<void> _settle(WidgetTester tester) async {
+  for (var i = 0; i < 8; i++) {
+    await tester.pump(const Duration(milliseconds: 100));
+  }
+}
+
 Future<_Taps> _pump(WidgetTester tester, CalendarDay day) async {
   final taps = _Taps();
   await tester.pumpWidget(
@@ -95,20 +102,29 @@ void main() {
     expect(find.text('With Marcus Lee'), findsOneWidget);
     expect(find.text('Free at 10:15 AM'), findsOneWidget);
     expect(find.text('2 bookings'), findsOneWidget);
-    expect(find.text('In progress'), findsOneWidget);
   });
 
-  testWidgets('a booking card opens that booking', (tester) async {
+  testWidgets('a barber row opens the day, and a booking opens that booking', (
+    tester,
+  ) async {
     ShopTime.clock = () => DateTime.utc(2026, 10, 27, 16, 10);
     final taps = await _pump(
       tester,
       _day([_a(1, 'Marcus Lee', 9 * 60 + 30, 10 * 60 + 15, 3)]),
     );
-    await tester.tap(find.text('Marcus Lee').last);
+    // The booking is not on the page itself, only in the barber's day.
+    expect(find.text('Marcus Lee'), findsNothing);
+    await tester.tap(find.text('Mike'));
+    await _settle(tester);
+    expect(find.text('In progress'), findsOneWidget);
+    await tester.tap(find.text('Marcus Lee'));
+    await _settle(tester);
     expect(taps.bookings.single.title, 'Marcus Lee');
+    // The sheet closed before the booking opened.
+    expect(find.text('In progress'), findsNothing);
   });
 
-  testWidgets('a free card starts a booking at that time', (tester) async {
+  testWidgets('the plus on a free barber books them right now', (tester) async {
     ShopTime.clock = () => DateTime.utc(2026, 10, 27, 16, 10);
     final taps = await _pump(
       tester,
@@ -119,6 +135,59 @@ void main() {
     final (lane, minute) = taps.frees.single;
     expect(lane.name, isNotEmpty);
     expect(minute % 15, 0, reason: 'bookings start on the quarter hour');
+    expect(minute, 10 * 60 + 15);
+  });
+
+  testWidgets('a free time in the barber day starts a booking there', (
+    tester,
+  ) async {
+    ShopTime.clock = () => DateTime.utc(2026, 10, 27, 16, 10);
+    final taps = await _pump(tester, _day(const []));
+    await tester.tap(find.text('Mutaz'));
+    await _settle(tester);
+    expect(find.text('Free now'), findsWidgets);
+    // Both the row and the day list have a plus; the list is on top.
+    await tester.tap(find.byIcon(Icons.add_rounded).last);
+    await _settle(tester);
+    expect(taps.frees.single.$1.name, 'Mutaz');
+  });
+
+  testWidgets('each barber has a day bar with the first and last hour', (
+    tester,
+  ) async {
+    ShopTime.clock = () => DateTime.utc(2026, 10, 27, 16, 10);
+    await _pump(tester, _day(const []));
+    expect(find.text('9:00 AM'), findsWidgets);
+    expect(find.text('6:00 PM'), findsWidgets);
+    expect(find.byType(CustomPaint), findsWidgets);
+  });
+
+  testWidgets('more than four barbers: the rest are one tap away', (
+    tester,
+  ) async {
+    ShopTime.clock = () => DateTime.utc(2026, 10, 27, 16, 10);
+    final lanes = [
+      for (var i = 1; i <= 6; i++) CalendarLane(id: i, name: 'B$i'),
+    ];
+    final day = CalendarDay(
+      lanes: lanes,
+      events: const [],
+      availability: DayAvailability(
+        openMin: 9 * 60,
+        closeMin: 20 * 60,
+        shopDayOff: false,
+        staff: {
+          for (var i = 1; i <= 6; i++)
+            i: const StaffDay(isDayOff: false, hours: [(9 * 60, 18 * 60)]),
+        },
+      ),
+    );
+    await _pump(tester, day);
+    expect(find.text('B5'), findsNothing);
+    await tester.tap(find.text('Show 2 more barbers'));
+    await tester.pump();
+    expect(find.text('B5'), findsOneWidget);
+    expect(find.text('Show fewer barbers'), findsOneWidget);
   });
 
   testWidgets('before opening the NOW marker and shop hours explain it', (
@@ -128,7 +197,6 @@ void main() {
     await _pump(tester, _day(const []));
     expect(find.text('Opens at 9:00 AM'), findsOneWidget);
     expect(find.text('Not in yet'), findsWidgets);
-    expect(find.text('NOW'), findsWidgets); // the marker in each strip
   });
 
   testWidgets('barbers who do not work are grouped under their reason', (
